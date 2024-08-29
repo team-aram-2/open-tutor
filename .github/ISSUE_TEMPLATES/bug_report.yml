@@ -1,0 +1,29 @@
+name: "Bug Report"
+description: "Create a report to help us fix a broken feature"
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description"
+      description: "A clear and concise description of what the bug is."
+      placeholder: "The teleporter is no longer working"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: "Steps to Reproduce"
+      description: "How can we reproduce the undesired behavior? Add a list of chronological steps."
+      placeholder: |
+        1. Walk over to the science lab
+        2. Find the teleporter
+        3. Attempt to use the teleporter
+        4. Observe that the teleporter does not work
+  - type: textarea
+    id: expectation
+    attributes:
+      label: "Expected Behavior"
+      description: "What did you expect to happen instead?"
+      placeholder: "The teleporter should have teleported me to the moon base"

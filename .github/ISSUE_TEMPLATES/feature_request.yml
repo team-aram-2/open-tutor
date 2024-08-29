@@ -1,0 +1,21 @@
+name: "New Feature"
+description: "A new feature for the project"
+title: "[FEATURE]: "
+labels: ["feature"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem To Solve"
+      description: "A clear and concise description of what the problem is or what should happen differently."
+      placeholder: "It's very difficult to get from the south city to the north city"
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: "Proposed Solution"
+      description: "A clear and concise description of what you think should happen instead."
+      placeholder: "We should build a teleporter to move between the two cities quickly"
+    validations:
+      required: true
