@@ -14,7 +14,216 @@ info:
 servers: []
 
 paths:
+  # Read or change a meeting #
+  /meeting/{meetingId}:
+    get:
+      summary: Get a meeting by ID
+      operationId: getMeetingById
+      parameters:
+        - name: meetingId
+          in: path
+          required: true
+          description: The ID of the meeting to get.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Meeting found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meeting"
+        "404":
+          description: Meeting not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Meeting not found.
+    put:
+      summary: Update meeting information
+      operationId: updateMeetingById
+      parameters:
+        - name: meetingId
+          in: path
+          required: true
+          description: The ID of the meeting to update.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Meeting"
+      responses:
+        "200":
+          description: Meeting updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meeting"
+        "404":
+          description: Meeting not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Meeting not found.
+    delete:
+      summary: Delete a meeting by ID
+      operationId: deleteMeetingById
+      parameters:
+        - name: meetingId
+          in: path
+          required: true
+          description: The ID of the meeting to delete.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Meeting deleted.
+        "404":
+          description: Meeting not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Meeting not found.
+
+  # Read or change a user #
+  /user/{userId}:
+    get:
+      summary: Get a user by ID
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to get.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found.
+    put:
+      summary: Update user information
+      operationId: updateUserById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to update.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: User updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tutor"
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found.
+    delete:
+      summary: Delete user account, maybe via settings or moderation panel
+      operationId: deleteUserById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to delete.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: User deleted.
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User not found.
 
 components:
+  schemas:
+    Tutor:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        totalHours:
+          type: integer
+        signedUpAt:
+          type: string
+          format: date-time
+      required:
+        - id
+    Meeting:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tutorId:
+          type: string
+          format: uuid
+        studentId:
+          type: string
+          format: uuid
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
 
 security:
