@@ -280,24 +280,24 @@ paths:
                     type: string
                     example: Tutor not found
 
-  # Create as tutor #
-  /tutor:
+  # Post a rating #
+  /rating:
     post:
-      summary: Sign up as a tutor
-      operationId: signUpAsTutor
+      summary: Post a rating
+      operationId: postRating
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Tutor"
+              $ref: "#/components/schemas/Rating"
       responses:
         "201":
-          description: Tutor signed up
+          description: Rating posted
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Tutor"
+                $ref: "#/components/schemas/Rating"
 
 components:
   schemas:
