@@ -14,6 +14,25 @@ info:
 servers: []
 
 paths:
+  # Create new meeting #
+  /meeting:
+    post:
+      summary: Create a new meeting
+      operationId: createMeeting
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Meeting"
+      responses:
+        "201":
+          description: Meeting created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meeting"
+
   # Read or change a meeting #
   /meeting/{meetingId}:
     get:
@@ -23,19 +42,19 @@ paths:
         - name: meetingId
           in: path
           required: true
-          description: The ID of the meeting to get.
+          description: The ID of the meeting to get
           schema:
             type: string
             format: uuid
       responses:
         "200":
-          description: Meeting found.
+          description: Meeting found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Meeting"
         "404":
-          description: Meeting not found.
+          description: Meeting not found
           content:
             application/json:
               schema:
@@ -43,7 +62,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Meeting not found.
+                    example: Meeting not found
     put:
       summary: Update meeting information
       operationId: updateMeetingById
@@ -51,7 +70,7 @@ paths:
         - name: meetingId
           in: path
           required: true
-          description: The ID of the meeting to update.
+          description: The ID of the meeting to update
           schema:
             type: string
             format: uuid
@@ -63,13 +82,13 @@ paths:
               $ref: "#/components/schemas/Meeting"
       responses:
         "200":
-          description: Meeting updated.
+          description: Meeting updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Meeting"
         "404":
-          description: Meeting not found.
+          description: Meeting not found
           content:
             application/json:
               schema:
@@ -77,7 +96,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Meeting not found.
+                    example: Meeting not found
     delete:
       summary: Delete a meeting by ID
       operationId: deleteMeetingById
@@ -85,15 +104,15 @@ paths:
         - name: meetingId
           in: path
           required: true
-          description: The ID of the meeting to delete.
+          description: The ID of the meeting to delete
           schema:
             type: string
             format: uuid
       responses:
         "204":
-          description: Meeting deleted.
+          description: Meeting deleted
         "404":
-          description: Meeting not found.
+          description: Meeting not found
           content:
             application/json:
               schema:
@@ -101,7 +120,26 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Meeting not found.
+                    example: Meeting not found
+
+  # User sign up #
+  /user:
+    post:
+      summary: Create a new user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
 
   # Read or change a user #
   /user/{userId}:
@@ -112,19 +150,19 @@ paths:
         - name: userId
           in: path
           required: true
-          description: The ID of the user to get.
+          description: The ID of the user to get
           schema:
             type: string
             format: uuid
       responses:
         "200":
-          description: User found.
+          description: User found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
         "404":
-          description: User not found.
+          description: User not found
           content:
             application/json:
               schema:
@@ -132,7 +170,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: User not found.
+                    example: User not found
     put:
       summary: Update user information
       operationId: updateUserById
@@ -140,7 +178,7 @@ paths:
         - name: userId
           in: path
           required: true
-          description: The ID of the user to update.
+          description: The ID of the user to update
           schema:
             type: string
             format: uuid
@@ -152,13 +190,13 @@ paths:
               $ref: "#/components/schemas/User"
       responses:
         "200":
-          description: User updated.
+          description: User updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tutor"
         "404":
-          description: User not found.
+          description: User not found
           content:
             application/json:
               schema:
@@ -166,7 +204,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: User not found.
+                    example: User not found
     delete:
       summary: Delete user account, maybe via settings or moderation panel
       operationId: deleteUserById
@@ -174,15 +212,15 @@ paths:
         - name: userId
           in: path
           required: true
-          description: The ID of the user to delete.
+          description: The ID of the user to delete
           schema:
             type: string
             format: uuid
       responses:
         "204":
-          description: User deleted.
+          description: User deleted
         "404":
-          description: User not found.
+          description: User not found
           content:
             application/json:
               schema:
@@ -190,7 +228,57 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: User not found.
+                    example: User not found
+
+  # Sign up as tutor #
+  /tutor:
+    post:
+      summary: Sign up as a tutor
+      operationId: signUpAsTutor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Tutor"
+      responses:
+        "201":
+          description: Tutor signed up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tutor"
+
+  # Read or change tutor information #
+  /tutor/{tutorId}:
+    get:
+      summary: Get a tutor by ID
+      operationId: getTutorById
+      parameters:
+        - name: tutorId
+          in: path
+          required: true
+          description: The ID of the tutor to get
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Tutor found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tutor"
+        "404":
+          description: Tutor not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Tutor not found
 
 components:
   schemas:
