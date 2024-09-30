@@ -3,14 +3,15 @@ info:
   title: OpenTutor API
   version: 1.0.0
   summary: The OpenTutor application API.
-  description: The OpenTutor API, for use with OpenTutor the frontend to
-  provide various OpenTutor features.
+  description: |
+    The OpenTutor API, for use with OpenTutor the frontend to
+    provide various OpenTutor features.
   contact:
     name: OpenTutor API Support
     email: nathanjodoin@my.unt.edu
 
 # We don't currently have any servers.
-servers:
+servers: []
 
 paths:
 
