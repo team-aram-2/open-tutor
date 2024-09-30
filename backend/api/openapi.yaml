@@ -280,6 +280,25 @@ paths:
                     type: string
                     example: Tutor not found
 
+  # Create as tutor #
+  /tutor:
+    post:
+      summary: Sign up as a tutor
+      operationId: signUpAsTutor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Tutor"
+      responses:
+        "201":
+          description: Tutor signed up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tutor"
+
 components:
   schemas:
     Tutor:
@@ -313,5 +332,38 @@ components:
         endAt:
           type: string
           format: date-time
+    Rating:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ratingType:
+          type: string
+          enum: [tutor, student]
+        userId:
+          type: string
+          format: uuid
+        reviewerUserId:
+          type: string
+          format: uuid
+        meetingId:
+          type: string
+          format: uuid
+        ratings:
+          type: object
+          properties: # Subject to change?
+            professionalism:
+              type: integer
+            knowledge:
+              type: integer
+            communication:
+              type: integer
+            punctuality:
+              type: integer
+            overall:
+              type: integer
+        comment:
+          type: string
 
 security:
