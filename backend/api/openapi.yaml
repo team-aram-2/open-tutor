@@ -58,11 +58,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Meeting not found
+                $ref: "#/components/schemas/ErrorModel"
     put:
       summary: Update meeting information
       operationId: updateMeetingById
@@ -92,11 +88,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Meeting not found
+                $ref: "#/components/schemas/ErrorModel"
     delete:
       summary: Delete a meeting by ID
       operationId: deleteMeetingById
@@ -106,7 +98,6 @@ paths:
           required: true
           description: The ID of the meeting to delete
           schema:
-            type: string
             format: uuid
       responses:
         "204":
@@ -116,11 +107,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Meeting not found
+                $ref: "#/components/schemas/ErrorModel"
 
   # User sign up #
   /user:
@@ -140,6 +127,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+        "400":
+          description: User post request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $:ref "#/components/schemas/ErrorModel"
 
   # Read or change a user #
   /user/{userId}:
@@ -161,16 +154,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+        "400":
+          description: User get request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
         "404":
           description: User not found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: User not found
+                $ref: "#/components/schemas/ErrorModel"
     put:
       summary: Update user information
       operationId: updateUserById
@@ -195,16 +190,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tutor"
-        "404":
-          description: User not found
+        "400":
+          description: Update User request malformed or denied.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: User not found
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: User to be updated not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
     delete:
       summary: Delete user account, maybe via settings or moderation panel
       operationId: deleteUserById
@@ -219,16 +216,18 @@ paths:
       responses:
         "204":
           description: User deleted
-        "404":
-          description: User not found
+        "400":
+          description: Delete user request malformed or denied
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: User not found
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: User to be deleted not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
 
   # Sign up as tutor #
   /tutor:
@@ -248,6 +247,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tutor"
+        "400":
+          description: Create tutor request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
 
   # Read or change tutor information #
   /tutor/{tutorId}:
@@ -269,16 +274,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tutor"
+        "400":
+          description: Get tutor request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
         "404":
           description: Tutor not found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Tutor not found
+                $ref: "#/components/schemas/ErrorModel"
 
   # Post a rating #
   /rating:
@@ -298,22 +305,108 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Rating"
-
+        "400":
+          description: Post rating request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
 components:
   schemas:
-    Tutor:
+    ErrorModel:
       type: object
+      required:
+      - message
+      - code
+      example:
+        message: Resource not found.
+        code: 400
       properties:
-        id:
+        message:
+          type: string
+        code:
+          type: integer
+          minimum: 100
+          maximum: 600
+    User:
+      type: object
+      example:
+        userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
+        email: email@example.com
+        firstName: Jacob
+        lastName: Hochstetler
+      description: Base User object containing shared details needed for all users.
+      required:
+      - userId
+      - email
+      - firstName
+      - lastName
+      properties:
+        userId:
           type: string
           format: uuid
-        totalHours:
-          type: integer
+        email:
+          type: string
+          format: email
         signedUpAt:
           type: string
           format: date-time
+        firstName:
+          type: string
+        lastName:
+          type: string
+        accountLocked:
+          type: boolean
+    Student:
+      description: Extends user to include student specific information.
+      type: object
       required:
-        - id
+        - userId
+        - calendar
+        - ratings
+      example:
+        userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
+      properties:
+        userId:
+          type: string
+          format: uuid
+        calendar:
+          $ref: "#/components/schemas/Calendar"
+        ratings: # a map of string to integer (for aggregate rating by category)
+          type: object
+          properties:
+            overall: # overall aggregate rating
+              type: integer
+            categories: # subcategory ratings
+              type: object
+              additionalProperties:
+                type: integer
+    Tutor:
+      description: Extends user to include student specific information.
+      type: object
+      required:
+        - userId
+        - calendar
+        - ratings
+      example:
+        userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
+      properties:
+        userId:
+          type: string
+          format: uuid
+        calendar:
+          $ref: "#/components/schemas/Calendar"
+        ratings: # a map of string to integer (for aggregate rating by category)
+          type: object
+          properties:
+            overall: # overall aggregate rating
+              type: integer
+            categories: # subcategory ratings
+              type: object
+              additionalProperties:
+                type: integer
+        totalHours: # not sure if this is total hours worked or???
+          type: integer
     Meeting:
       type: object
       properties:
@@ -332,6 +425,12 @@ components:
         endAt:
           type: string
           format: date-time
+    Calendar:
+      type: object
+      properties:
+        type: array
+        items:
+          $ref: "#/components/schemas/Meeting"
     Rating:
       type: object
       properties:
@@ -352,6 +451,8 @@ components:
           format: uuid
         ratings:
           type: object
+          required:
+          - overall
           properties: # Subject to change?
             professionalism:
               type: integer
