@@ -428,9 +428,10 @@ components:
     Calendar:
       type: object
       properties:
-        type: array
-        items:
-          $ref: "#/components/schemas/Meeting"
+        meetings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meeting"
     Rating:
       type: object
       properties:
