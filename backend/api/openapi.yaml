@@ -311,6 +311,169 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
+  
+  # Post a message #
+  /message:
+    post:
+      summary: Creates a new message
+      operationId: createMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Message"
+      responses:
+        "201":
+          description: Message created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  # Read or change a message #
+  /message/{messageId}:
+    get:
+      summary: Get a message by id
+      operationId: getMessageById
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          description: The ID of the message to get.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Message found.
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Message not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    put:
+      summary: Update a message
+      operationId: updateMessageById
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          description: The ID of the message to update
+          schema: 
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Message"
+      responses:
+        "200":
+          description: Message updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Message not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    delete:
+      summary: Delete a message by id
+      operationId: deleteMessageById
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          description: The ID of the message to delete
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Message deleted
+        "404":
+          description: Message not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # Post a message attachment #
+  /messageAttachment:
+    post:
+      summary: Create a new message attachment.
+      operationId: createMessageAttachment
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageAttachment"
+    responses:
+      "201":
+        description: Attachment created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageAttachment"
+
+
+  /messageAttachment/{messageAttachmentId}:
+    get:
+      summary: Get an attachment by ID
+      operationId: getMessageAttachmentById
+      parameters:
+        - name: messageAttachmentId
+          in: path
+          required: true
+          description: The ID of the attachment to get
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Attachment found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageAttachment"
+        "404":
+          description: Attachment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    delete:
+      summary: Delete an attachment by ID
+      operationId: deleteMessageAttachmentById
+      parameters:
+        - name: messageAttachmentId
+          in: path
+          required: true
+          description: The ID of the attachment to delete
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Attachment deleted
+        "404":
+          description: Attachment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
 components:
   schemas:
     ErrorModel:
@@ -467,5 +630,45 @@ components:
               type: integer
         comment:
           type: string
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the message.
+        originId:
+          type: string
+          format: uuid
+          description: Unique identifier for the originID for the message.
+        message:
+          type: string
+          description: Message content.
+        MessageAttachments:
+          type: array
+          description: Array of message attachments 
+          items:
+            $ref: "#/components/schemas/MessageAttachment"
+        required:
+          - id
+          - originId
+          - message
+    MessageAttachment:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: Name of the attachment. 
+        mimetype:
+          type: string
+          description: Mimetype of the attachment.
+        url:
+          type: string
+          format: uri 
+          description: Source of the attachment. 
+        required:
+          - filename
+          - mimetype 
+          - url
 
 security:
