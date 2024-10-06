@@ -10,7 +10,7 @@ info:
     email: nathanjodoin@my.unt.edu
 
 paths:
-  # Create new meeting #
+  # Create new meeting
   /meeting:
     post:
       summary: Create a new meeting
@@ -29,7 +29,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Meeting"
 
-  # Read or change a meeting #
+  # Read or change a meeting
   /meeting/{meetingId}:
     get:
       summary: Get a meeting by ID
@@ -105,7 +105,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
-  # User sign up #
+  # User sign up
   /user:
     post:
       summary: Create a new user
@@ -225,10 +225,68 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
-  # Sign up as tutor #
+  # Sign up as tutor
+  /student:
+    post:
+      summary: create student profile for a user
+      operationId: signUpAsStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Student"
+      responses:
+        "201":
+          description: Student profile created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          description: Create student request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # Read or change student information
+  /student/{tutorId}:
+    get:
+      summary: Get a student by ID
+      operationId: getStudentByID
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          description: The ID of the tutor to get
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Student found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          description: Get student request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # Sign up as tutor
   /tutor:
     post:
-      summary: Sign up as a tutor
+      summary: Create Tutor Profile for User
       operationId: signUpAsTutor
       requestBody:
         required: true
@@ -250,7 +308,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
-  # Read or change tutor information #
+  # Read or change tutor information
   /tutor/{tutorId}:
     get:
       summary: Get a tutor by ID
@@ -283,7 +341,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
-  # Post a rating #
+  # Post a rating
   /rating:
     post:
       summary: Post a rating
@@ -308,7 +366,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
-  # Post a message #
+  # Post a message
   /message:
     post:
       summary: Creates a new message
@@ -327,7 +385,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Message"
 
-  # Read or change a message #
+  # Read or change a message
   /message/{messageId}:
     get:
       summary: Get a message by id
@@ -404,7 +462,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
-  # Post a message attachment #
+  # Post a message attachment
   /messageAttachment:
     post:
       summary: Create a new message attachment.
