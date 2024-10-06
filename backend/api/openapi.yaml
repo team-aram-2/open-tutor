@@ -225,7 +225,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
-  # Sign up as tutor
+  # Sign up as student
   /student:
     post:
       summary: create student profile for a user
@@ -251,7 +251,7 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
 
   # Read or change student information
-  /student/{tutorId}:
+  /student/{studentID}:
     get:
       summary: Get a student by ID
       operationId: getStudentByID
