@@ -134,7 +134,7 @@ paths:
               schema:
                 $:ref "#/components/schemas/ErrorModel"
 
-  # Read or change a user #
+  # Read or change a user
   /user/{userId}:
     get:
       summary: Get a user by ID
@@ -311,7 +311,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
-  
+
   # Post a message #
   /message:
     post:
@@ -349,7 +349,7 @@ paths:
           description: Message found.
           content:
             application/json:
-              schema: 
+              schema:
                 $ref: "#/components/schemas/Message"
         "404":
           description: Message not found
@@ -365,7 +365,7 @@ paths:
           in: path
           required: true
           description: The ID of the message to update
-          schema: 
+          schema:
             type: string
             format: uuid
       requestBody:
@@ -413,7 +413,7 @@ paths:
     post:
       summary: Create a new message attachment.
       operationId: createMessageAttachment
-      requestBody: 
+      requestBody:
         required: true
         content:
           application/json:
@@ -475,7 +475,28 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
 
 components:
-  schemas:
+  securitySchemes:
+    GitHubOAuth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://github.com/login/oauth/authorize
+          tokenUrl: https://github.com/login/oauth/access_token
+          scopes:
+            read:user: "Grants read access to the user's profile data on GitHub"
+            repo: "Grants read and write access to public and private repositories"
+
+    GoogleOAuth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://accounts.google.com/o/oauth2/auth
+          tokenUrl: https://oauth2.googleapis.com/token
+          scopes:
+            openid: "Grants access to user's basic profile information"
+            email: "Grants access to the user's email address"
+            profile: "Grants access to the user's profile information"
+schemas:
     ErrorModel:
       type: object
       required:
@@ -646,7 +667,7 @@ components:
           description: Message content.
         MessageAttachments:
           type: array
-          description: Array of message attachments 
+          description: Array of message attachments
           items:
             $ref: "#/components/schemas/MessageAttachment"
         required:
@@ -658,17 +679,20 @@ components:
       properties:
         filename:
           type: string
-          description: Name of the attachment. 
+          description: Name of the attachment.
         mimetype:
           type: string
           description: Mimetype of the attachment.
         url:
           type: string
-          format: uri 
-          description: Source of the attachment. 
+          format: uri
+          description: Source of the attachment.
         required:
           - filename
-          - mimetype 
+          - mimetype
           - url
-
 security:
+  - GitHubOAuth:
+      - read:user
+  - GoogleOAuth:
+      - openid
