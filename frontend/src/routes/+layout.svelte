@@ -4,20 +4,21 @@
 
 <script>
     // Shared logic across pages goes here
+    import '../app.css';
+    import Sidebar from '$lib/components/sidebar.svelte';
     
 </script>
 
+
+
 <!-- SIDEBAR -->
 <div class="dashboard-layout">
-    <div class="sidebar">
-        <h2 class="sidebar-title">Student</h2>
-        <nav class="sidebar-items">
-            <p class="selected-sidebar-item">View Tutors</p>
-            <p>Appointments</p>
-            <p>Messages</p>
-            <p>Payments</p>
-        </nav>
-    </div>
+
+    <Sidebar>
+        <h1 class="text-4xl font-bold">Welcome to My App!</h1>
+        <p class="text-lg mt-4">This is a simple demo of a collapsible sidebar with SvelteKit and TailwindCSS.</p>
+    </Sidebar>
+    
 
     <main class="content">
         <header>
@@ -54,74 +55,6 @@
         background: #231d34;
 
         /* font:  */
-    }
-
-    .sidebar {
-        
-        top: 0;
-        bottom: 0;
-        left: 0;
-
-        padding-right: 20px;
-        
-
-        border-top-right-radius: 25px;
-        border-bottom-right-radius: 25px;
-
-        min-width: 375px;
-        width: auto;
-
-        display: flex;
-        flex-direction: column;
-
-        background-color: #453a69;
-    }
-    .sidebar-title {
-        display: flex;
-        flex-direction: column;
-        
-        position: relative;
-        top: 0;
-        left: 0;
-
-        padding-top: 0;
-        padding-left: 15px;
-        margin-top: 15px;
-
-        max-height: 50px;
-        margin-bottom: 0;
-
-        font-size: 70px;
-        font-weight: bold;
-        /* border: 2px solid blue */
-    }
-    .sidebar-items {
-        display: flex;
-        flex-direction: column;
-        
-        padding-left: 0px;
-        padding-top: 50px;
-        padding-bottom: 0px;
-
-        margin: 0;
-
-        position: relative;
-        top: 0;
-
-        font-size: 40px;
-        font-weight: bold;
-    }
-    .sidebar-items p {
-        margin: 0;
-        padding: 15px 20px;
-    }
-
-    .selected-sidebar-item {
-        background-color: #7261a8;
-        padding-left: 20px;
-
-        border-bottom-right-radius: 20px;
-        border-top-right-radius: 20px;
     }
 
     .content {
