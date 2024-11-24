@@ -6,6 +6,7 @@
     // Shared logic across pages goes here
     import '../app.css';
     import Sidebar from '$lib/components/sidebar.svelte';
+    import Tutor from '$lib/components/tutor-card.svelte';
     
 </script>
 
@@ -15,18 +16,16 @@
 <div class="dashboard-layout">
 
     <Sidebar>
-        <h1 class="text-4xl font-bold">Welcome to My App!</h1>
-        <p class="text-lg mt-4">This is a simple demo of a collapsible sidebar with SvelteKit and TailwindCSS.</p>
     </Sidebar>
     
 
     <main class="content">
-        <header>
-            <h1>DASHBOARD HEADER PLACEHOLDER</h1>
-        </header>
+
 
         <slot />
         <!-- Where page content will be rendered -->
+         <Tutor></Tutor>
+         <Tutor></Tutor>
     </main>
 </div>
 
