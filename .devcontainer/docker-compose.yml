@@ -1,0 +1,45 @@
+# .devcontainer/docker-compose.yml
+services:
+  open-tutor:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ..:/workspace:cached
+      - ~/.ssh:/home/vscode/.ssh:ro
+      - go-pkg:/home/vscode/go
+    command: sleep infinity
+    networks:
+      - dev_net
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - SERVICES=s3,sqs,dynamodb,lambda
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - LAMBDA_EXECUTOR=docker
+      - DEFAULT_REGION=us-hell-2
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    volumes:
+      - "./localstack_data:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - dev_net
+
+networks:
+  dev_net:
+    driver: bridge
+
+volumes:
+  # Used to cache Go packages and build cache to prevent:
+  # - Repeated downloads of Go dependencies
+  # - Rebuilding packages on every container restart
+  go-pkg:
