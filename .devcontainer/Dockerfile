@@ -32,7 +32,7 @@ RUN mkdir -p /home/vscode/go/{bin,pkg,src} \
 && chown -R vscode:vscode /home/vscode/go
 
 USER vscode
-ENV PATH="/usr/local/go/bin:${PATH}"
+ENV PATH="${PATH}:/usr/local/go/bin"
 ENV GOPATH="/home/vscode/go"
 ENV PATH="${PATH}:${GOPATH}/bin"
 WORKDIR /workspace
