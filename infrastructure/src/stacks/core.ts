@@ -16,7 +16,7 @@ export class CoreStack extends TerraformStack {
     //   organization: "opentutor",
     //   workspaces: new NamedCloudWorkspace(`open-tutor-core`),
     // });
-    
+
 
     new AwsProvider(this, "AWS", {
       region: "us-west-2",
