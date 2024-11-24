@@ -23,7 +23,7 @@ services:
       - DEBUG=1
       - DATA_DIR=/tmp/localstack/data
       - LAMBDA_EXECUTOR=docker
-      - DEFAULT_REGION=us-hell-2
+      - DEFAULT_REGION=us-west-2
       - DOCKER_HOST=unix:///var/run/docker.sock
     ports:
       - "4566:4566"
