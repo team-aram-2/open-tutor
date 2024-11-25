@@ -1,0 +1,797 @@
+openapi: 3.0.0
+info:
+  title: OpenTutor API
+  version: 1.0.0
+  description: |
+    The OpenTutor API, for use with OpenTutor the frontend to
+    provide various OpenTutor features.
+  contact:
+    name: OpenTutor API Support
+    email: nathanjodoin@my.unt.edu
+
+paths:
+  # Create new meeting
+  /meeting:
+    post:
+      summary: Create a new meeting
+      operationId: createMeeting
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Meeting"
+      responses:
+        "201":
+          description: Meeting created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meeting"
+
+  # Read or change a meeting
+  /meeting/{meetingId}:
+    get:
+      summary: Get a meeting by ID
+      operationId: getMeetingById
+      parameters:
+        - name: meetingId
+          in: path
+          required: true
+          description: The ID of the meeting to get
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Meeting found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meeting"
+        "404":
+          description: Meeting not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    put:
+      summary: Update meeting information
+      operationId: updateMeetingById
+      parameters:
+        - name: meetingId
+          in: path
+          required: true
+          description: The ID of the meeting to update
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Meeting"
+      responses:
+        "200":
+          description: Meeting updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meeting"
+        "404":
+          description: Meeting not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    delete:
+      summary: Delete a meeting by ID
+      operationId: deleteMeetingById
+      parameters:
+        - name: meetingId
+          in: path
+          required: true
+          description: The ID of the meeting to delete
+          schema:
+            format: uuid
+      responses:
+        "204":
+          description: Meeting deleted
+        "404":
+          description: Meeting not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # User sign up
+  /user:
+    post:
+      summary: Create a new user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: User post request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # Read or change a user
+  /user/{userId}:
+    get:
+      summary: Get a user by ID
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to get
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: User get request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    put:
+      summary: Update user information
+      operationId: updateUserById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to update
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tutor"
+        "400":
+          description: Update User request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: User to be updated not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    delete:
+      summary: Delete user account, maybe via settings or moderation panel
+      operationId: deleteUserById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to delete
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: User deleted
+        "400":
+          description: Delete user request malformed or denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: User to be deleted not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # Sign up as student
+  /student:
+    post:
+      summary: create student profile for a user
+      operationId: signUpAsStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Student"
+      responses:
+        "201":
+          description: Student profile created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          description: Create student request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # Read or change student information
+  /student/{studentID}:
+    get:
+      summary: Get a student by ID
+      operationId: getStudentByID
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          description: The ID of the tutor to get
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Student found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          description: Get student request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # Sign up as tutor
+  /tutor:
+    post:
+      summary: Create Tutor Profile for User
+      operationId: signUpAsTutor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Tutor"
+      responses:
+        "201":
+          description: Tutor signed up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tutor"
+        "400":
+          description: Create tutor request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # Read or change tutor information
+  /tutor/{tutorId}:
+    get:
+      summary: Get a tutor by ID
+      operationId: getTutorById
+      parameters:
+        - name: tutorId
+          in: path
+          required: true
+          description: The ID of the tutor to get
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Tutor found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tutor"
+        "400":
+          description: Get tutor request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: Tutor not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # Post a rating
+  /rating:
+    post:
+      summary: Post a rating
+      operationId: postRating
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Rating"
+      responses:
+        "201":
+          description: Rating posted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rating"
+        "400":
+          description: Post rating request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # Post a message
+  /message:
+    post:
+      summary: Creates a new message
+      operationId: createMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Message"
+      responses:
+        "201":
+          description: Message created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  # Read or change a message
+  /message/{messageId}:
+    get:
+      summary: Get a message by id
+      operationId: getMessageById
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          description: The ID of the message to get.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Message found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Message not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    put:
+      summary: Update a message
+      operationId: updateMessageById
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          description: The ID of the message to update
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Message"
+      responses:
+        "200":
+          description: Message updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "404":
+          description: Message not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    delete:
+      summary: Delete a message by id
+      operationId: deleteMessageById
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          description: The ID of the message to delete
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Message deleted
+        "404":
+          description: Message not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  # Post a message attachment
+  /messageAttachment:
+    post:
+      summary: Create a new message attachment.
+      operationId: createMessageAttachment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageAttachment"
+      responses:
+        "201":
+          description: Attachment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageAttachment"
+
+
+  /messageAttachment/{messageAttachmentId}:
+    get:
+      summary: Get an attachment by ID
+      operationId: getMessageAttachmentById
+      parameters:
+        - name: messageAttachmentId
+          in: path
+          required: true
+          description: The ID of the attachment to get
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Attachment found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageAttachment"
+        "404":
+          description: Attachment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    delete:
+      summary: Delete an attachment by ID
+      operationId: deleteMessageAttachmentById
+      parameters:
+        - name: messageAttachmentId
+          in: path
+          required: true
+          description: The ID of the attachment to delete
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Attachment deleted
+        "404":
+          description: Attachment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+components:
+  securitySchemes:
+    GitHubOAuth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://github.com/login/oauth/authorize
+          tokenUrl: https://github.com/login/oauth/access_token
+          scopes:
+            read:user: "Grants read access to the user's profile data on GitHub"
+            repo: "Grants read and write access to public and private repositories"
+
+    GoogleOAuth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://accounts.google.com/o/oauth2/auth
+          tokenUrl: https://oauth2.googleapis.com/token
+          scopes:
+            openid: "Grants access to user's basic profile information"
+            email: "Grants access to the user's email address"
+            profile: "Grants access to the user's profile information"
+  schemas:
+      ErrorModel:
+        type: object
+        required:
+        - message
+        - code
+        example:
+          message: Resource not found.
+          code: 400
+        properties:
+          message:
+            type: string
+          code:
+            type: integer
+            minimum: 100
+            maximum: 600
+      User:
+        type: object
+        example:
+          userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
+          email: email@example.com
+          firstName: Jacob
+          lastName: Hochstetler
+        description: Base User object containing shared details needed for all users.
+        required:
+        - userId
+        - email
+        - firstName
+        - lastName
+        properties:
+          userId:
+            type: string
+            format: uuid
+          email:
+            type: string
+            format: email
+          signedUpAt:
+            type: string
+            format: date-time
+          firstName:
+            type: string
+          lastName:
+            type: string
+          accountLocked:
+            type: boolean
+      Student:
+        description: Extends user to include student specific information.
+        type: object
+        required:
+          - userId
+          - calendar
+          - ratings
+        example:
+          userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
+        properties:
+          userId:
+            type: string
+            format: uuid
+          calendar:
+            $ref: "#/components/schemas/Calendar"
+          ratings: # a map of string to integer (for aggregate rating by category)
+            type: object
+            properties:
+              overall: # overall aggregate rating
+                type: integer
+              categories: # subcategory ratings
+                type: object
+                additionalProperties:
+                  type: integer
+      Tutor:
+        description: Extends user to include student specific information.
+        type: object
+        required:
+          - userId
+          - calendar
+          - ratings
+        example:
+          userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
+        properties:
+          userId:
+            type: string
+            format: uuid
+          calendar:
+            $ref: "#/components/schemas/Calendar"
+          ratings: # a map of string to integer (for aggregate rating by category)
+            type: object
+            properties:
+              overall: # overall aggregate rating
+                type: integer
+              categories: # subcategory ratings
+                type: object
+                additionalProperties:
+                  type: integer
+          totalHours: # not sure if this is total hours worked or???
+            type: integer
+          skills:
+            type: array
+              items:
+                type: string
+      Meeting:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          tutorId:
+            type: string
+            format: uuid
+          studentId:
+            type: string
+            format: uuid
+          startAt:
+            type: string
+            format: date-time
+          endAt:
+            type: string
+            format: date-time
+      Calendar:
+        type: object
+        properties:
+          meetings:
+            type: array
+            items:
+              $ref: "#/components/schemas/Meeting"
+      Rating:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          ratingType:
+            type: string
+            enum: [tutor, student]
+          userId:
+            type: string
+            format: uuid
+          reviewerUserId:
+            type: string
+            format: uuid
+          meetingId:
+            type: string
+            format: uuid
+          ratings:
+            type: object
+            required:
+            - overall
+            properties: # Subject to change?
+              professionalism:
+                type: integer
+              knowledge:
+                type: integer
+              communication:
+                type: integer
+              punctuality:
+                type: integer
+              overall:
+                type: integer
+          comment:
+            type: string
+      Message:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+            description: Unique identifier for the message.
+          originId:
+            type: string
+            format: uuid
+            description: Unique identifier for the originID for the message.
+          message:
+            type: string
+            description: Message content.
+          MessageAttachments:
+            type: array
+            description: Array of message attachments
+            items:
+              $ref: "#/components/schemas/MessageAttachment"
+        required:
+          - id
+          - originId
+          - message
+      MessageAttachment:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+            description: Unique identifier for the message.
+          filename:
+            type: string
+            description: Name of the attachment.
+          mimetype:
+            type: string
+            description: Mimetype of the attachment.
+          url:
+            type: string
+            format: uri
+            description: Source of the attachment.
+        required:
+          - filename
+          - mimetype
+          - url
+      Skill:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+            description: Unique identifier for the skill.
+          title:
+            type: string
+            description: title/name for the skill
+          description:
+            type: string
+            description: Description for the skill
+          quiz:
+            type: object
+            $ref: TODO
+          validated:
+            type: boolean
+            description: If the skill is validated
+          required:
+            - id
+            - title
+            - description
+            - validated
+      Question:
+        type: object
+        properties:
+          question:
+            type: string
+            description: The literal question being asked.
+          valid:
+            type: string
+            description: The valid answer to the question
+          invalid:
+            type: array
+            items:
+              type: string
+security:
+  - GitHubOAuth:
+      - read:user
+  - GoogleOAuth:
+      - openid
