@@ -4,4 +4,3 @@ cdktf.out
 .gen
 .env
 *.tfstate
-volume/cache
