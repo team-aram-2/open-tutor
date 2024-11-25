@@ -14,7 +14,9 @@
                 "davidanson.vscode-markdownlint",
                 "shardulm94.trailing-spaces",
                 "Gruntfuggly.todo-tree",
-                "github.vscode-pull-request-github"
+                "github.vscode-pull-request-github",
+                "svelte.svelte-vscode",
+                "shd101wyy.markdown-preview-enhanced"
             ],
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "bash",
