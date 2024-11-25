@@ -6,7 +6,6 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - ..:/workspace:cached
-      - ~/.ssh:/home/vscode/.ssh:ro
       - go-pkg:/home/vscode/go
     command: sleep infinity
     networks:
