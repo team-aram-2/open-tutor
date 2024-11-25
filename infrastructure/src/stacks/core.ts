@@ -1,24 +1,34 @@
+import { IamRolePolicyAttachment } from "@cdktf/provider-aws/lib/iam-role-policy-attachment/index.js";
+import { IamRole } from "@cdktf/provider-aws/lib/iam-role/index.js";
+import { LambdaFunctionUrl } from "@cdktf/provider-aws/lib/lambda-function-url/index.js";
+import { LambdaFunction } from "@cdktf/provider-aws/lib/lambda-function/index.js";
+import { AwsProvider } from "@cdktf/provider-aws/lib/provider/index.js";
+import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket/index.js";
+import { TerraformStack } from "cdktf";
 import { Construct } from "constructs";
-import { CloudBackend, NamedCloudWorkspace, TerraformStack } from "cdktf";
-import { LambdaFunction } from "@cdktf/provider-aws/lib/lambda-function";
-import { IamRole } from "@cdktf/provider-aws/lib/iam-role";
-import { AwsProvider } from "@cdktf/provider-aws/lib/provider";
-import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket";
-import { IamRolePolicyAttachment } from "@cdktf/provider-aws/lib/iam-role-policy-attachment";
-import { LambdaFunctionUrl } from "@cdktf/provider-aws/lib/lambda-function-url";
 
 export class CoreStack extends TerraformStack {
   constructor(scope: Construct) {
-    super(scope, "core");
+    super(scope, "core-local");
 
-    new CloudBackend(this, {
-      hostname: "app.terraform.io",
-      organization: "opentutor",
-      workspaces: new NamedCloudWorkspace(`open-tutor-core`),
-    });
+    // new CloudBackend(this, {
+    //   hostname: "app.terraform.io",
+    //   organization: "opentutor",
+    //   workspaces: new NamedCloudWorkspace(`open-tutor-core`),
+    // });
+
 
     new AwsProvider(this, "AWS", {
       region: "us-west-2",
+      s3UsePathStyle: true,
+      endpoints: [
+        {
+          iam: "http://localstack:4566",
+          s3: "http://localstack:4566",
+          lambda: "http://localstack:4566",
+          sts: "http://localstack:4566",
+        }
+      ]
     });
 
     const bucket = new S3Bucket(this, "bucket", {
@@ -45,7 +55,7 @@ export class CoreStack extends TerraformStack {
       policyArn: "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
     });
 
-    new LambdaFunction(this, "hello-world", {
+    const lambdaFunction = new LambdaFunction(this, "hello-world", {
       functionName: "HelloWorld",
       runtime: "nodejs20.x",
       architectures: ["arm64"],
@@ -57,6 +67,9 @@ export class CoreStack extends TerraformStack {
     new LambdaFunctionUrl(this, "url", {
       authorizationType: "NONE",
       functionName: "HelloWorld",
+      dependsOn: [
+        lambdaFunction,
+      ]
     });
   }
 }

@@ -3,3 +3,4 @@ dist
 cdktf.out
 .gen
 .env
+*.tfstate

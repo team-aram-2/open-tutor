@@ -1,0 +1,57 @@
+{
+    "name": "open-tutor",
+    "remoteUser": "vscode",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "open-tutor",
+    "workspaceFolder": "/workspace",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.vscode-docker",
+                "vscode-icons-team.vscode-icons",
+                "hashicorp.terraform",
+                "golang.go",
+                "davidanson.vscode-markdownlint",
+                "shardulm94.trailing-spaces",
+                "Gruntfuggly.todo-tree",
+                "github.vscode-pull-request-github",
+                "svelte.svelte-vscode",
+                "shd101wyy.markdown-preview-enhanced"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "editor.formatOnSave": true,
+                "go.buildTags": "",
+                "go.toolsEnvVars": {
+                    "CGO_ENABLED": "1"
+                },
+                "go.testFlags": [
+                    "-v",
+                    "-race"
+                ],
+                "go.testTimeout": "10s",
+                "go.coverOnSingleTest": true,
+                "go.coverOnSingleTestFile": true,
+                "go.coverOnTestPackage": true,
+                "go.lintTool": "golangci-lint",
+                "go.lintOnSave": "package",
+                "[go]": {
+                    "editor.codeActionsOnSave": {
+                        "source.organizeImports": "always"
+                    }
+                },
+                "gopls": {
+                    "usePlaceholders": false,
+                    "staticcheck": true,
+                    "formatting.gofumpt": true
+                }
+            }
+        }
+    },
+    "postCreateCommand": "go install golang.org/x/tools/gopls@latest && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest && aws configure set region us-west-2 && aws configure set output json",
+    "forwardPorts": [
+        4566,
+        4571
+    ],
+    "shutdownAction": "stopCompose"
+}
