@@ -1,0 +1,12 @@
+{
+  "language": "typescript",
+  "app": "npm run build && node --experimental-specifier-resolution=node -r source-map-support/register dist/main.js",
+  "sendCrashReports": "true",
+  "terraformProviders": [],
+  "terraformModules": [],
+  "context": {
+    "excludeStackIdFromLogicalIds": "true",
+    "allowSepCharsInLogicalIds": "true"
+  },
+  "projectId": "3ad2c80f-2e7c-4ab9-a041-a64650c933bb"
+}
