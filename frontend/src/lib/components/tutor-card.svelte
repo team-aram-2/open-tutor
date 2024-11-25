@@ -1,5 +1,5 @@
 <script>
-    export let profilePicture = 'images/cards/pfp.png';
+    export let profilePicture = '/images/cards/pfp.png';
     export let name = 'John Doe';
     export let rating = 2;
     export let starImage = "/images/cards/star.png";
@@ -34,7 +34,7 @@
         border-top-left-radius: 25px;
         border-bottom-left-radius: 25px;
 
-        min-width: 375px;
+        min-width: 500px;
         min-height: 375px;
         height: auto;
         width: auto;

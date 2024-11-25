@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
   let selectedItem = 'view-tutors';
 
-  const setSelectedItem = (item) => {
+  const setSelectedItem = (item: string) => {
     selectedItem = item;
   };
 </script>

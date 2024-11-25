@@ -6,13 +6,19 @@
     // Shared logic across pages goes here
     import '../app.css';
     import Sidebar from '$lib/components/sidebar.svelte';
-    import Tutor from '$lib/components/tutor-card.svelte';
-    
+
+    // Load student my people dashboard by default TEMPORARY
+    import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+
+    onMount(() => {
+        goto('/my_people/student');
+    });
 </script>
 
 
 
-<!-- SIDEBAR -->
+<!-- Page Content -->
 <div class="dashboard-layout">
 
     <Sidebar>
@@ -24,8 +30,7 @@
 
         <slot />
         <!-- Where page content will be rendered -->
-         <Tutor></Tutor>
-         <Tutor></Tutor>
+         
     </main>
 </div>
 
