@@ -647,8 +647,8 @@ components:
             type: integer
           skills:
             type: array
-              items:
-                type: string
+            items:
+              type: string
       Meeting:
         type: object
         properties:
@@ -766,17 +766,14 @@ components:
           description:
             type: string
             description: Description for the skill
-          quiz:
-            type: object
-            $ref: TODO
           validated:
             type: boolean
             description: If the skill is validated
-          required:
-            - id
-            - title
-            - description
-            - validated
+        required:
+          - id
+          - title
+          - description
+          - validated
       Question:
         type: object
         properties:
