@@ -5,7 +5,7 @@
 <script>
     // Shared logic across pages goes here
     import '../app.css';
-    import Sidebar from '$lib/components/sidebar.svelte';
+    import Sidebar from '$lib/components/dashboard/sidebar.svelte';
 
     // Load student my people dashboard by default TEMPORARY
     import { goto } from '$app/navigation';
