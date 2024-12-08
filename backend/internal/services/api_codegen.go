@@ -165,7 +165,7 @@ type ServerInterface interface {
 	CreateMeeting(w http.ResponseWriter, r *http.Request)
 	// Delete a meeting by ID
 	// (DELETE /meeting/{meetingId})
-	DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId interface{})
+	DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
 	// Get a meeting by ID
 	// (GET /meeting/{meetingId})
 	GetMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
@@ -259,7 +259,7 @@ func (siw *ServerInterfaceWrapper) DeleteMeetingById(w http.ResponseWriter, r *h
 	var err error
 
 	// ------------- Path parameter "meetingId" -------------
-	var meetingId interface{}
+	var meetingId openapi_types.UUID
 
 	err = runtime.BindStyledParameterWithOptions("simple", "meetingId", r.PathValue("meetingId"), &meetingId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
