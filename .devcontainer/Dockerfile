@@ -1,18 +1,19 @@
 FROM node:23 AS base
 
 USER root
+ARG USERNAME=node
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+RUN apt-get install -y \
     wget \
     unzip \
     curl \
     git \
     lsb-release \
-    sudo \
     && rm -rf /var/lib/apt/lists/*
-
-RUN useradd -m -s /bin/bash vscode \
-    && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 RUN wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz \
     && tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz \
@@ -28,10 +29,10 @@ RUN wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /us
     && sudo apt update \
     && sudo apt install terraform
 
-RUN mkdir -p /home/vscode/go/{bin,pkg,src} \
-&& chown -R vscode:vscode /home/vscode/go
+RUN mkdir -p /home/${USERNAME}/go/{bin,pkg,src} \
+&& chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/go
 
-USER vscode
+USER node
 ENV PATH="${PATH}:/usr/local/go/bin"
 ENV GOPATH="/home/vscode/go"
 ENV PATH="${PATH}:${GOPATH}/bin"

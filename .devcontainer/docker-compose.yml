@@ -53,12 +53,15 @@ services:
     environment:
       - PGADMIN_DEFAULT_EMAIL=dev@opentutor.io
       - PGADMIN_DEFAULT_PASSWORD=password
+      - PGADMIN_SERVER_JSON_FILE=/pgadmin/servers.json
     networks:
       - dev_net
     ports:
       - "5050:80"
     depends_on:
       - postgres
+    volumes:
+      - "../.devcontainer/configs/pgadmin:/pgadmin"
 
 networks:
   dev_net:

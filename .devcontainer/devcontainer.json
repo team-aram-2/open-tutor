@@ -1,6 +1,7 @@
 {
     "name": "open-tutor",
-    "remoteUser": "vscode",
+    "remoteUser": "node",
+    "containerUser": "node",
     "dockerComposeFile": "docker-compose.yml",
     "service": "open-tutor",
     "workspaceFolder": "/workspace",
