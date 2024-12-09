@@ -1,5 +1,5 @@
 <script lang="ts">
-  let selectedItem = 'view-tutors';
+  let selectedItem = 'view';
 
   const setSelectedItem = (item: string) => {
     selectedItem = item;
