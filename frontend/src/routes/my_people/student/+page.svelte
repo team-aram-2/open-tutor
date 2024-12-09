@@ -9,6 +9,8 @@
             <Tutor
             name="{tutor.firstName} {tutor.lastName}"
             rating={tutor.overallRating}
+            skills={tutor.skills}
+            userId="{tutor.userId}"
             ></Tutor>
         {/each}
     </div>
@@ -19,8 +21,8 @@
         display:flex;
         flex-direction: row;
         flex-wrap:wrap;
-        gap: 75px;
+        gap: 50px;
         flex: 0 0 33%;
-
     }
+
 </style>
