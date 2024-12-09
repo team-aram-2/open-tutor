@@ -26,10 +26,11 @@ const (
 	RatingRatingTypeTutor   RatingRatingType = "tutor"
 )
 
-// Calendar defines model for Calendar.
-type Calendar struct {
-	Meetings *[]Meeting `json:"meetings,omitempty"`
-}
+// Defines values for GetRatingByIdParamsUserType.
+const (
+	GetRatingByIdParamsUserTypeStudent GetRatingByIdParamsUserType = "student"
+	GetRatingByIdParamsUserTypeTutor   GetRatingByIdParamsUserType = "tutor"
+)
 
 // ErrorModel defines model for ErrorModel.
 type ErrorModel struct {
@@ -59,6 +60,10 @@ type Message struct {
 
 	// OriginId Unique identifier for the originID for the message.
 	OriginId openapi_types.UUID `json:"originId"`
+
+	// RecipientId Unique identifier for the recipient of the message.
+	RecipientId openapi_types.UUID `json:"recipientId"`
+	SentOn      time.Time          `json:"sentOn"`
 }
 
 // MessageAttachment defines model for MessageAttachment.
@@ -66,8 +71,8 @@ type MessageAttachment struct {
 	// Filename Name of the attachment.
 	Filename string `json:"filename"`
 
-	// Id Unique identifier for the message.
-	Id *openapi_types.UUID `json:"id,omitempty"`
+	// Id Unique identifier for the message the attachment belongs to.
+	Id openapi_types.UUID `json:"id"`
 
 	// Mimetype Mimetype of the attachment.
 	Mimetype string `json:"mimetype"`
@@ -83,11 +88,11 @@ type Rating struct {
 	MeetingId  *openapi_types.UUID `json:"meetingId,omitempty"`
 	RatingType *RatingRatingType   `json:"ratingType,omitempty"`
 	Ratings    *struct {
-		Communication   *int `json:"communication,omitempty"`
-		Knowledge       *int `json:"knowledge,omitempty"`
-		Overall         int  `json:"overall"`
-		Professionalism *int `json:"professionalism,omitempty"`
-		Punctuality     *int `json:"punctuality,omitempty"`
+		Communication   int `json:"communication"`
+		Knowledge       int `json:"knowledge"`
+		Overall         int `json:"overall"`
+		Professionalism int `json:"professionalism"`
+		Punctuality     int `json:"punctuality"`
 	} `json:"ratings,omitempty"`
 	ReviewerUserId *openapi_types.UUID `json:"reviewerUserId,omitempty"`
 	UserId         *openapi_types.UUID `json:"userId,omitempty"`
@@ -96,26 +101,16 @@ type Rating struct {
 // RatingRatingType defines model for Rating.RatingType.
 type RatingRatingType string
 
-// Student Extends user to include student specific information.
-type Student struct {
-	Calendar Calendar `json:"calendar"`
-	Ratings  struct {
-		Categories *map[string]int `json:"categories,omitempty"`
-		Overall    *int            `json:"overall,omitempty"`
-	} `json:"ratings"`
-	UserId openapi_types.UUID `json:"userId"`
-}
-
-// Tutor Extends user to include student specific information.
+// Tutor defines model for Tutor.
 type Tutor struct {
-	Calendar Calendar `json:"calendar"`
-	Ratings  struct {
-		Categories *map[string]int `json:"categories,omitempty"`
-		Overall    *int            `json:"overall,omitempty"`
-	} `json:"ratings"`
-	Skills     *[]string          `json:"skills,omitempty"`
-	TotalHours *int               `json:"totalHours,omitempty"`
-	UserId     openapi_types.UUID `json:"userId"`
+	AccountLocked *bool               `json:"accountLocked,omitempty"`
+	Email         openapi_types.Email `json:"email"`
+	FirstName     string              `json:"firstName"`
+	LastName      string              `json:"lastName"`
+	SignedUpAt    *time.Time          `json:"signedUpAt,omitempty"`
+	Skills        *[]string           `json:"skills,omitempty"`
+	TotalHours    *int                `json:"totalHours,omitempty"`
+	UserId        openapi_types.UUID  `json:"userId"`
 }
 
 // User Base User object containing shared details needed for all users.
@@ -127,6 +122,14 @@ type User struct {
 	SignedUpAt    *time.Time          `json:"signedUpAt,omitempty"`
 	UserId        openapi_types.UUID  `json:"userId"`
 }
+
+// GetRatingByIdParams defines parameters for GetRatingById.
+type GetRatingByIdParams struct {
+	UserType *GetRatingByIdParamsUserType `form:"userType,omitempty" json:"userType,omitempty"`
+}
+
+// GetRatingByIdParamsUserType defines parameters for GetRatingById.
+type GetRatingByIdParamsUserType string
 
 // CreateMeetingJSONRequestBody defines body for CreateMeeting for application/json ContentType.
 type CreateMeetingJSONRequestBody = Meeting
@@ -146,9 +149,6 @@ type CreateMessageAttachmentJSONRequestBody = MessageAttachment
 // PostRatingJSONRequestBody defines body for PostRating for application/json ContentType.
 type PostRatingJSONRequestBody = Rating
 
-// SignUpAsStudentJSONRequestBody defines body for SignUpAsStudent for application/json ContentType.
-type SignUpAsStudentJSONRequestBody = Student
-
 // SignUpAsTutorJSONRequestBody defines body for SignUpAsTutor for application/json ContentType.
 type SignUpAsTutorJSONRequestBody = Tutor
 
@@ -165,7 +165,7 @@ type ServerInterface interface {
 	CreateMeeting(w http.ResponseWriter, r *http.Request)
 	// Delete a meeting by ID
 	// (DELETE /meeting/{meetingId})
-	DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
+	DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId interface{})
 	// Get a meeting by ID
 	// (GET /meeting/{meetingId})
 	GetMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
@@ -196,12 +196,9 @@ type ServerInterface interface {
 	// Post a rating
 	// (POST /rating)
 	PostRating(w http.ResponseWriter, r *http.Request)
-	// create student profile for a user
-	// (POST /student)
-	SignUpAsStudent(w http.ResponseWriter, r *http.Request)
-	// Get a student by ID
-	// (GET /student/{studentID})
-	GetStudentByID(w http.ResponseWriter, r *http.Request, studentID openapi_types.UUID)
+	// Get a user's rating by user ID, optionally filtering by usertype.
+	// (GET /rating/{userId})
+	GetRatingById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID, params GetRatingByIdParams)
 	// Create Tutor Profile for User
 	// (POST /tutor)
 	SignUpAsTutor(w http.ResponseWriter, r *http.Request)
@@ -259,7 +256,7 @@ func (siw *ServerInterfaceWrapper) DeleteMeetingById(w http.ResponseWriter, r *h
 	var err error
 
 	// ------------- Path parameter "meetingId" -------------
-	var meetingId openapi_types.UUID
+	var meetingId interface{}
 
 	err = runtime.BindStyledParameterWithOptions("simple", "meetingId", r.PathValue("meetingId"), &meetingId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -583,39 +580,17 @@ func (siw *ServerInterfaceWrapper) PostRating(w http.ResponseWriter, r *http.Req
 	handler.ServeHTTP(w, r)
 }
 
-// SignUpAsStudent operation middleware
-func (siw *ServerInterfaceWrapper) SignUpAsStudent(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.SignUpAsStudent(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// GetStudentByID operation middleware
-func (siw *ServerInterfaceWrapper) GetStudentByID(w http.ResponseWriter, r *http.Request) {
+// GetRatingById operation middleware
+func (siw *ServerInterfaceWrapper) GetRatingById(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
-	// ------------- Path parameter "studentID" -------------
-	var studentID openapi_types.UUID
+	// ------------- Path parameter "userId" -------------
+	var userId openapi_types.UUID
 
-	err = runtime.BindStyledParameterWithOptions("simple", "studentID", r.PathValue("studentID"), &studentID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", r.PathValue("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "studentID", Err: err})
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "userId", Err: err})
 		return
 	}
 
@@ -627,8 +602,19 @@ func (siw *ServerInterfaceWrapper) GetStudentByID(w http.ResponseWriter, r *http
 
 	r = r.WithContext(ctx)
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetRatingByIdParams
+
+	// ------------- Optional query parameter "userType" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "userType", r.URL.Query(), &params.UserType)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "userType", Err: err})
+		return
+	}
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetStudentByID(w, r, studentID)
+		siw.Handler.GetRatingById(w, r, userId, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -946,8 +932,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("DELETE "+options.BaseURL+"/messageAttachment/{messageAttachmentId}", wrapper.DeleteMessageAttachmentById)
 	m.HandleFunc("GET "+options.BaseURL+"/messageAttachment/{messageAttachmentId}", wrapper.GetMessageAttachmentById)
 	m.HandleFunc("POST "+options.BaseURL+"/rating", wrapper.PostRating)
-	m.HandleFunc("POST "+options.BaseURL+"/student", wrapper.SignUpAsStudent)
-	m.HandleFunc("GET "+options.BaseURL+"/student/{studentID}", wrapper.GetStudentByID)
+	m.HandleFunc("GET "+options.BaseURL+"/rating/{userId}", wrapper.GetRatingById)
 	m.HandleFunc("POST "+options.BaseURL+"/tutor", wrapper.SignUpAsTutor)
 	m.HandleFunc("GET "+options.BaseURL+"/tutor/{tutorId}", wrapper.GetTutorById)
 	m.HandleFunc("POST "+options.BaseURL+"/user", wrapper.CreateUser)

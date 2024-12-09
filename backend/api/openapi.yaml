@@ -226,64 +226,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
-  # Sign up as student
-  /student:
-    post:
-      summary: create student profile for a user
-      operationId: signUpAsStudent
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Student"
-      responses:
-        "201":
-          description: Student profile created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Student"
-        "400":
-          description: Create student request malformed or denied.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-
-  # Read or change student information
-  /student/{studentID}:
-    get:
-      summary: Get a student by ID
-      operationId: getStudentByID
-      parameters:
-        - name: studentID
-          in: path
-          required: true
-          description: The ID of the tutor to get
-          schema:
-            type: string
-            format: uuid
-      responses:
-        "200":
-          description: Student found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Student"
-        "400":
-          description: Get student request malformed or denied.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-        "404":
-          description: Student not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-
   # Sign up as tutor
   /tutor:
     post:
@@ -341,6 +283,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
+
+  /rating/{userId}:
+    get:
+      summary: Get a user's rating by user ID, optionally filtering by usertype.
+      operationId: getRatingById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The uuid of the user to get ratings for.
+          schema:
+            type: string
+            format: uuid
+        - name: userType
+          in: query
+          schema:
+            type: string
+            enum: [student, tutor]
+          required: false
+      responses:
+        "200":
+          description: Got Rating(s)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                    $ref: "#/components/schemas/Rating"
+        "400":
+          description: Post rating request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
 
   # Post a rating
   /rating:
@@ -482,7 +459,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/MessageAttachment"
 
-
   /messageAttachment/{messageAttachmentId}:
     get:
       summary: Get an attachment by ID
@@ -596,85 +572,25 @@ components:
             type: string
           accountLocked:
             type: boolean
-      Student:
-        description: Extends user to include student specific information.
-        type: object
-        required:
-          - userId
-          - calendar
-          - ratings
-        example:
-          userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
-        properties:
-          userId:
-            type: string
-            format: uuid
-          calendar:
-            $ref: "#/components/schemas/Calendar"
-          ratings: # a map of string to integer (for aggregate rating by category)
-            type: object
-            properties:
-              overall: # overall aggregate rating
-                type: integer
-              categories: # subcategory ratings
-                type: object
-                additionalProperties:
-                  type: integer
+
       Tutor:
         description: Extends user to include student specific information.
-        type: object
-        required:
-          - userId
-          - calendar
-          - ratings
-        example:
-          userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
-        properties:
-          userId:
-            type: string
-            format: uuid
-          calendar:
-            $ref: "#/components/schemas/Calendar"
-          ratings: # a map of string to integer (for aggregate rating by category)
-            type: object
+        allOf:
+          - $ref: "#/components/schemas/User"
+          - type: object
+            required:
+              - calendar
+              - ratings
+            example:
+              userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
             properties:
-              overall: # overall aggregate rating
+              totalHours: # not sure if this is total hours worked or???
                 type: integer
-              categories: # subcategory ratings
-                type: object
-                additionalProperties:
-                  type: integer
-          totalHours: # not sure if this is total hours worked or???
-            type: integer
-          skills:
-            type: array
-            items:
-              type: string
-      Meeting:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-          tutorId:
-            type: string
-            format: uuid
-          studentId:
-            type: string
-            format: uuid
-          startAt:
-            type: string
-            format: date-time
-          endAt:
-            type: string
-            format: date-time
-      Calendar:
-        type: object
-        properties:
-          meetings:
-            type: array
-            items:
-              $ref: "#/components/schemas/Meeting"
+              skills:
+                type: array
+                items:
+                  type: string
+
       Rating:
         type: object
         properties:
@@ -697,19 +613,61 @@ components:
             type: object
             required:
             - overall
+            - professionalism
+            - knowledge
+            - communication
+            - punctuality
             properties: # Subject to change?
               professionalism:
                 type: integer
+                minimum: 1
+                maximum: 5
               knowledge:
                 type: integer
+                minimum: 1
+                maximum: 5
               communication:
                 type: integer
+                minimum: 1
+                maximum: 5
               punctuality:
                 type: integer
+                minimum: 1
+                maximum: 5
               overall:
                 type: integer
+                minimum: 1
+                maximum: 5
           comment:
             type: string
+
+      Meeting:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          tutorId:
+            type: string
+            format: uuid
+          studentId:
+            type: string
+            format: uuid
+          startAt:
+            type: string
+            format: date-time
+          endAt:
+            type: string
+            format: date-time
+
+      Calendar:
+        type: object
+        properties:
+          meetings:
+            type: array
+            items:
+              $ref: "#/components/schemas/Meeting"
+
       Message:
         type: object
         properties:
@@ -717,29 +675,39 @@ components:
             type: string
             format: uuid
             description: Unique identifier for the message.
+          sentOn:
+            type: string
+            format: date-time
           originId:
             type: string
             format: uuid
             description: Unique identifier for the originID for the message.
+          recipientId:
+            type: string
+            format: uuid
+            description: Unique identifier for the recipient of the message.
           message:
             type: string
             description: Message content.
           MessageAttachments:
             type: array
-            description: Array of message attachments
             items:
               $ref: "#/components/schemas/MessageAttachment"
+            description: Array of message attachments
         required:
           - id
+          - sentOn
           - originId
+          - recipientId
           - message
+
       MessageAttachment:
         type: object
         properties:
           id:
             type: string
             format: uuid
-            description: Unique identifier for the message.
+            description: Unique identifier for the message the attachment belongs to.
           filename:
             type: string
             description: Name of the attachment.
@@ -751,10 +719,12 @@ components:
             format: uri
             description: Source of the attachment.
         required:
+          - id
           - filename
           - mimetype
           - url
-      Skill:
+
+      AvailableSkill:
         type: object
         properties:
           id:
@@ -767,14 +737,22 @@ components:
           description:
             type: string
             description: Description for the skill
-          validated:
-            type: boolean
-            description: If the skill is validated
         required:
           - id
           - title
           - description
-          - validated
+
+      TutorSkill:
+        allOf:
+          - $ref: "#/components/schemas/AvailableSkill"
+          - type: object
+            properties:
+              validated:
+                type: boolean
+                description: If the skill is validated
+            required:
+              - validated
+
       Question:
         type: object
         properties:
