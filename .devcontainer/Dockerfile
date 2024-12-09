@@ -18,6 +18,7 @@ RUN apt-get install -y \
     openssh-server \
     nano \
     vim \
+    less \
     && rm -rf /var/lib/apt/lists/*
 
 RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config; \
