@@ -1,0 +1,32 @@
+{
+  "tutors": [
+    {
+      "firstName": "Bill",
+      "lastName": "Frog",
+      "userId": "c811d448-ecb4-4039-9d3e-085b31e62326",
+      "skills": [ "Calculus I", "Calculus II", "Calculus III", "Diff. Eq." ],
+      "overallRating": 5
+    },
+    {
+      "firstName": "Alex",
+      "lastName": "Ho",
+      "userId": "f9b93996-f535-48eb-8b8c-e3dcadcddafe",
+      "skills": [ "Calculus I", "Calculus II", "Calculus III"],
+      "overallRating": 4      
+    },
+    {
+      "firstName": "John",
+      "lastName": "Doe",
+      "userId": "373aa1eb-1e3d-4b17-9fe0-d4aa869ae791",
+      "skills": [ "Calculus I", "Multivar. Calculus", "Diff. Eq." ],
+      "overallRating": 5      
+    },
+    {
+      "firstName": "Arnold",
+      "lastName": "Herzmann",
+      "userId": "b9f148c9-c0af-41c8-a139-6a8069755ddf",
+      "skills": [ "Calculus I", "Calculus II", "Linear Algebra" ],
+      "overallRating": 4      
+    }
+  ]
+}
