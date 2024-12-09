@@ -32,6 +32,19 @@ services:
     networks:
       - dev_net
 
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: developer
+    ports:
+      - "5432:5432"
+    volumes:
+      - "/docker-entrypoint-initdb.d/init.sql:/workspace/backend/init.sql"
+    networks:
+      - dev_net
+
 networks:
   dev_net:
     driver: bridge

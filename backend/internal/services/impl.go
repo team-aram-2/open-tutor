@@ -3,20 +3,40 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"database/sql"
+	_ "github.com/lib/pq"
+	"log"
+	"time"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-type OpenTutor struct {
-	Users map[string]User
-}
+type OpenTutor struct {}
 
 var _ ServerInterface = (*OpenTutor)(nil)
+var db *sql.DB
 
 func NewOpenTutor() *OpenTutor {
-	return &OpenTutor{
-		Users: make(map[string]User),
+	// Connect to database //
+	var conErr error
+	db, conErr = sql.Open("postgres", "postgres://postgres:developer@localhost:7654/postgres?sslmode=disable")
+	if conErr != nil {
+		log.Fatal(conErr)
 	}
+	defer db.Close()
+
+	// Test connection //
+	conErr = db.Ping()
+	if conErr != nil {
+		log.Fatal(conErr)
+	}
+
+	// Set connection pool settings //
+	db.SetMaxOpenConns(30)
+	db.SetMaxIdleConns(30)
+  db.SetConnMaxLifetime(5 * time.Minute)
+
+	return &OpenTutor{}
 }
 
 func sendError(w http.ResponseWriter, code int, message string) {
@@ -34,9 +54,29 @@ func (t *OpenTutor) CreateUser(w http.ResponseWriter, r *http.Request) {
 		sendError(w, http.StatusBadRequest, "Invalid format for user")
 		return
 	}
-	t.Users[string(user.UserId.String())] = user
+
+	var userId string
+	insertErr := db.QueryRow(`
+		INSERT INTO users (email, signed_up_at, first_name, last_name, account_locked)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING user_id
+	`,
+		user.Email,
+		user.SignedUpAt,
+		user.FirstName,
+		user.LastName,
+		user.AccountLocked,
+	).Scan(&userId)
+
+	if insertErr != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(map[string]string{
+		"userId": userId,
+	})
 }
 
 func (t *OpenTutor) CreateMeeting(w http.ResponseWriter, r *http.Request) {
