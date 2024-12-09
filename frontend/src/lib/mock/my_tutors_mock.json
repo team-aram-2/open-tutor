@@ -4,7 +4,7 @@
       "firstName": "Bill",
       "lastName": "Frog",
       "userId": "billfrog69",
-      "skills": [ "Calculus I", "Calculus II", "Calculus III", "Differential Equations" ],
+      "skills": [ "Calculus I", "Calculus II", "Calculus III", "Diff. Eq." ],
       "overallRating": 5
     },
     {
@@ -18,7 +18,7 @@
       "firstName": "John",
       "lastName": "Doe",
       "userId": "doe_a_deer",
-      "skills": [ "Calculus I", "Multivariable Calculus", "Differential Equations" ],
+      "skills": [ "Calculus I", "Multivar. Calculus", "Diff. Eq." ],
       "overallRating": 5      
     },
     {
