@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	"time"
+	"fmt"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
@@ -19,11 +20,11 @@ var db *sql.DB
 func NewOpenTutor() *OpenTutor {
 	// Connect to database //
 	var conErr error
-	db, conErr = sql.Open("postgres", "postgres://postgres:developer@localhost:7654/postgres?sslmode=disable")
+	db, conErr = sql.Open("postgres", "postgres://postgres:developer@db:5432/postgres?sslmode=disable")
 	if conErr != nil {
 		log.Fatal(conErr)
 	}
-	defer db.Close()
+	// defer db.Close()
 
 	// Test connection //
 	conErr = db.Ping()
@@ -34,7 +35,8 @@ func NewOpenTutor() *OpenTutor {
 	// Set connection pool settings //
 	db.SetMaxOpenConns(30)
 	db.SetMaxIdleConns(30)
-  db.SetConnMaxLifetime(5 * time.Minute)
+	db.SetConnMaxLifetime(5 * time.Minute)
+	fmt.Printf("Connected to database\n")
 
 	return &OpenTutor{}
 }
@@ -57,19 +59,18 @@ func (t *OpenTutor) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	var userId string
 	insertErr := db.QueryRow(`
-		INSERT INTO users (email, signed_up_at, first_name, last_name, account_locked)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO users (email, first_name, last_name)
+		VALUES ($1, $2, $3)
 		RETURNING user_id
 	`,
 		user.Email,
-		user.SignedUpAt,
 		user.FirstName,
 		user.LastName,
-		user.AccountLocked,
 	).Scan(&userId)
 
 	if insertErr != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "%s\n", insertErr)
 		return
 	}
 
@@ -83,7 +84,7 @@ func (t *OpenTutor) CreateMeeting(w http.ResponseWriter, r *http.Request) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
 
-func (t *OpenTutor) DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID) {
+func (t *OpenTutor) DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId interface{}) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
 
@@ -135,6 +136,10 @@ func (t *OpenTutor) GetStudentByID(w http.ResponseWriter, r *http.Request, stude
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
 
+func (t *OpenTutor) GetRatingById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID, params GetRatingByIdParams) {
+	sendError(w, http.StatusMethodNotAllowed, "TODO")
+}
+
 func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
@@ -148,7 +153,28 @@ func (t *OpenTutor) DeleteUserById(w http.ResponseWriter, r *http.Request, userI
 }
 
 func (t *OpenTutor) GetUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
+	user := &User{}
+	selectErr := db.QueryRow(`
+		SELECT *
+		FROM users
+		WHERE user_id = $1
+	`, userId).Scan(
+		&user.UserId,
+		&user.Email,
+		&user.SignedUpAt,
+		&user.FirstName,
+		&user.LastName,
+		&user.AccountLocked,
+	)
+
+	if selectErr != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "%s\n", selectErr)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
 }
 
 func (t *OpenTutor) UpdateUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {

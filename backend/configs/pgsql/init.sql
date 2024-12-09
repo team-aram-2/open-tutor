@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS users;
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
   "user_id" TEXT NOT NULL PRIMARY KEY,
   "email" TEXT NOT NULL UNIQUE,
-  "signed_up_at" TIMESTAMP NOT NULL,
+  "signed_up_at" TIMESTAMP DEFAULT NOW(),
   "first_name" TEXT NOT NULL,
   "last_name" TEXT NOT NULL,
   "account_locked" BOOLEAN DEFAULT 'f'
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
 COMMENT ON TABLE "users" IS 'Base User object containing shared details needed for all users.';
 
 DROP TABLE IF EXISTS tutors;
-CREATE TABLE IF NOT EXISTS tutors (
+CREATE TABLE tutors (
   "user_id" TEXT NOT NULL PRIMARY KEY,
   "total_hours" INT DEFAULT 0,
   FOREIGN KEY (user_id) REFERENCES users(user_id)
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS tutors (
 COMMENT ON TABLE "tutors" IS 'Tutor object that extends user object with tutor specific information.';
 
 DROP TABLE IF EXISTS available_skills;
-CREATE TABLE IF NOT EXISTS available_skills (
+CREATE TABLE available_skills (
   "id" TEXT NOT NULL PRIMARY KEY,
   "title" TEXT NOT NULL,
   "description" TEXT NOT NULL
@@ -28,7 +28,7 @@ COMMENT ON COLUMN available_skills.title IS 'title/name for the skill';
 COMMENT ON COLUMN available_skills.description IS 'Description for the skill';
 
 DROP TABLE IF EXISTS tutor_skills;
-CREATE TABLE IF NOT EXISTS tutor_skills (
+CREATE TABLE tutor_skills (
   "entry_id" INT NOT NULL PRIMARY KEY,
   "skill_id" TEXT NOT NULL,
   "tutor_id" TEXT NOT NULL,
@@ -41,7 +41,7 @@ COMMENT ON COLUMN tutor_skills.tutor_id IS 'Tutor uuid.';
 COMMENT ON COLUMN tutor_skills.validated IS 'If tutor skill is validated.';
 
 DROP TABLE IF EXISTS meetings;
-CREATE TABLE IF NOT EXISTS meetings (
+CREATE TABLE meetings (
   "id" TEXT NOT NULL PRIMARY KEY,
   "tutor_id" TEXT NOT NULL,
   "student_id" TEXT NOT NULL,
