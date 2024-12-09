@@ -20,7 +20,6 @@
 
 <!-- Page Content -->
 <div class="dashboard-layout">
-
     <Sidebar>
     </Sidebar>
     
@@ -62,8 +61,8 @@
     }
 
     .content {
-        padding-left: 30px;
-        padding-top: 20px
+        padding-left: 50px;
+        padding-top: 20px;
     }
     /* .page-title {
         padding-left: 30px;
