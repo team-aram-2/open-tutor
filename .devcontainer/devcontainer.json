@@ -51,7 +51,9 @@
     "postCreateCommand": "go install golang.org/x/tools/gopls@latest && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest && aws configure set region us-west-2 && aws configure set output json",
     "forwardPorts": [
         4566,
-        4571
+        4571,
+        5050,
+        5432
     ],
     "shutdownAction": "stopCompose"
 }

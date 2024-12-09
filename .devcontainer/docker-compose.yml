@@ -31,19 +31,34 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - dev_net
+    depends_on:
+      - postgres
+      - pgadmin
 
-  db:
+  postgres:
     image: postgres
-    restart: always
+    restart: unless-stopped
     shm_size: 128mb
     environment:
-      POSTGRES_PASSWORD: developer
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: opentutor
     volumes:
-      - "/docker-entrypoint-initdb.d/init.sql:/workspace/backend/init.sql"
+      - "../backend/configs/pgsql:/docker-entrypoint-initdb.d/"
     networks:
       - dev_net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=dev@opentutor.io
+      - PGADMIN_DEFAULT_PASSWORD=password
+    networks:
+      - dev_net
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
 
 networks:
   dev_net:
