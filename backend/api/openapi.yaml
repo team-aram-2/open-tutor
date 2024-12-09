@@ -94,6 +94,7 @@ paths:
           required: true
           description: The ID of the meeting to delete
           schema:
+            type: string
             format: uuid
       responses:
         "204":

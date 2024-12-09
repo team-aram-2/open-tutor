@@ -1,27 +1,26 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
+	"flag"
+	"log"
+	"net"
 	"net/http"
+
+	api "open-tutor/internal/services"
 )
 
-type Response struct {
-	Message string `json:"message"`
-}
-
-func ping(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	response := Response{Message: "pong"}
-
-	json.NewEncoder(w).Encode(response)
-	fmt.Println(w, "pong")
-}
-
 func main() {
-	http.HandleFunc("/ping", ping)
+	port := flag.String("port", "8080", "test port")
+	flag.Parse()
 
-	fmt.Println("Starting server on 8080")
+	openTutor := api.NewOpenTutor()
 
-	http.ListenAndServe(":8080", nil)
+	r := http.NewServeMux()
+	h := api.HandlerFromMux(openTutor, r)
+	s := &http.Server{
+		Handler: h,
+		Addr:    net.JoinHostPort("127.0.0.1", *port),
+	}
+
+	log.Fatal(s.ListenAndServe())
 }
