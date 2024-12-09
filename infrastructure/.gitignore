@@ -4,3 +4,4 @@ cdktf.out
 .gen
 .env
 *.tfstate
+*.tfstate.backup
