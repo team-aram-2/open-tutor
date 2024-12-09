@@ -14,6 +14,8 @@ services:
       - SYS_PTRACE
     security_opt:
       - seccomp:unconfined
+    ports:
+      - "2222:22"
 
   localstack:
     image: localstack/localstack:latest

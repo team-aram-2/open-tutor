@@ -8,12 +8,27 @@ RUN apt-get update && apt-get install -y sudo \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 RUN apt-get install -y \
+    sed\
     wget \
     unzip \
     curl \
     git \
     lsb-release \
+    fuse \
+    openssh-server \
     && rm -rf /var/lib/apt/lists/*
+
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config; \
+    sed -i 's/KbdInteractiveAuthentication no/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config
+
+RUN echo "node:node"|chpasswd
+
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage; \
+    chmod +x ./nvim.appimage; \
+    ./nvim.appimage --appimage-extract; \
+    sudo mv squashfs-root /; \
+    sudo ln -s /squashfs-root/AppRun /usr/bin/nvim; \
+    chmod +x /usr/bin/nvim;
 
 RUN wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz \
     && tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz \
@@ -30,12 +45,21 @@ RUN wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /us
     && sudo apt install terraform
 
 RUN mkdir -p /home/${USERNAME}/go/{bin,pkg,src} \
-&& chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/go
+    && chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/go
 
 USER node
-ENV PATH="${PATH}:/usr/local/go/bin"
-ENV GOPATH="/home/vscode/go"
-ENV PATH="${PATH}:${GOPATH}/bin"
-WORKDIR /workspace
+WORKDIR /home/node
 
-RUN go version && node --version && npm --version
+ENV PATH="${PATH}:/usr/local/go/bin"
+ENV GOPATH="/home/${USERNAME}/go"
+ENV PATH="${PATH}:${GOPATH}/bin"
+
+ENV PATH="${PATH}:/opt/nvim"
+
+RUN mkdir -p ~/.config/nvim:wget; \
+    git clone https://github.com/corigne/dot-neovim.git .config/nvim;
+
+RUN go install golang.org/x/tools/gopls@latest \
+    && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+WORKDIR /workspace
