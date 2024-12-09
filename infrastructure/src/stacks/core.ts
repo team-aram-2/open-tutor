@@ -1,9 +1,7 @@
+import { DbInstance } from "@cdktf/provider-aws/lib/db-instance/index.js";
 import { IamRolePolicyAttachment } from "@cdktf/provider-aws/lib/iam-role-policy-attachment/index.js";
 import { IamRole } from "@cdktf/provider-aws/lib/iam-role/index.js";
-import { LambdaFunctionUrl } from "@cdktf/provider-aws/lib/lambda-function-url/index.js";
-import { LambdaFunction } from "@cdktf/provider-aws/lib/lambda-function/index.js";
 import { AwsProvider } from "@cdktf/provider-aws/lib/provider/index.js";
-import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket/index.js";
 import { TerraformStack } from "cdktf";
 import { Construct } from "constructs";
 
@@ -17,8 +15,9 @@ export class CoreStack extends TerraformStack {
     //   workspaces: new NamedCloudWorkspace(`open-tutor-core`),
     // });
 
-
     new AwsProvider(this, "AWS", {
+      accessKey: "test",
+      secretKey: "test",
       region: "us-west-2",
       s3UsePathStyle: true,
       endpoints: [
@@ -27,12 +26,9 @@ export class CoreStack extends TerraformStack {
           s3: "http://localstack:4566",
           lambda: "http://localstack:4566",
           sts: "http://localstack:4566",
+          rds: "http://localstack:4566",
         }
       ]
-    });
-
-    const bucket = new S3Bucket(this, "bucket", {
-      bucketPrefix: "opentutor",
     });
 
     const helloWorldRole = new IamRole(this, "hello-world-role", {
@@ -55,21 +51,15 @@ export class CoreStack extends TerraformStack {
       policyArn: "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
     });
 
-    const lambdaFunction = new LambdaFunction(this, "hello-world", {
-      functionName: "HelloWorld",
-      runtime: "nodejs20.x",
-      architectures: ["arm64"],
-      role: helloWorldRole.arn,
-      s3Bucket: bucket.bucket,
-      s3Key: "index.zip",
-      handler: "index.handler",
-    });
-    new LambdaFunctionUrl(this, "url", {
-      authorizationType: "NONE",
-      functionName: "HelloWorld",
-      dependsOn: [
-        lambdaFunction,
-      ]
+    new DbInstance(this, "data-db", {
+      allocatedStorage: 10,
+      dbName: "opentutor-data",
+      engine: "postgres",
+      engineVersion: "17.2",
+      instanceClass: "db.t4g.medium",
+      username: "postgres",
+      password: "developer",
+      skipFinalSnapshot: true,
     });
   }
 }

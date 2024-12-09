@@ -1,2 +1,5 @@
-volume/cache
+volume/**
 .ssh/
+*.pem
+*.crt
+*.key
