@@ -16,6 +16,8 @@ RUN apt-get install -y \
     lsb-release \
     fuse \
     openssh-server \
+    nano \
+    vim \
     && rm -rf /var/lib/apt/lists/*
 
 RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config; \
