@@ -1,18 +1,37 @@
 FROM node:23 AS base
 
 USER root
+ARG USERNAME=node
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+RUN apt-get install -y \
+    sed\
     wget \
     unzip \
     curl \
     git \
     lsb-release \
-    sudo \
+    fuse \
+    openssh-server \
+    nano \
+    vim \
+    less \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -m -s /bin/bash vscode \
-    && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config; \
+    sed -i 's/KbdInteractiveAuthentication no/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config
+
+RUN echo "node:node"|chpasswd
+
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage; \
+    chmod +x ./nvim.appimage; \
+    ./nvim.appimage --appimage-extract; \
+    sudo mv squashfs-root /; \
+    sudo ln -s /squashfs-root/AppRun /usr/bin/nvim; \
+    chmod +x /usr/bin/nvim;
 
 RUN wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz \
     && tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz \
@@ -28,13 +47,22 @@ RUN wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /us
     && sudo apt update \
     && sudo apt install terraform
 
-RUN mkdir -p /home/vscode/go/{bin,pkg,src} \
-&& chown -R vscode:vscode /home/vscode/go
+RUN mkdir -p /home/${USERNAME}/go/{bin,pkg,src} \
+    && chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/go
 
-USER vscode
+USER node
+WORKDIR /home/node
+
 ENV PATH="${PATH}:/usr/local/go/bin"
-ENV GOPATH="/home/vscode/go"
+ENV GOPATH="/home/${USERNAME}/go"
 ENV PATH="${PATH}:${GOPATH}/bin"
-WORKDIR /workspace
 
-RUN go version && node --version && npm --version
+ENV PATH="${PATH}:/opt/nvim"
+
+RUN mkdir -p ~/.config/nvim:wget; \
+    git clone https://github.com/corigne/dot-neovim.git .config/nvim;
+
+RUN go install golang.org/x/tools/gopls@latest \
+    && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+WORKDIR /workspace
