@@ -30,8 +30,9 @@
 <style>
     
     .tutor-card{
+
         height: 100vh;
-        width: 100vh;
+        width: 100%;
 
         padding-right: 20px;
         padding-bottom: 50px;
@@ -41,7 +42,6 @@
         border-bottom-right-radius: 25px;
         border-top-left-radius: 25px;
         border-bottom-left-radius: 25px;
-
 
 
 
