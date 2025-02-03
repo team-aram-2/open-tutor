@@ -1,0 +1,19 @@
+{
+  "tutors": [
+	{
+  	"firstName": "Bill",
+  	"lastName": "Frog",
+  	"userId": "billfrog69",
+  	"skills": ["Calculus I", "Calculus II", "Calculus III", "Differential Equations"],
+  	"overallRating": 5
+	},
+	{
+  	"firstName": "Sarah",
+  	"lastName": "Smith",
+  	"userId": "sarahs42",
+  	"skills": ["Calculus I", "Calculus II", "Statistics"],
+  	"overallRating": 4.5
+	}
+  ]
+
+}
