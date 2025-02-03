@@ -26,8 +26,9 @@ RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/
 
 RUN echo "node:node"|chpasswd
 
-RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage; \
-    chmod +x ./nvim.appimage; \
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage; \
+    chmod u+x nvim-linux-x86_64.appimage; \
+    mv nvim-linux-x86_64.appimage nvim.appimage; \
     ./nvim.appimage --appimage-extract; \
     sudo mv squashfs-root /; \
     sudo ln -s /squashfs-root/AppRun /usr/bin/nvim; \
