@@ -35,7 +35,7 @@ func NewOpenTutor() *OpenTutor {
 	// Set connection pool settings //
 	db.SetMaxOpenConns(30)
 	db.SetMaxIdleConns(30)
-  db.SetConnMaxLifetime(5 * time.Minute)
+	db.SetConnMaxLifetime(5 * time.Minute)
 	fmt.Printf("Connected to database\n")
 
 	return &OpenTutor{}

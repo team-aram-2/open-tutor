@@ -1,0 +1,14 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "OpenTutor_DEV",
+            "Group": "Servers",
+            "Port": 5432,
+            "Username": "dev",
+            "Host": "postgres",
+            "SSLMode": "prefer",
+            "MaintenanceDB": "postgres",
+            "PassFile": "/pgadmin/pgpass"
+        }
+    }
+}
