@@ -107,6 +107,7 @@ type Tutor struct {
 	Email         openapi_types.Email `json:"email"`
 	FirstName     string              `json:"firstName"`
 	LastName      string              `json:"lastName"`
+	PasswordHash  *string             `json:"passwordHash,omitempty"`
 	SignedUpAt    *time.Time          `json:"signedUpAt,omitempty"`
 	Skills        *[]string           `json:"skills,omitempty"`
 	TotalHours    *int                `json:"totalHours,omitempty"`
@@ -119,8 +120,23 @@ type User struct {
 	Email         openapi_types.Email `json:"email"`
 	FirstName     string              `json:"firstName"`
 	LastName      string              `json:"lastName"`
+	PasswordHash  *string             `json:"passwordHash,omitempty"`
 	SignedUpAt    *time.Time          `json:"signedUpAt,omitempty"`
 	UserId        openapi_types.UUID  `json:"userId"`
+}
+
+// UserLogin Payload for user logins
+type UserLogin struct {
+	Email    openapi_types.Email `json:"email"`
+	Password string              `json:"password"`
+}
+
+// UserSignup Payload for user signups
+type UserSignup struct {
+	Email     openapi_types.Email `json:"email"`
+	FirstName string              `json:"firstName"`
+	LastName  string              `json:"lastName"`
+	Password  string              `json:"password"`
 }
 
 // GetRatingByIdParams defines parameters for GetRatingById.
@@ -130,6 +146,9 @@ type GetRatingByIdParams struct {
 
 // GetRatingByIdParamsUserType defines parameters for GetRatingById.
 type GetRatingByIdParamsUserType string
+
+// LoginUserJSONRequestBody defines body for LoginUser for application/json ContentType.
+type LoginUserJSONRequestBody = UserLogin
 
 // CreateMeetingJSONRequestBody defines body for CreateMeeting for application/json ContentType.
 type CreateMeetingJSONRequestBody = Meeting
@@ -149,23 +168,26 @@ type CreateMessageAttachmentJSONRequestBody = MessageAttachment
 // PostRatingJSONRequestBody defines body for PostRating for application/json ContentType.
 type PostRatingJSONRequestBody = Rating
 
+// RegisterUserJSONRequestBody defines body for RegisterUser for application/json ContentType.
+type RegisterUserJSONRequestBody = UserSignup
+
 // SignUpAsTutorJSONRequestBody defines body for SignUpAsTutor for application/json ContentType.
 type SignUpAsTutorJSONRequestBody = Tutor
-
-// CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
-type CreateUserJSONRequestBody = User
 
 // UpdateUserByIdJSONRequestBody defines body for UpdateUserById for application/json ContentType.
 type UpdateUserByIdJSONRequestBody = User
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Log in as an existing user
+	// (POST /login)
+	LoginUser(w http.ResponseWriter, r *http.Request)
 	// Create a new meeting
 	// (POST /meeting)
 	CreateMeeting(w http.ResponseWriter, r *http.Request)
 	// Delete a meeting by ID
 	// (DELETE /meeting/{meetingId})
-	DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId interface{})
+	DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
 	// Get a meeting by ID
 	// (GET /meeting/{meetingId})
 	GetMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
@@ -199,15 +221,15 @@ type ServerInterface interface {
 	// Get a user's rating by user ID, optionally filtering by usertype.
 	// (GET /rating/{userId})
 	GetRatingById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID, params GetRatingByIdParams)
+	// Sign up as a new user
+	// (POST /register)
+	RegisterUser(w http.ResponseWriter, r *http.Request)
 	// Create Tutor Profile for User
 	// (POST /tutor)
 	SignUpAsTutor(w http.ResponseWriter, r *http.Request)
 	// Get a tutor by ID
 	// (GET /tutor/{tutorId})
 	GetTutorById(w http.ResponseWriter, r *http.Request, tutorId openapi_types.UUID)
-	// Create a new user
-	// (POST /user)
-	CreateUser(w http.ResponseWriter, r *http.Request)
 	// Delete user account, maybe via settings or moderation panel
 	// (DELETE /user/{userId})
 	DeleteUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID)
@@ -227,6 +249,28 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// LoginUser operation middleware
+func (siw *ServerInterfaceWrapper) LoginUser(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
+
+	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.LoginUser(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // CreateMeeting operation middleware
 func (siw *ServerInterfaceWrapper) CreateMeeting(w http.ResponseWriter, r *http.Request) {
@@ -256,7 +300,7 @@ func (siw *ServerInterfaceWrapper) DeleteMeetingById(w http.ResponseWriter, r *h
 	var err error
 
 	// ------------- Path parameter "meetingId" -------------
-	var meetingId interface{}
+	var meetingId openapi_types.UUID
 
 	err = runtime.BindStyledParameterWithOptions("simple", "meetingId", r.PathValue("meetingId"), &meetingId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
@@ -624,6 +668,28 @@ func (siw *ServerInterfaceWrapper) GetRatingById(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r)
 }
 
+// RegisterUser operation middleware
+func (siw *ServerInterfaceWrapper) RegisterUser(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
+
+	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RegisterUser(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // SignUpAsTutor operation middleware
 func (siw *ServerInterfaceWrapper) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 
@@ -670,28 +736,6 @@ func (siw *ServerInterfaceWrapper) GetTutorById(w http.ResponseWriter, r *http.R
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetTutorById(w, r, tutorId)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// CreateUser operation middleware
-func (siw *ServerInterfaceWrapper) CreateUser(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateUser(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -920,6 +964,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 		ErrorHandlerFunc:   options.ErrorHandlerFunc,
 	}
 
+	m.HandleFunc("POST "+options.BaseURL+"/login", wrapper.LoginUser)
 	m.HandleFunc("POST "+options.BaseURL+"/meeting", wrapper.CreateMeeting)
 	m.HandleFunc("DELETE "+options.BaseURL+"/meeting/{meetingId}", wrapper.DeleteMeetingById)
 	m.HandleFunc("GET "+options.BaseURL+"/meeting/{meetingId}", wrapper.GetMeetingById)
@@ -933,9 +978,9 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("GET "+options.BaseURL+"/messageAttachment/{messageAttachmentId}", wrapper.GetMessageAttachmentById)
 	m.HandleFunc("POST "+options.BaseURL+"/rating", wrapper.PostRating)
 	m.HandleFunc("GET "+options.BaseURL+"/rating/{userId}", wrapper.GetRatingById)
+	m.HandleFunc("POST "+options.BaseURL+"/register", wrapper.RegisterUser)
 	m.HandleFunc("POST "+options.BaseURL+"/tutor", wrapper.SignUpAsTutor)
 	m.HandleFunc("GET "+options.BaseURL+"/tutor/{tutorId}", wrapper.GetTutorById)
-	m.HandleFunc("POST "+options.BaseURL+"/user", wrapper.CreateUser)
 	m.HandleFunc("DELETE "+options.BaseURL+"/user/{userId}", wrapper.DeleteUserById)
 	m.HandleFunc("GET "+options.BaseURL+"/user/{userId}", wrapper.GetUserById)
 	m.HandleFunc("PUT "+options.BaseURL+"/user/{userId}", wrapper.UpdateUserById)

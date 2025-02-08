@@ -106,26 +106,57 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
-  # User sign up
-  /user:
+  # User login
+  /login:
     post:
-      summary: Create a new user
-      operationId: createUser
+      summary: Log in as an existing user
+      operationId: loginUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/UserLogin"
       responses:
-        "201":
-          description: User created
+        "200":
+          description: Login successful
+          content:
+            application/json: {}
+          headers:
+            Authorization:
+              schema:
+                type: string
+              description: The JWT associated with this authenticated session
+        "400":
+          description: User login failed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/ErrorModel"
+
+  # User register
+  /register:
+    post:
+      summary: Sign up as a new user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserSignup"
+      responses:
+        "200":
+          description: Sign up success
+          content:
+            application/json: {}
+          headers:
+            Authorization:
+              schema:
+                type: string
+              description: The JWT associated with this authenticated session
         "400":
-          description: User post request malformed or denied.
+          description: User signup request malformed or denied.
           content:
             application/json:
               schema:
@@ -543,6 +574,7 @@ components:
             type: integer
             minimum: 100
             maximum: 600
+
       User:
         type: object
         example:
@@ -552,10 +584,10 @@ components:
           lastName: Hochstetler
         description: Base User object containing shared details needed for all users.
         required:
-        - userId
-        - email
-        - firstName
-        - lastName
+          - userId
+          - email
+          - firstName
+          - lastName
         properties:
           userId:
             type: string
@@ -572,6 +604,50 @@ components:
             type: string
           accountLocked:
             type: boolean
+          passwordHash:
+            type: string
+
+      UserLogin:
+        type: object
+        example:
+          email: email@example.com
+          password: N3v3rG0nn4G1veY0uUp!
+        description: Payload for user logins
+        required:
+          - email
+          - password
+        properties:
+          email:
+            type: string
+            format: email
+          password:
+            type: string
+            format: password
+
+      UserSignup:
+        type: object
+        example:
+          email: email@example.com
+          password: N3v3rG0nn4G1veY0uUp!
+          firstName: Jacob
+          lastName: Hochstetler
+        description: Payload for user signups
+        required:
+          - email
+          - password
+          - firstName
+          - lastName
+        properties:
+          email:
+            type: string
+            format: email
+          password:
+            type: string
+            format: password
+          firstName:
+            type: string
+          lastName:
+            type: string
 
       Tutor:
         description: Extends user to include student specific information.

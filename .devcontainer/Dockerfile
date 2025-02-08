@@ -78,4 +78,7 @@ RUN mkdir -p ~/.config/nvim:wget; \
 RUN go install golang.org/x/tools/gopls@latest \
     && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
+# install oapi-codegen #
+RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
+
 WORKDIR /workspace
