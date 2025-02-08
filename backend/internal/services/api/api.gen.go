@@ -81,6 +81,15 @@ type MessageAttachment struct {
 	Url string `json:"url"`
 }
 
+// ProtoUser Base object with all the information needed for a user to sign up.
+type ProtoUser struct {
+	AccountLocked *bool               `json:"accountLocked,omitempty"`
+	Email         openapi_types.Email `json:"email"`
+	FirstName     string              `json:"firstName"`
+	LastName      string              `json:"lastName"`
+	SignedUpAt    *time.Time          `json:"signedUpAt,omitempty"`
+}
+
 // Rating defines model for Rating.
 type Rating struct {
 	Comment    *string             `json:"comment,omitempty"`
@@ -153,7 +162,7 @@ type PostRatingJSONRequestBody = Rating
 type SignUpAsTutorJSONRequestBody = Tutor
 
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
-type CreateUserJSONRequestBody = User
+type CreateUserJSONRequestBody = ProtoUser
 
 // UpdateUserByIdJSONRequestBody defines body for UpdateUserById for application/json ContentType.
 type UpdateUserByIdJSONRequestBody = User
@@ -165,7 +174,7 @@ type ServerInterface interface {
 	CreateMeeting(w http.ResponseWriter, r *http.Request)
 	// Delete a meeting by ID
 	// (DELETE /meeting/{meetingId})
-	DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId interface{})
+	DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
 	// Get a meeting by ID
 	// (GET /meeting/{meetingId})
 	GetMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
@@ -256,7 +265,7 @@ func (siw *ServerInterfaceWrapper) DeleteMeetingById(w http.ResponseWriter, r *h
 	var err error
 
 	// ------------- Path parameter "meetingId" -------------
-	var meetingId interface{}
+	var meetingId openapi_types.UUID
 
 	err = runtime.BindStyledParameterWithOptions("simple", "meetingId", r.PathValue("meetingId"), &meetingId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {

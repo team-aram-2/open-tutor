@@ -116,7 +116,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/ProtoUser"
       responses:
         "201":
           description: User created
@@ -560,6 +560,31 @@ components:
           userId:
             type: string
             format: uuid
+          email:
+            type: string
+            format: email
+          signedUpAt:
+            type: string
+            format: date-time
+          firstName:
+            type: string
+          lastName:
+            type: string
+          accountLocked:
+            type: boolean
+
+      ProtoUser:
+        type: object
+        example:
+          email: email@example.com
+          firstName: Jacob
+          lastName: Hochstetler
+        description: Base object with all the information needed for a user to sign up.
+        required:
+        - email
+        - firstName
+        - lastName
+        properties:
           email:
             type: string
             format: email
