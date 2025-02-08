@@ -19,7 +19,7 @@ jobs:
         run: npm i
       - uses: sibiraj-s/action-eslint@v3
         with:
+          working-directory: ./frontend
           eslint-args: '--ignore-path=.gitignore --quiet'
           extensions: 'js,jsx,ts,tsx'
           annotations: true
-          working-dir: ./frontend
