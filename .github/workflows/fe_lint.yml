@@ -20,4 +20,4 @@ jobs:
           eslint-args: '--ignore-path=.gitignore --quiet'
           extensions: 'js,jsx,ts,tsx'
           annotations: true
-          working-dir: frontend
+          working-dir: ./frontend
