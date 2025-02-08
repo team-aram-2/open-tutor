@@ -18,4 +18,4 @@ jobs:
         working-directory: frontend
         run: |
           npm i
-          eslint .
+          ./node_modules/.bin/eslint .
