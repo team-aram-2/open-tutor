@@ -67,9 +67,3 @@ services:
 networks:
   dev_net:
     driver: bridge
-
-volumes:
-  # Used to cache Go packages and build cache to prevent:
-  # - Repeated downloads of Go dependencies
-  # - Rebuilding packages on every container restart
-  go-pkg:

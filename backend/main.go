@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	api "open-tutor/internal/services/api"
-	db "open-tutor/internal/services/db"
 )
 
 func main() {
