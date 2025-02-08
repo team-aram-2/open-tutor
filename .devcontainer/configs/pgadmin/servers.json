@@ -1,11 +1,11 @@
 {
     "Servers": {
         "1": {
-            "Name": "OpenTutor",
-            "Group": "Server Group 1",
+            "Name": "OpenTutor_DEV",
+            "Group": "Servers",
             "Port": 5432,
             "Username": "dev",
-            "Host": "localhost",
+            "Host": "postgres",
             "SSLMode": "prefer",
             "MaintenanceDB": "postgres",
             "PassFile": "/pgadmin/pgpass"

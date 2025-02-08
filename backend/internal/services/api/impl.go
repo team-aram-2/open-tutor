@@ -11,7 +11,7 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-type OpenTutor struct {}
+type OpenTutor struct{}
 
 var _ ServerInterface = (*OpenTutor)(nil)
 
