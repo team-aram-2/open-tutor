@@ -20,5 +20,5 @@ jobs:
       - name: Prettify code
         uses: creyD/prettier_action@v4.3
         with:
-          prettier_options: '--write **/*.{js,ts,tsx,json,md,css}'
+          prettier_options: '--write frontend/**/*.{js,ts,tsx,json,md,css}'
           github_token: ${{ secrets.GITHUB_TOKEN }}
