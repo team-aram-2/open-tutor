@@ -20,4 +20,4 @@ jobs:
       - uses: sibiraj-s/action-eslint@v3
         with:
           working-directory: frontend
-          all-file: true
+          all-files: true
