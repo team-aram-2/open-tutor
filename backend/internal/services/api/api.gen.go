@@ -52,6 +52,9 @@ type Message struct {
 	// MessageAttachments Array of message attachments
 	MessageAttachments *[]MessageAttachment `json:"MessageAttachments,omitempty"`
 
+	// ConversationId Unique identifier for the conversation for the message.
+	ConversationId openapi_types.UUID `json:"conversationId"`
+
 	// Id Unique identifier for the message.
 	Id openapi_types.UUID `json:"id"`
 
@@ -60,10 +63,7 @@ type Message struct {
 
 	// OriginId Unique identifier for the originID for the message.
 	OriginId openapi_types.UUID `json:"originId"`
-
-	// RecipientId Unique identifier for the recipient of the message.
-	RecipientId openapi_types.UUID `json:"recipientId"`
-	SentOn      time.Time          `json:"sentOn"`
+	SentOn   time.Time          `json:"sentOn"`
 }
 
 // MessageAttachment defines model for MessageAttachment.
@@ -184,6 +184,9 @@ type ServerInterface interface {
 	// Creates a new message
 	// (POST /message)
 	CreateMessage(w http.ResponseWriter, r *http.Request)
+	// Get all messages with this conversationId
+	// (GET /message/{conversationId})
+	GetMessagesByConversationId(w http.ResponseWriter, r *http.Request, conversationId openapi_types.UUID)
 	// Delete a message by id
 	// (DELETE /message/{messageId})
 	DeleteMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID)
@@ -371,6 +374,39 @@ func (siw *ServerInterfaceWrapper) CreateMessage(w http.ResponseWriter, r *http.
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateMessage(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetMessagesByConversationId operation middleware
+func (siw *ServerInterfaceWrapper) GetMessagesByConversationId(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "conversationId" -------------
+	var conversationId openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "conversationId", r.PathValue("conversationId"), &conversationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "conversationId", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
+
+	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetMessagesByConversationId(w, r, conversationId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -934,6 +970,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("GET "+options.BaseURL+"/meeting/{meetingId}", wrapper.GetMeetingById)
 	m.HandleFunc("PUT "+options.BaseURL+"/meeting/{meetingId}", wrapper.UpdateMeetingById)
 	m.HandleFunc("POST "+options.BaseURL+"/message", wrapper.CreateMessage)
+	m.HandleFunc("GET "+options.BaseURL+"/message/{conversationId}", wrapper.GetMessagesByConversationId)
 	m.HandleFunc("DELETE "+options.BaseURL+"/message/{messageId}", wrapper.DeleteMessageById)
 	m.HandleFunc("GET "+options.BaseURL+"/message/{messageId}", wrapper.GetMessageById)
 	m.HandleFunc("PUT "+options.BaseURL+"/message/{messageId}", wrapper.UpdateMessageById)
