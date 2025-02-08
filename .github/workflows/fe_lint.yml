@@ -14,7 +14,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm i # or yarn install
+      - name: Install Node Modules
+        working-directory: ./frontend
+        run: npm i
       - uses: sibiraj-s/action-eslint@v3
         with:
           eslint-args: '--ignore-path=.gitignore --quiet'
