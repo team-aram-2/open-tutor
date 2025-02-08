@@ -16,8 +16,6 @@ jobs:
           node-version: 20
       - name: Install Node Modules
         working-directory: frontend
-        run: npm i
-      - uses: sibiraj-s/action-eslint@v3
-        with:
-          working-directory: frontend
-          all-files: true
+        run: |
+          npm i
+          npm run lint
