@@ -6,7 +6,6 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - ..:/workspace:cached
-      - go-pkg:/home/node/go
     command: sleep infinity
     networks:
       - dev_net
