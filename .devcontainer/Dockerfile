@@ -42,6 +42,8 @@ RUN ARCH=$(uname -m); \
 RUN ARCH=$(uname -m); \
     if [ $ARCH = 'aarch64' ]; then \
         ARCH='arm64'; \
+    elif [ $ARCH = 'x86_64' ]; then \
+        ARCH='amd64'; \
     fi && \
     wget https://go.dev/dl/go1.21.6.linux-$ARCH.tar.gz \
     && tar -C /usr/local -xzf go1.21.6.linux-$ARCH.tar.gz \
