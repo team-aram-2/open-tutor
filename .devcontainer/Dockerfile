@@ -26,19 +26,29 @@ RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/
 
 RUN echo "node:node"|chpasswd
 
-RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage; \
-    chmod u+x nvim-linux-x86_64.appimage; \
-    mv nvim-linux-x86_64.appimage nvim.appimage; \
+RUN ARCH=$(uname -m); \
+    if [ $ARCH = 'aarch64' ]; then \
+        ARCH='arm64'; \
+    fi && \
+    echo "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-$ARCH.appimage"; \
+    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-$ARCH.appimage; \
+    chmod u+x nvim-linux-$ARCH.appimage; \
+    mv nvim-linux-$ARCH.appimage nvim.appimage; \
     ./nvim.appimage --appimage-extract; \
     sudo mv squashfs-root /; \
     sudo ln -s /squashfs-root/AppRun /usr/bin/nvim; \
     chmod +x /usr/bin/nvim;
 
-RUN wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz \
-    && tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz \
-    && rm go1.21.6.linux-amd64.tar.gz
+RUN ARCH=$(uname -m); \
+    if [ $ARCH = 'aarch64' ]; then \
+        ARCH='arm64'; \
+    fi && \
+    wget https://go.dev/dl/go1.21.6.linux-$ARCH.tar.gz \
+    && tar -C /usr/local -xzf go1.21.6.linux-$ARCH.tar.gz \
+    && rm go1.21.6.linux-$ARCH.tar.gz
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+RUN ARCH=$(uname -m); \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-$ARCH.zip" -o "awscliv2.zip" \
     && unzip awscliv2.zip \
     && ./aws/install \
     && rm -rf aws awscliv2.zip

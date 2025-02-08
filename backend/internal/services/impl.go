@@ -1,21 +1,24 @@
 package api
 
 import (
-	"encoding/json"
-	"net/http"
 	"database/sql"
-	_ "github.com/lib/pq"
-	"log"
-	"time"
+	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
+	"time"
+
+	_ "github.com/lib/pq"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-type OpenTutor struct {}
+type OpenTutor struct{}
 
-var _ ServerInterface = (*OpenTutor)(nil)
-var db *sql.DB
+var (
+	_  ServerInterface = (*OpenTutor)(nil)
+	db *sql.DB
+)
 
 func NewOpenTutor() *OpenTutor {
 	// Connect to database //
