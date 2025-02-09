@@ -14,7 +14,7 @@
 		<a href={`/my_people/student/my_tutor/${userId}`} class="tutor-name no-decoration"
 			>{name}
 			<div class="rating">
-				{#each Array(5) index}
+				{#each Array(5) as _, index}
 					<img class="star" src={index < rating ? starImage : emptyStarImage} alt="" />
 				{/each}
 			</div>
