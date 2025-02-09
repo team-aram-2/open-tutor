@@ -11,6 +11,7 @@
 		"test": "vitest",
 		"lint": "node_modules/.bin/eslint .",
 		"check-format": "prettier -c .",
+		"fix-format": "prettier -c --write .",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
