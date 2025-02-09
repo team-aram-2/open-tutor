@@ -80,4 +80,7 @@ RUN go install golang.org/x/tools/gopls@latest
 # install golangci-lint
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.63.4
 
+# install oapi-codegen #
+RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
+
 WORKDIR /workspace
