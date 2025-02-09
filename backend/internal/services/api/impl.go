@@ -60,7 +60,7 @@ func (t *OpenTutor) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{
+	_ = json.NewEncoder(w).Encode(map[string]string{
 		"userId": userId,
 	})
 }
@@ -159,7 +159,7 @@ func (t *OpenTutor) GetUserById(w http.ResponseWriter, r *http.Request, userId o
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
+	_ = json.NewEncoder(w).Encode(user)
 }
 
 func (t *OpenTutor) UpdateUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {
