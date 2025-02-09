@@ -107,10 +107,10 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
 
   # User login
-  /login:
+  /auth/login:
     post:
       summary: Log in as an existing user
-      operationId: loginUser
+      operationId: userLogin
       requestBody:
         required: true
         content:
@@ -123,7 +123,7 @@ paths:
           content:
             application/json: {}
           headers:
-            Authorization:
+            x-session-token:
               schema:
                 type: string
               description: The JWT associated with this authenticated session
@@ -135,14 +135,14 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
 
   # User register
-  /register:
+  /auth/register:
     post:
       summary: Sign up as a new user
-      operationId: registerUser
+      operationId: userRegister
       requestBody:
         required: true
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               $ref: "#/components/schemas/UserSignup"
       responses:
@@ -151,7 +151,7 @@ paths:
           content:
             application/json: {}
           headers:
-            Authorization:
+            x-session-token:
               schema:
                 type: string
               description: The JWT associated with this authenticated session
@@ -644,9 +644,9 @@ components:
           password:
             type: string
             format: password
-          firstName:
+          first_name:
             type: string
-          lastName:
+          last_name:
             type: string
 
       Tutor:

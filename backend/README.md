@@ -11,7 +11,7 @@ are changes to the OpenAPI specification.
 
 To codegen, do the following while working dir is `~/../project_dir/backend/`:
 
-`oapi-codegen --config=configs/api_codegen.yaml api/openapi.yaml`
+`scripts/update_oapi.sh`
 
 This is destructive and will overwrite the existing `api.gen.go` in
 `~/../proj_dir/backend/internal/services`

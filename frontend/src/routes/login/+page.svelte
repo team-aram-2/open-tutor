@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { PUBLIC_API_HOST } from '$env/static/public';
+	import { onMount } from 'svelte';
 
 	enum Tab {
 		Login = 'LOGIN',
@@ -9,6 +10,12 @@
 	$: selectedTab = Tab.Login;
 	$: submittingForm = false;
 	$: submissionError = '';
+	$: loginError = '';
+
+	onMount(() => {
+		const params = new URLSearchParams(window.location.search);
+		loginError = params.get('err') ?? '';
+	});
 
 	const onSubmit = async (e: any) => {
 		if (submittingForm) return;
@@ -20,17 +27,17 @@
 
 		const formData = Object.fromEntries(new FormData(e.target));
 
-		let response;
+		let reqPromise;
 		switch (selectedTab) {
 			case Tab.Login:
-				response = fetch(`${PUBLIC_API_HOST}/login`, {
+				reqPromise = fetch(`${PUBLIC_API_HOST}/auth/login`, {
 					method: 'POST',
 					body: JSON.stringify(formData)
 				});
 				break;
 			case Tab.Register:
-				response = fetch(`${PUBLIC_API_HOST}/register`, {
-					method: 'POST',
+				reqPromise = fetch(`${PUBLIC_API_HOST}/auth/register`, {
+					method: 'PUT',
 					body: JSON.stringify(formData)
 				});
 				break;
@@ -38,18 +45,19 @@
 				console.error('unknown form tab');
 		}
 
-		try {
-			const jsonResponse = await (await response)?.json();
-		} catch (err) {
-			submissionError = err as any;
-		} finally {
-			submittingForm = false;
+		const response = await reqPromise;
+		if (!response || !response?.ok) {
+			console.error(`failed to sign up/login`);
+			return;
 		}
+
+		window.localStorage.setItem('SessionToken', response.headers.get('X-Session-Token')!);
+		// window.location.href = '/';
 	};
 </script>
 
 <div class="w-full flex flex-col text-white">
-	<div class="flex flex-col gap-1">
+	<div class="flex flex-col gap-1 w-120 mx-auto">
 		<h1 class="text-center text-5xl">Open Tutor</h1>
 
 		<div class="my-6">
@@ -70,7 +78,13 @@
 			<hr class="border-gray-600 border-dashed" />
 		</div>
 
-		<form class="flex flex-col gap-3 w-120 mx-auto" on:submit={onSubmit}>
+		<span class="text-red-600 text-center">{loginError}</span>
+
+		<form
+			class="flex flex-col gap-3"
+			method="POST"
+			action="{PUBLIC_API_HOST}/auth/{selectedTab.toLowerCase()}"
+		>
 			{#if selectedTab === Tab.Login}
 				<input
 					class="bg-gray-900 px-4 py-2 rounded-md"

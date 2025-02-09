@@ -69,7 +69,7 @@ func (t *OpenTutor) CreateMeeting(w http.ResponseWriter, r *http.Request) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
 
-func (t *OpenTutor) DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId interface{}) {
+func (t *OpenTutor) DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
 

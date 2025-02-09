@@ -104,3 +104,11 @@ CREATE TABLE ratings (
   FOREIGN KEY (reviewer_user_id) REFERENCES users(user_id),
   FOREIGN KEY (meeting_id) REFERENCES meetings(id)
 );
+
+DROP TABLE IF EXISTS key_pairs;
+CREATE TABLE key_pairs (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "public_key" TEXT NOT NULL,
+  "private_key" TEXT NOT NULL,
+  "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
