@@ -20,6 +20,8 @@ type KeyPair struct {
 	CreatedAt  time.Time
 }
 
+type HttpContextKey string
+
 // Serialize keys to PEM format for storage //
 func serializeKeys(privateKey *rsa.PrivateKey, publicKey *rsa.PublicKey) (string, string, error) {
 	// Encode private key
