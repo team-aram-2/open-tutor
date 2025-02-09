@@ -35,7 +35,7 @@ func GetAuthenticationInfo(r *http.Request) *AuthenticationInfo {
 func Authenticate(next http.Handler) http.HandlerFunc {
 	jwtKeyPair, err := util.GetKeyPair("user-auth-jwt")
 	if err != nil {
-		panic(fmt.Sprintf("failed to get user_auth_jwt keypair: %v", err))
+		panic(fmt.Sprintf("failed to get user-auth-jwt keypair: %v", err))
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
