@@ -44,8 +44,11 @@ services:
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: password
       POSTGRES_DB: opentutor
+    ports:
+      - "5432:5432"
     volumes:
       - "../backend/configs/pgsql:/docker-entrypoint-initdb.d/"
+      - "postgres-data:/var/lib/postgresql/data"
     networks:
       - dev_net
 
@@ -73,3 +76,4 @@ volumes:
   # - Repeated downloads of Go dependencies
   # - Rebuilding packages on every container restart
   go-pkg:
+  postgres-data:

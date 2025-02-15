@@ -28,7 +28,7 @@ RUN echo "node:node"|chpasswd
 
 RUN ARCH=$(uname -m); \
     if [ $ARCH = 'aarch64' ]; then \
-        ARCH='arm64'; \
+    ARCH='arm64'; \
     fi && \
     echo "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-$ARCH.appimage"; \
     curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-$ARCH.appimage; \
@@ -41,9 +41,9 @@ RUN ARCH=$(uname -m); \
 
 RUN ARCH=$(uname -m); \
     if [ $ARCH = 'aarch64' ]; then \
-        ARCH='arm64'; \
+    ARCH='arm64'; \
     elif [ $ARCH = 'x86_64' ]; then \
-        ARCH='amd64'; \
+    ARCH='amd64'; \
     fi && \
     wget https://go.dev/dl/go1.21.6.linux-$ARCH.tar.gz \
     && tar -C /usr/local -xzf go1.21.6.linux-$ARCH.tar.gz \
@@ -75,7 +75,12 @@ ENV PATH="${PATH}:/opt/nvim"
 RUN mkdir -p ~/.config/nvim:wget; \
     git clone https://github.com/corigne/dot-neovim.git .config/nvim;
 
-RUN go install golang.org/x/tools/gopls@latest \
-    && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+RUN go install golang.org/x/tools/gopls@latest
+
+# install golangci-lint
+RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.63.4
+
+# install oapi-codegen #
+RUN go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
 
 WORKDIR /workspace
