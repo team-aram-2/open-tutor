@@ -9,13 +9,13 @@
 <div class="sidebar flex h-screen">
     <h2 class="sidebar-title">Student</h2>
     <nav class="sidebar-items">
-        <a href="#" class="no-decoration" class:selected-sidebar-item={selectedItem === 'view'} on:click={() => setSelectedItem('view')}>
+        <a href="/my_people/student" class="no-decoration" class:selected-sidebar-item={selectedItem === 'view'} on:click={() => setSelectedItem('view')}>
             <p>View Tutors</p>
         </a>
         <a href="#" class="no-decoration" class:selected-sidebar-item={selectedItem === 'apt'} on:click={() => setSelectedItem('apt')}>
             <p>Appointments</p>
         </a>
-        <a href="#" class="no-decoration" class:selected-sidebar-item={selectedItem === 'msg'} on:click={() => setSelectedItem('msg')}>
+        <a href="/messages/student" class="no-decoration" class:selected-sidebar-item={selectedItem === 'msg'} on:click={() => setSelectedItem('msg')}>
             <p>Messages</p>
         </a>
         <a href="#" class="no-decoration" class:selected-sidebar-item={selectedItem === 'pym'} on:click={() => setSelectedItem('pym')}>
@@ -45,6 +45,8 @@
         flex-direction: column;
 
         background-color: #453a69;
+
+        z-index: 1000;
     }
     .sidebar-title {
         display: flex;
