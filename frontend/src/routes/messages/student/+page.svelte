@@ -28,14 +28,11 @@
 <div class="messagecontainer">
 	<div style="padding-bottom: 30px"></div>
 	{#each messages as message}
-		<Message
-			conversationId={message.conversationId}
-			messageId={message.messageId}
-			originId={message.originId}
-			messageContent={message.messageContent}
-			messageAttachments={message.messageAttachments}
-			userId="userId"
-			sentOn={message.sentOn}
+		<!-- conversationId={message.conversationId}
+  messageId={message.messageId}
+  messageAttachments={message.messageAttachments}
+  sentOn={message.sentOn} -->
+		<Message originId={message.originId} messageContent={message.messageContent} userId="userId"
 		></Message>
 	{/each}
 	<!-- Sort messages by timestamp -->
