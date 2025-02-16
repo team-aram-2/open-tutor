@@ -6,14 +6,14 @@
 @tailwind utilities;
 
 :root {
-  --purple-very-light: #E7E4F1;
-  --purple-light: #7261A8;
-  --purple-dark: #453A69;
-  --purple-very-dark: #231D34;
+	--purple-very-light: #e7e4f1;
+	--purple-light: #7261a8;
+	--purple-dark: #453a69;
+	--purple-very-dark: #231d34;
 
-  --yellow-very-light: #FDF8ED;
-  --yellow-light: #F4D390;
-  --yellow-neutral: #EBAD33;
-  --yellow-dark: #A4771E;
-  --yellow-very-dark: #5D4109;
+	--yellow-very-light: #fdf8ed;
+	--yellow-light: #f4d390;
+	--yellow-neutral: #ebad33;
+	--yellow-dark: #a4771e;
+	--yellow-very-dark: #5d4109;
 }

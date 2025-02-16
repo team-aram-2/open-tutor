@@ -1,9 +1,8 @@
 {
-  "appointments": [
-    "e24fd0b9-fcd2-4de7-a3e1-e81d6191f15c",
-    "171e9b6a-4b62-4c87-b35e-c9d73b00c882",
-    "d5b09bbf-5a04-4266-9913-14a84c535dcd",
-    "792c7f13-29c2-480e-b74e-a3f251262580"
-  ]
-
+	"appointments": [
+		"e24fd0b9-fcd2-4de7-a3e1-e81d6191f15c",
+		"171e9b6a-4b62-4c87-b35e-c9d73b00c882",
+		"d5b09bbf-5a04-4266-9913-14a84c535dcd",
+		"792c7f13-29c2-480e-b74e-a3f251262580"
+	]
 }
