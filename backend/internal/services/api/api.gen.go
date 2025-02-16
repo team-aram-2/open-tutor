@@ -32,6 +32,14 @@ const (
 	GetRatingByIdParamsUserTypeTutor   GetRatingByIdParamsUserType = "tutor"
 )
 
+// CreateMeetingBody defines model for CreateMeetingBody.
+type CreateMeetingBody struct {
+	EndAt     *time.Time          `json:"endAt,omitempty"`
+	StartAt   *time.Time          `json:"startAt,omitempty"`
+	StudentId *openapi_types.UUID `json:"studentId,omitempty"`
+	TutorId   *openapi_types.UUID `json:"tutorId,omitempty"`
+}
+
 // ErrorModel defines model for ErrorModel.
 type ErrorModel struct {
 	Code    int    `json:"code"`
@@ -45,6 +53,7 @@ type Meeting struct {
 	StartAt   *time.Time          `json:"startAt,omitempty"`
 	StudentId *openapi_types.UUID `json:"studentId,omitempty"`
 	TutorId   *openapi_types.UUID `json:"tutorId,omitempty"`
+	ZoomLink  *string             `json:"zoomLink,omitempty"`
 }
 
 // Message defines model for Message.
@@ -154,7 +163,7 @@ type UserLoginJSONRequestBody = UserLogin
 type UserRegisterFormdataRequestBody = UserSignup
 
 // CreateMeetingJSONRequestBody defines body for CreateMeeting for application/json ContentType.
-type CreateMeetingJSONRequestBody = Meeting
+type CreateMeetingJSONRequestBody = CreateMeetingBody
 
 // UpdateMeetingByIdJSONRequestBody defines body for UpdateMeetingById for application/json ContentType.
 type UpdateMeetingByIdJSONRequestBody = Meeting

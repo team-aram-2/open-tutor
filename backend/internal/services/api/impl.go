@@ -65,22 +65,6 @@ func (t *OpenTutor) CreateUser(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (t *OpenTutor) CreateMeeting(w http.ResponseWriter, r *http.Request) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) GetMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) UpdateMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
 func (t *OpenTutor) CreateMessage(w http.ResponseWriter, r *http.Request) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
