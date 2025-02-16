@@ -35,9 +35,6 @@
 
 <!-- Style for the page goes here -->
 <style>
-    /* Import Inter font */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700');
-
     /* Apply these globally */
     * {
         font-family: 'Inter', sans-serif;
@@ -60,9 +57,11 @@
         /* font:  */
     }
 
-    .content {
-        padding-left: 50px;
-        padding-top: 20px;
+    * .content {
+        padding-left: 0px;
+        padding-top: 0px;
+        width: auto;
+        flex-grow: 1;
     }
     /* .page-title {
         padding-left: 30px;

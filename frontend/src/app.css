@@ -1,3 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --purple-very-light: #E7E4F1;
+  --purple-light: #7261A8;
+  --purple-dark: #453A69;
+  --purple-very-dark: #231D34;
+
+  --yellow-very-light: #FDF8ED;
+  --yellow-light: #F4D390;
+  --yellow-neutral: #EBAD33;
+  --yellow-dark: #A4771E;
+  --yellow-very-dark: #5D4109;
+}
