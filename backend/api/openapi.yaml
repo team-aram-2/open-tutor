@@ -741,9 +741,6 @@ components:
       CreateMeetingBody:
         type: object
         properties:
-          tutorId:
-            type: string
-            format: uuid
           studentId:
             type: string
             format: uuid

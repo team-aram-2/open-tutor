@@ -37,7 +37,6 @@ type CreateMeetingBody struct {
 	EndAt     *time.Time          `json:"endAt,omitempty"`
 	StartAt   *time.Time          `json:"startAt,omitempty"`
 	StudentId *openapi_types.UUID `json:"studentId,omitempty"`
-	TutorId   *openapi_types.UUID `json:"tutorId,omitempty"`
 }
 
 // ErrorModel defines model for ErrorModel.

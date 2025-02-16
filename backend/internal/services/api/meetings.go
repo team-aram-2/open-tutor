@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"open-tutor/internal/services/db"
+	middleware "open-tutor/middleware"
 
 	"github.com/google/uuid"
 	openapi_types "github.com/oapi-codegen/runtime/types"
@@ -18,13 +19,20 @@ func (t *OpenTutor) CreateMeeting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	authInfo := middleware.GetAuthenticationInfo(r)
+	if authInfo == nil {
+		fmt.Printf("No authentication info found.\n")
+	} else {
+		fmt.Printf("Authenticated user id: %s\n", authInfo.UserID)
+	}
+
 	_, err := db.GetDB().Exec(`
 		INSERT INTO meetings
 		(id, tutor_id, student_id, start_at, end_at, zoom_link)
 		VALUES ($1, $2, $3, $4, $5, $6);
 	`,
 		uuid.New().String(),
-		meetingPayload.TutorId,
+		authInfo.UserID,
 		meetingPayload.StudentId,
 		meetingPayload.StartAt,
 		meetingPayload.EndAt,
