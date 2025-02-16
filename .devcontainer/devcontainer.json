@@ -20,7 +20,9 @@
                 "Gruntfuggly.todo-tree",
                 "github.vscode-pull-request-github",
                 "svelte.svelte-vscode",
-                "shd101wyy.markdown-preview-enhanced"
+                "shd101wyy.markdown-preview-enhanced",
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint"
             ],
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "bash",
