@@ -7,7 +7,6 @@ import (
 
 	"open-tutor/internal/services/db"
 
-	"github.com/google/uuid"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
@@ -24,41 +23,6 @@ func checkUser(userId openapi_types.UUID) (bool, error) {
 		return false, err
 	}
 	return exist, nil
-}
-
-func (t *OpenTutor) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var protoUser ProtoUser
-	var user User
-	if err := json.NewDecoder(r.Body).Decode(&protoUser); err != nil {
-		sendError(w, http.StatusBadRequest, "Invalid format for user")
-		return
-	}
-
-	userId := uuid.New().String()
-	insertErr := db.GetDB().QueryRow(`
-		INSERT INTO users (user_id, email, first_name, last_name)
-		VALUES ($1, $2, $3, $4)
-		RETURNING user_id, email, first_name, last_name;
-	`,
-		userId,
-		protoUser.Email,
-		protoUser.FirstName,
-		protoUser.LastName,
-	).Scan(
-		&user.UserId,
-		&user.Email,
-		&user.FirstName,
-		&user.LastName,
-	)
-
-	if insertErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%s\n", insertErr)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(user)
 }
 
 func (t *OpenTutor) DeleteUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {
@@ -122,7 +86,7 @@ func (t *OpenTutor) GetUserById(w http.ResponseWriter, r *http.Request, userId o
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
+	_ = json.NewEncoder(w).Encode(user)
 }
 
 func (t *OpenTutor) UpdateUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {
@@ -162,5 +126,5 @@ func (t *OpenTutor) UpdateUserById(w http.ResponseWriter, r *http.Request, userI
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(updatedUser)
+	_ = json.NewEncoder(w).Encode(updatedUser)
 }

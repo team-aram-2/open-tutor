@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
 	"open-tutor/internal/services/db"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
@@ -34,36 +35,6 @@ func sendError(w http.ResponseWriter, code int, message string) {
 	_ = json.NewEncoder(w).Encode(sendError)
 }
 
-func (t *OpenTutor) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var user User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		sendError(w, http.StatusBadRequest, "Invalid format for user")
-		return
-	}
-
-	var userId string
-	insertErr := db.GetDB().QueryRow(`
-		INSERT INTO users (email, first_name, last_name)
-		VALUES ($1, $2, $3)
-		RETURNING user_id
-	`,
-		user.Email,
-		user.FirstName,
-		user.LastName,
-	).Scan(&userId)
-
-	if insertErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%s\n", insertErr)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(map[string]string{
-		"userId": userId,
-	})
-}
-
 func (t *OpenTutor) CreateMeeting(w http.ResponseWriter, r *http.Request) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
@@ -77,22 +48,6 @@ func (t *OpenTutor) GetMeetingById(w http.ResponseWriter, r *http.Request, meeti
 }
 
 func (t *OpenTutor) UpdateMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) CreateMessage(w http.ResponseWriter, r *http.Request) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) DeleteMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) GetMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) UpdateMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
 
@@ -129,38 +84,5 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *OpenTutor) GetTutorById(w http.ResponseWriter, r *http.Request, tutorId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) DeleteUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) GetUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {
-	user := &User{}
-	selectErr := db.GetDB().QueryRow(`
-		SELECT *
-		FROM users
-		WHERE user_id = $1
-	`, userId).Scan(
-		&user.UserId,
-		&user.Email,
-		&user.SignedUpAt,
-		&user.FirstName,
-		&user.LastName,
-		&user.AccountLocked,
-	)
-
-	if selectErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%s\n", selectErr)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(user)
-}
-
-func (t *OpenTutor) UpdateUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }

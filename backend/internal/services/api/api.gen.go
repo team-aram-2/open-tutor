@@ -32,6 +32,12 @@ const (
 	GetRatingByIdParamsUserTypeTutor   GetRatingByIdParamsUserType = "tutor"
 )
 
+// Conversation defines model for Conversation.
+type Conversation struct {
+	Id    *openapi_types.UUID   `json:"id,omitempty"`
+	Users *[]openapi_types.UUID `json:"users,omitempty"`
+}
+
 // ErrorModel defines model for ErrorModel.
 type ErrorModel struct {
 	Code    int    `json:"code"`
@@ -79,15 +85,6 @@ type MessageAttachment struct {
 
 	// Url Source of the attachment.
 	Url string `json:"url"`
-}
-
-// ProtoUser Base object with all the information needed for a user to sign up.
-type ProtoUser struct {
-	AccountLocked *bool               `json:"accountLocked,omitempty"`
-	Email         openapi_types.Email `json:"email"`
-	FirstName     string              `json:"firstName"`
-	LastName      string              `json:"lastName"`
-	SignedUpAt    *time.Time          `json:"signedUpAt,omitempty"`
 }
 
 // Rating defines model for Rating.
@@ -148,6 +145,9 @@ type UserSignup struct {
 	Password  string              `json:"password"`
 }
 
+// CreateConversationJSONBody defines parameters for CreateConversation.
+type CreateConversationJSONBody = []openapi_types.UUID
+
 // GetRatingByIdParams defines parameters for GetRatingById.
 type GetRatingByIdParams struct {
 	UserType *GetRatingByIdParamsUserType `form:"userType,omitempty" json:"userType,omitempty"`
@@ -161,6 +161,9 @@ type UserLoginJSONRequestBody = UserLogin
 
 // UserRegisterFormdataRequestBody defines body for UserRegister for application/x-www-form-urlencoded ContentType.
 type UserRegisterFormdataRequestBody = UserSignup
+
+// CreateConversationJSONRequestBody defines body for CreateConversation for application/json ContentType.
+type CreateConversationJSONRequestBody = CreateConversationJSONBody
 
 // CreateMeetingJSONRequestBody defines body for CreateMeeting for application/json ContentType.
 type CreateMeetingJSONRequestBody = Meeting
@@ -194,6 +197,15 @@ type ServerInterface interface {
 	// Sign up as a new user
 	// (POST /auth/register)
 	UserRegister(w http.ResponseWriter, r *http.Request)
+	// Create a new conversation
+	// (POST /conversation)
+	CreateConversation(w http.ResponseWriter, r *http.Request)
+	// Get all messages in the conversation via conversationId
+	// (GET /conversation/messages/{conversationId})
+	GetMessagesByConversationId(w http.ResponseWriter, r *http.Request, conversationId openapi_types.UUID)
+	// Get all userIds in the conversation via conversationId
+	// (GET /conversation/{conversationId})
+	GetUsersByConversationId(w http.ResponseWriter, r *http.Request, conversationId openapi_types.UUID)
 	// Create a new meeting
 	// (POST /meeting)
 	CreateMeeting(w http.ResponseWriter, r *http.Request)
@@ -209,9 +221,6 @@ type ServerInterface interface {
 	// Creates a new message
 	// (POST /message)
 	CreateMessage(w http.ResponseWriter, r *http.Request)
-	// Get all messages with this conversationId
-	// (GET /message/{conversationId})
-	GetMessagesByConversationId(w http.ResponseWriter, r *http.Request, conversationId openapi_types.UUID)
 	// Delete a message by id
 	// (DELETE /message/{messageId})
 	DeleteMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID)
@@ -297,6 +306,94 @@ func (siw *ServerInterfaceWrapper) UserRegister(w http.ResponseWriter, r *http.R
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UserRegister(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateConversation operation middleware
+func (siw *ServerInterfaceWrapper) CreateConversation(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
+
+	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateConversation(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetMessagesByConversationId operation middleware
+func (siw *ServerInterfaceWrapper) GetMessagesByConversationId(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "conversationId" -------------
+	var conversationId openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "conversationId", r.PathValue("conversationId"), &conversationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "conversationId", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
+
+	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetMessagesByConversationId(w, r, conversationId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetUsersByConversationId operation middleware
+func (siw *ServerInterfaceWrapper) GetUsersByConversationId(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "conversationId" -------------
+	var conversationId openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "conversationId", r.PathValue("conversationId"), &conversationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "conversationId", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
+
+	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetUsersByConversationId(w, r, conversationId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -440,39 +537,6 @@ func (siw *ServerInterfaceWrapper) CreateMessage(w http.ResponseWriter, r *http.
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateMessage(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// GetMessagesByConversationId operation middleware
-func (siw *ServerInterfaceWrapper) GetMessagesByConversationId(w http.ResponseWriter, r *http.Request) {
-
-	var err error
-
-	// ------------- Path parameter "conversationId" -------------
-	var conversationId openapi_types.UUID
-
-	err = runtime.BindStyledParameterWithOptions("simple", "conversationId", r.PathValue("conversationId"), &conversationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "conversationId", Err: err})
-		return
-	}
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetMessagesByConversationId(w, r, conversationId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1011,12 +1075,14 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 
 	m.HandleFunc("POST "+options.BaseURL+"/auth/login", wrapper.UserLogin)
 	m.HandleFunc("POST "+options.BaseURL+"/auth/register", wrapper.UserRegister)
+	m.HandleFunc("POST "+options.BaseURL+"/conversation", wrapper.CreateConversation)
+	m.HandleFunc("GET "+options.BaseURL+"/conversation/messages/{conversationId}", wrapper.GetMessagesByConversationId)
+	m.HandleFunc("GET "+options.BaseURL+"/conversation/{conversationId}", wrapper.GetUsersByConversationId)
 	m.HandleFunc("POST "+options.BaseURL+"/meeting", wrapper.CreateMeeting)
 	m.HandleFunc("DELETE "+options.BaseURL+"/meeting/{meetingId}", wrapper.DeleteMeetingById)
 	m.HandleFunc("GET "+options.BaseURL+"/meeting/{meetingId}", wrapper.GetMeetingById)
 	m.HandleFunc("PUT "+options.BaseURL+"/meeting/{meetingId}", wrapper.UpdateMeetingById)
 	m.HandleFunc("POST "+options.BaseURL+"/message", wrapper.CreateMessage)
-	m.HandleFunc("GET "+options.BaseURL+"/message/{conversationId}", wrapper.GetMessagesByConversationId)
 	m.HandleFunc("DELETE "+options.BaseURL+"/message/{messageId}", wrapper.DeleteMessageById)
 	m.HandleFunc("GET "+options.BaseURL+"/message/{messageId}", wrapper.GetMessageById)
 	m.HandleFunc("PUT "+options.BaseURL+"/message/{messageId}", wrapper.UpdateMessageById)

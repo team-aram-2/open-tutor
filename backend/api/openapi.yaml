@@ -470,34 +470,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
-  
-  /message/{conversationId}:
-    get:
-      summary: Get all messages with this conversationId
-      operationId: getMessagesByConversationId
-      parameters:
-        - name: conversationId
-          in: path
-          required: true
-          description: The ID of the conversation to fetch
-          schema:
-            type: string
-            format: uuid
-      responses:
-        "404":
-          description: Conversation not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-        "200":
-          description: Conversation found
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Message"
 
   # Post a message attachment
   /messageAttachment:
@@ -563,7 +535,82 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
-                
+
+  /conversation:
+    post:
+      summary: Create a new conversation
+      operationId: createConversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+      responses:
+        "201":
+          description: Attachment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+
+
+  /conversation/{conversationId}:
+    get:
+      summary: Get all userIds in the conversation via conversationId
+      operationId: getUsersByConversationId
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          description: The ID of the conversation to fetch
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "404":
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "200":
+          description: Conversation found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+  /conversation/messages/{conversationId}:
+    get:
+      summary: Get all messages in the conversation via conversationId
+      operationId: getMessagesByConversationId
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          description: The ID of the conversation to fetch
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "404":
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "200":
+          description: Messages found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+
 
 components:
   securitySchemes:
@@ -875,6 +922,9 @@ components:
       Conversation:
         type: object
         properties:
+          id:
+            type: string
+            format: uuid
           users:
             type: array
             items:
