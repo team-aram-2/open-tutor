@@ -2,42 +2,27 @@ package api
 
 import (
 	"encoding/json"
-	"net/http"
-	"database/sql"
-	_ "github.com/lib/pq"
-	"log"
-	"time"
 	"fmt"
+	"log"
+	"net/http"
+
+	"open-tutor/internal/services/db"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-type OpenTutor struct {}
+type OpenTutor struct{}
 
 var _ ServerInterface = (*OpenTutor)(nil)
-var db *sql.DB
 
-func NewOpenTutor() *OpenTutor {
-	// Connect to database //
-	var conErr error
-	db, conErr = sql.Open("postgres", "postgres://postgres:developer@db:5432/postgres?sslmode=disable")
-	if conErr != nil {
-		log.Fatal(conErr)
-	}
-	// defer db.Close()
-
-	// Test connection //
-	conErr = db.Ping()
-	if conErr != nil {
-		log.Fatal(conErr)
+func Init() *OpenTutor {
+	// Ensure the database is initialized
+	_, err := db.InitDB()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	// Set connection pool settings //
-	db.SetMaxOpenConns(30)
-	db.SetMaxIdleConns(30)
-	db.SetConnMaxLifetime(5 * time.Minute)
-	fmt.Printf("Connected to database\n")
-
+	fmt.Println("Database initialized successfully")
 	return &OpenTutor{}
 }
 
@@ -58,7 +43,7 @@ func (t *OpenTutor) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var userId string
-	insertErr := db.QueryRow(`
+	insertErr := db.GetDB().QueryRow(`
 		INSERT INTO users (email, first_name, last_name)
 		VALUES ($1, $2, $3)
 		RETURNING user_id
@@ -75,7 +60,7 @@ func (t *OpenTutor) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{
+	_ = json.NewEncoder(w).Encode(map[string]string{
 		"userId": userId,
 	})
 }
@@ -84,7 +69,7 @@ func (t *OpenTutor) CreateMeeting(w http.ResponseWriter, r *http.Request) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
 
-func (t *OpenTutor) DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId interface{}) {
+func (t *OpenTutor) DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
 
@@ -154,7 +139,7 @@ func (t *OpenTutor) DeleteUserById(w http.ResponseWriter, r *http.Request, userI
 
 func (t *OpenTutor) GetUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {
 	user := &User{}
-	selectErr := db.QueryRow(`
+	selectErr := db.GetDB().QueryRow(`
 		SELECT *
 		FROM users
 		WHERE user_id = $1
@@ -174,7 +159,7 @@ func (t *OpenTutor) GetUserById(w http.ResponseWriter, r *http.Request, userId o
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
+	_ = json.NewEncoder(w).Encode(user)
 }
 
 func (t *OpenTutor) UpdateUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {

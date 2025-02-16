@@ -1,0 +1,25 @@
+{
+	"appointments": [
+		{
+			"id": "e0812ab0-20c3-480f-bc5a-3a6e1242d265",
+			"tutorId": "0f39ae72-3b35-4494-984b-54fd5d230008",
+			"studentId": "cdaf0819-dc70-4658-8a37-e5413e466a55",
+			"startAt": "FORMAT UNKNOWN",
+			"endAt": "FORMAT UNKNOWN"
+		},
+		{
+			"id": "e0812ab0-20c3-480f-bc5a-3a6e1242d265",
+			"tutorId": "0f39ae72-3b35-4494-984b-54fd5d230008",
+			"studentId": "5d7821e6-4d4c-4667-a8df-a8be92edc94b",
+			"startAt": "FORMAT UNKNOWN",
+			"endAt": "FORMAT UNKNOWN"
+		},
+		{
+			"id": "e0812ab0-20c3-480f-bc5a-3a6e1242d265",
+			"tutorId": "0f39ae72-3b35-4494-984b-54fd5d230008",
+			"studentId": "45394141-a301-49ea-94d6-eaceadeec4b7",
+			"startAt": "FORMAT UNKNOWN",
+			"endAt": "FORMAT UNKNOWN"
+		}
+	]
+}

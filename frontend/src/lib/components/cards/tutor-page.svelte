@@ -1,139 +1,133 @@
 <script>
-    export let profilePicture = '/images/cards/pfp.png';
-    export let name = 'john doe';
-    export let rating = 2;
-    export let starImage = "/images/cards/star.png";
-    export let emptyStarImage = "/images/cards/empty_star.png";
-    export let skills = [ "" ];
-    export let userId = "";
+	export let profilePicture = '/images/cards/pfp.png';
+	export let name = 'john doe';
+	export let rating = 2;
+	export let starImage = '/images/cards/star.png';
+	export let emptyStarImage = '/images/cards/empty_star.png';
+	export let skills = [''];
+	export let userId = '';
 </script>
 
 <div class="tutor-card flex h-screen">
-    <h1 class="tutor-header">
-        <img class="pfp" src={profilePicture} alt=""/>
-        <h2 class="tutor-name no-decoration">{name}
-            <div class="rating">
-                {#each Array(5) as _, index}
-                    <img class="star" 
-                        src={index < rating ? starImage : emptyStarImage}
-                        alt="">
-                {/each}  
-            </div>
-        </h2>
-    </h1>
-    <div class="specialties">
-        {#each skills as skill}
-            <div class="tag">{skill}</div>
-        {/each}
-    </div>
+	<h1 class="tutor-header">
+		<img class="pfp" src={profilePicture} alt="" />
+		<h2 class="tutor-name no-decoration">
+			{name}
+			<div class="rating">
+				{#each Array(5) as _, index}
+					<img class="star" src={index < rating ? starImage : emptyStarImage} alt="" />
+				{/each}
+			</div>
+		</h2>
+	</h1>
+	<div class="specialties">
+		{#each skills as skill}
+			<div class="tag">{skill}</div>
+		{/each}
+	</div>
 </div>
+
 <style>
-    
-    .tutor-card{
+	.tutor-card {
+		height: 100vh;
+		width: 100vh;
 
-        height: 100vh;
-        width: 100%;
+		padding-right: 20px;
+		padding-bottom: 50px;
+		margin-bottom: 25px;
 
-        padding-right: 20px;
-        padding-bottom: 50px;
-        margin-bottom: 25px;
+		border-top-right-radius: 25px;
+		border-bottom-right-radius: 25px;
+		border-top-left-radius: 25px;
+		border-bottom-left-radius: 25px;
 
-        border-top-right-radius: 25px;
-        border-bottom-right-radius: 25px;
-        border-top-left-radius: 25px;
-        border-bottom-left-radius: 25px;
+		display: flex;
+		flex-direction: column;
 
+		background: #fdf8ed;
+		border: 5px solid #ebad33;
+	}
 
+	.tutor-header {
+		display: flex;
+		flex-direction: row;
+	}
+	.tutor-name {
+		height: 120px;
+		width: auto;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 
-        display: flex;
-        flex-direction: column;
+		position: relative;
+		top: 0;
+		left: 0;
 
-        background: #FDF8ED;
-        border: 5px solid #EBAD33;
-    }
+		padding-left: 25px;
+		padding-right: 25px;
+		margin: 0;
 
-    .tutor-header {
-        display: flex;
-        flex-direction: row;
-    }
-    .tutor-name {
-        height: 120px;
-        width: auto;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+		font-size: 3rem;
+		font-weight: bold;
+		color: #352505;
+		/* border: 2px solid blue */
+	}
 
-        position: relative;
-        top: 0;
-        left: 0;
-        
-        padding-left: 25px;
-        padding-right: 25px;
-        margin: 0;
+	.pfp {
+		width: 120px;
+		height: 120px;
 
-        font-size: 3rem;
-        font-weight: bold;
-        color: #352505;
-        /* border: 2px solid blue */
-    }
-    .pfp {
-        width: 120px;
-        height: 120px;
+		margin-left: 20px;
 
-        margin-left: 20px;
+		border-radius: 15px;
+		border-top-right-radius: 25px;
+		border-bottom-right-radius: 25px;
+		border-top-left-radius: 25px;
+		border-bottom-left-radius: 25px;
+		border: 2px solid #ebad33;
+	}
 
+	.rating {
+		display: flex;
+		flex-direction: row;
+	}
 
-        border-radius: 15px;
-        border-top-right-radius: 25px;
-        border-bottom-right-radius: 25px;
-        border-top-left-radius: 25px;
-        border-bottom-left-radius: 25px;
-        border: 2px solid #EBAD33;
+	.star {
+		width: 40px;
+		height: 40px;
+		margin-left: 5px;
+	}
 
-    }
+	.no-decoration {
+		text-decoration: none;
+		color: inherit;
+	}
 
-    .rating{
-        display: flex;
-        flex-direction: row;
+	.specialties {
+		display: flex;
+		flex-direction: row;
+		padding-left: 10px;
+	}
 
-    }
+	.tag {
+		width: auto;
+		line-height: 30px;
+		height: 30px;
+		margin-left: 10px;
+		padding: 3px 5px 3px;
 
-    .star{
-        width: 40px;
-        height: 40px;
-        margin-left: 5px;
-    }
+		border-radius: 15px;
+		border-top-right-radius: 25px;
+		border-bottom-right-radius: 25px;
+		border-top-left-radius: 25px;
+		border-bottom-left-radius: 25px;
 
-    .no-decoration{
-        text-decoration: none;
-        color: inherit;
-    }
+		font-size: 1.2rem;
+		font-weight: bold;
+		text-align: center;
 
-    .specialties{
-        display: flex;
-        flex-direction: row;
-        padding-left: 10px;
-    }
-
-    .tag{
-        width: auto;
-        line-height: 30px;
-        height: 30px;
-        margin-left: 10px;
-        padding: 3px 5px 3px;
-
-        border-radius: 15px;
-        border-top-right-radius: 25px;
-        border-bottom-right-radius: 25px;
-        border-top-left-radius: 25px;
-        border-bottom-left-radius: 25px;
-
-        font-size: 1.2rem;
-        font-weight: bold;
-        text-align: center;
-        
-        background: #EBAD33;
-        border: 3px solid #F4D390;
-        color: #352505;
-    }
+		background: #ebad33;
+		border: 3px solid #f4d390;
+		color: #352505;
+	}
 </style>

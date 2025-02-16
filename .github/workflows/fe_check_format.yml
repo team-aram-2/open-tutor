@@ -1,0 +1,24 @@
+name: Prettier CI
+
+# This action works with pull requests and pushes
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Node Modules
+        working-directory: frontend
+        run: |
+          npm i
+          npm run check-format

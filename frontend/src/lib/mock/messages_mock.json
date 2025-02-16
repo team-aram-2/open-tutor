@@ -2,102 +2,82 @@
   "messages": [
     {
       "conversationId": "02ffa59f-1bdc-4567-9176-aba50c0c4724",
-      "id":"c298fc36-69a8-4a75-93ed-c827b28f59e5",
+      "id": "c298fc36-69a8-4a75-93ed-c827b28f59e5",
       "originId": "997c96de-9a4c-41fe-acd7-231092284822",
       "message": "Never gonna give you up",
-      "messageAttachments": [
-
-      ],
+      "messageAttachments": [],
       "sentOn": "2025-02-03T21:03:46+00:00"
     },
     {
       "conversationId": "02ffa59f-1bdc-4567-9176-aba50c0c4724",
-      "id":"c298fc36-69a8-4a75-93ed-c827b28f59e5",
+      "id": "c298fc36-69a8-4a75-93ed-c827b28f59e5",
       "originId": "297c96de-9a4c-41fe-acd7-231092284822",
       "message": "Never gonna let you down",
-      "messageAttachments": [
-
-      ],
+      "messageAttachments": [],
       "sentOn": "2025-02-03T21:04:47+00:00"
     },
     {
       "conversationId": "02ffa59f-1bdc-4567-9176-aba50c0c4724",
-      "id":"c298fc36-69a8-4a75-93ed-c827b28f59e5",
+      "id": "c298fc36-69a8-4a75-93ed-c827b28f59e5",
       "originId": "userId",
       "message": "Never gonna run around and desert you",
-      "messageAttachments": [
-
-      ],
+      "messageAttachments": [],
       "sentOn": "2025-02-03T21:04:48+00:00"
     },
     {
       "conversationId": "02ffa59f-1bdc-4567-9176-aba50c0c4724",
-      "id":"c298fc36-69a8-4a75-93ed-c827b28f59e5",
+      "id": "c298fc36-69a8-4a75-93ed-c827b28f59e5",
       "originId": "297c96de-9a4c-41fe-acd7-231092284822",
       "message": "Never gonna make you cry",
-      "messageAttachments": [
-
-      ],
+      "messageAttachments": [],
       "sentOn": "2025-02-03T21:04:50+00:00"
     },
     {
       "conversationId": "02ffa59f-1bdc-4567-9176-aba50c0c4724",
-      "id":"c298fc36-69a8-4a75-93ed-c827b28f59e5",
+      "id": "c298fc36-69a8-4a75-93ed-c827b28f59e5",
       "originId": "297c96de-9a4c-41fe-acd7-231092284822",
       "message": "Never gonna say goodbye",
-      "messageAttachments": [
-        
-      ],
+      "messageAttachments": [],
       "sentOn": "2025-02-03T21:04:55+00:00"
     },
     {
       "conversationId": "02ffa59f-1bdc-4567-9176-aba50c0c4724",
-      "id":"c298fc36-69a8-4a75-93ed-c827b28f59e5",
+      "id": "c298fc36-69a8-4a75-93ed-c827b28f59e5",
       "originId": "997c96de-9a4c-41fe-acd7-231092284822",
       "message": "Never gonna tell a lie, and hurt you",
-      "messageAttachments": [
-
-      ],
+      "messageAttachments": [],
       "sentOn": "2025-02-03T21:04:59+00:00"
     },
     {
       "conversationId": "02ffa59f-1bdc-4567-9176-aba50c0c4724",
-      "id":"a298fc36-69a8-4a75-93ed-c827b28f59e5",
+      "id": "a298fc36-69a8-4a75-93ed-c827b28f59e5",
       "originId": "997c96de-9a4c-41fe-acd7-231092284822",
       "message": "1",
-      "messageAttachments": [
-
-      ],
+      "messageAttachments": [],
       "sentOn": "2025-02-03T21:04:59+00:00"
     },
     {
       "conversationId": "02ffa59f-1bdc-4567-9176-aba50c0c4724",
-      "id":"b298fc36-69a8-4a75-93ed-c827b28f59e5",
+      "id": "b298fc36-69a8-4a75-93ed-c827b28f59e5",
       "originId": "997c96de-9a4c-41fe-acd7-231092284822",
       "message": "Never gonna tell a lie, and hurt you",
-      "messageAttachments": [
-
-      ],
+      "messageAttachments": [],
       "sentOn": "2025-02-03T21:04:59+00:00"
     },
     {
       "conversationId": "02ffa59f-1bdc-4567-9176-aba50c0c4724",
-      "id":"d298fc36-69a8-4a75-93ed-c827b28f59e5",
+      "id": "d298fc36-69a8-4a75-93ed-c827b28f59e5",
       "originId": "997c96de-9a4c-41fe-acd7-231092284822",
       "message": "Never gonna tell a lie, and hurt you",
-      "messageAttachments": [
-
-      ],
+      "messageAttachments": [],
       "sentOn": "2025-02-03T21:04:59+00:00"
     },
     {
       "conversationId": "02ffa59f-1bdc-4567-9176-aba50c0c4724",
-      "id":"e298fc36-69a8-4a75-93ed-c827b28f59e5",
+      "id": "e298fc36-69a8-4a75-93ed-c827b28f59e5",
       "originId": "997c96de-9a4c-41fe-acd7-231092284822",
       "message": "Never gonna tell a lie, and hurt you",
-      "messageAttachments": [
-
-      ],
+      "messageAttachments": [],
       "sentOn": "2025-02-03T21:04:59+00:00"
     }
   ]
