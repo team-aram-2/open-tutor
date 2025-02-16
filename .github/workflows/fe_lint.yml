@@ -1,0 +1,21 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Node Modules
+        working-directory: frontend
+        run: |
+          npm i
+          ./node_modules/.bin/eslint .

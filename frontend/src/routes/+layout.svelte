@@ -3,68 +3,57 @@
 <!-- This will contain all shared layouts across the site -->
 
 <script>
-    // Shared logic across pages goes here
-    import '../app.css';
-    import Sidebar from '$lib/components/dashboard/sidebar.svelte';
+	// Shared logic across pages goes here
+	import '../app.css';
+	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
 
-    // Load student my people dashboard by default TEMPORARY
-    import { goto } from '$app/navigation';
+	// Load student my people dashboard by default TEMPORARY
+	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 
-    onMount(() => {
-        goto('/my_people/student');
-    });
+	onMount(() => {
+		// goto('/my_people/student');
+	});
 </script>
-
-
 
 <!-- Page Content -->
 <div class="dashboard-layout">
-    <Sidebar>
-    </Sidebar>
-    
+	<Sidebar></Sidebar>
 
-    <main class="content">
-
-
-        <slot />
-        <!-- Where page content will be rendered -->
-         
-    </main>
+	<main class="w-full px-20 py-20">
+		<slot />
+		<!-- Where page content will be rendered -->
+	</main>
 </div>
 
 <!-- Style for the page goes here -->
 <style>
-    /* Import Inter font */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700');
+	/* Import Inter font */
+	@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700');
 
-    /* Apply these globally */
-    * {
-        font-family: 'Inter', sans-serif;
-    }
+	/* Apply these globally */
+	* {
+		font-family: 'Inter', sans-serif;
+	}
 
-    .dashboard-layout {
-        display: flex;
-        flex-direction: row;
-        position: fixed;
+	.dashboard-layout {
+		display: flex;
+		flex-direction: row;
+		position: fixed;
 
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
 
-        min-height: 100;
+		min-height: 100;
 
-        background: #231d34;
+		background: #231d34;
 
-        /* font:  */
-    }
+		/* font:  */
+	}
 
-    .content {
-        padding-left: 50px;
-        padding-top: 20px;
-    }
-    /* .page-title {
+	/* .page-title {
         padding-left: 30px;
     } */
 </style>

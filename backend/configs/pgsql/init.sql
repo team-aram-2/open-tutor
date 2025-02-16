@@ -5,7 +5,8 @@ CREATE TABLE users (
   "signed_up_at" TIMESTAMP DEFAULT NOW(),
   "first_name" TEXT NOT NULL,
   "last_name" TEXT NOT NULL,
-  "account_locked" BOOLEAN DEFAULT 'f'
+  "account_locked" BOOLEAN DEFAULT 'f',
+  "password_hash" TEXT NOT NULL
 );
 COMMENT ON TABLE "users" IS 'Base User object containing shared details needed for all users.';
 
@@ -102,4 +103,12 @@ CREATE TABLE ratings (
   FOREIGN KEY (user_id) REFERENCES users(user_id),
   FOREIGN KEY (reviewer_user_id) REFERENCES users(user_id),
   FOREIGN KEY (meeting_id) REFERENCES meetings(id)
+);
+
+DROP TABLE IF EXISTS key_pairs;
+CREATE TABLE key_pairs (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "public_key" TEXT NOT NULL,
+  "private_key" TEXT NOT NULL,
+  "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
