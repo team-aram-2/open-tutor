@@ -7,13 +7,9 @@
 	import '../app.css';
 	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
 
-	// Load student my people dashboard by default TEMPORARY
-	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 
-	onMount(() => {
-		// goto('/my_people/student');
-	});
+	onMount(() => {});
 </script>
 
 <!-- Page Content -->

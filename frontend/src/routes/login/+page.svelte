@@ -16,44 +16,6 @@
 		const params = new URLSearchParams(window.location.search);
 		loginError = params.get('err') ?? '';
 	});
-
-	const onSubmit = async (e: any) => {
-		if (submittingForm) return;
-
-		submittingForm = true;
-		submissionError = '';
-
-		e.preventDefault();
-
-		const formData = Object.fromEntries(new FormData(e.target));
-
-		let reqPromise;
-		switch (selectedTab) {
-			case Tab.Login:
-				reqPromise = fetch(`${PUBLIC_API_HOST}/auth/login`, {
-					method: 'POST',
-					body: JSON.stringify(formData)
-				});
-				break;
-			case Tab.Register:
-				reqPromise = fetch(`${PUBLIC_API_HOST}/auth/register`, {
-					method: 'PUT',
-					body: JSON.stringify(formData)
-				});
-				break;
-			default:
-				console.error('unknown form tab');
-		}
-
-		const response = await reqPromise;
-		if (!response || !response?.ok) {
-			console.error(`failed to sign up/login`);
-			return;
-		}
-
-		window.localStorage.setItem('SessionToken', response.headers.get('X-Session-Token')!);
-		// window.location.href = '/';
-	};
 </script>
 
 <div class="w-full flex flex-col text-white">

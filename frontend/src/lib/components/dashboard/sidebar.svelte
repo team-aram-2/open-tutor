@@ -17,8 +17,9 @@
 		>
 			<p>View Tutors</p>
 		</a>
+		<!-- TODO: MOVE THIS HREF BACK TO THE APPOINTMENTS <a> tag -->
 		<a
-			href="#"
+			href="#/"
 			class="no-decoration"
 			class:selected-sidebar-item={selectedItem === 'apt'}
 			on:click={() => setSelectedItem('apt')}
@@ -34,7 +35,7 @@
 			<p>Messages</p>
 		</a>
 		<a
-			href="#"
+			href="#/"
 			class="no-decoration"
 			class:selected-sidebar-item={selectedItem === 'pym'}
 			on:click={() => setSelectedItem('pym')}
