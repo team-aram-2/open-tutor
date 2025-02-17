@@ -87,6 +87,18 @@ type MessageAttachment struct {
 	Url string `json:"url"`
 }
 
+// ProtoMessage defines model for ProtoMessage.
+type ProtoMessage struct {
+	// ConversationId Unique identifier for the conversation.
+	ConversationId openapi_types.UUID `json:"conversationId"`
+
+	// Message Message content.
+	Message string `json:"message"`
+
+	// OriginId Unique identifier for the ID of the sender.
+	OriginId openapi_types.UUID `json:"originId"`
+}
+
 // Rating defines model for Rating.
 type Rating struct {
 	Comment    *string             `json:"comment,omitempty"`
@@ -172,7 +184,7 @@ type CreateMeetingJSONRequestBody = Meeting
 type UpdateMeetingByIdJSONRequestBody = Meeting
 
 // CreateMessageJSONRequestBody defines body for CreateMessage for application/json ContentType.
-type CreateMessageJSONRequestBody = Message
+type CreateMessageJSONRequestBody = ProtoMessage
 
 // UpdateMessageByIdJSONRequestBody defines body for UpdateMessageById for application/json ContentType.
 type UpdateMessageByIdJSONRequestBody = Message

@@ -54,20 +54,25 @@ CREATE TABLE meetings (
 );
 COMMENT ON COLUMN meetings.id IS 'Meeting unique id, uuid';
 
+DROP TABLE IF EXISTS conversations;
+CREATE TABLE conversations (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "user_ids" TEXT[] NOT NULL
+);
+
 DROP TABLE IF EXISTS messages;
 CREATE TABLE messages (
   "id" TEXT NOT NULL PRIMARY KEY,
   "sent_at" TIMESTAMP NOT NULL,
   "origin_id" TEXT NOT NULL,
-  "recipient_id" TEXT NOT NULL,
+  "conversation_id" TEXT NOT NULL,
   "message" TEXT NOT NULL,
   FOREIGN KEY (origin_id) REFERENCES users(user_id),
-  FOREIGN KEY (recipient_id) REFERENCES users(user_id)
+  FOREIGN KEY (conversation_id) REFERENCES conversations(id)
 );
 COMMENT ON COLUMN messages.id IS 'Unique identifier for the message.';
 COMMENT ON COLUMN messages.sent_at IS 'Date time the message was sent.';
 COMMENT ON COLUMN messages.origin_id IS 'Unique identifier for the originID for the message.';
-COMMENT ON COLUMN messages.recipient_id IS 'UserId of the recipient.';
 COMMENT ON COLUMN messages.message IS 'Message text content.';
 
 DROP TABLE IF EXISTS message_attachments;

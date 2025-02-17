@@ -385,7 +385,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Message"
+              $ref: "#/components/schemas/ProtoMessage"
+              
       responses:
         "201":
           description: Message created
@@ -849,6 +850,25 @@ components:
         required:
           - id
           - sentOn
+          - originId
+          - conversationId
+          - message
+
+      ProtoMessage:
+        type: object
+        properties:
+          originId:
+            type: string
+            format: uuid
+            description: Unique identifier for the ID of the sender.
+          conversationId:
+            type: string
+            format: uuid
+            description: Unique identifier for the conversation.
+          message:
+            type: string
+            description: Message content.
+        required:
           - originId
           - conversationId
           - message
