@@ -42,11 +42,21 @@ func (t *OpenTutor) CreateMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *OpenTutor) DeleteMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
+	_, deleteErr := db.GetDB().Exec(`
+		DELETE FROM messages
+		WHERE id = $1
+	`, messageId)
+
+	if deleteErr != nil {
+		sendError(w, http.StatusInternalServerError, "Database Error")
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (t *OpenTutor) GetMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
+	// TODO: DECIDE ON THE FUTURE OF THIS CALL
 }
 
 func (t *OpenTutor) UpdateMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID) {
