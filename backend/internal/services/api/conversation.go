@@ -73,8 +73,14 @@ func (t *OpenTutor) GetMessagesByConversationId(w http.ResponseWriter, r *http.R
 		}
 		messages = append(messages, temp)
 	}
+
+	response := struct {
+		Messages []Message `json:"messages"`
+	}{
+		Messages: messages,
+	}
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(messages)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
 func (t *OpenTutor) GetUsersByConversationId(w http.ResponseWriter, r *http.Request, conversationId openapi_types.UUID) {
