@@ -85,9 +85,9 @@ CREATE TABLE message_attachments (
   FOREIGN KEY (message_id) REFERENCES messages(id)
 );
 COMMENT ON COLUMN message_attachments.message_id IS 'Unique identifier for the message the attachement belongs to.';
-COMMENT ON COLUMN message_attachments.message_id IS 'Friendly name of the attachment.';
-COMMENT ON COLUMN message_attachments.message_id IS 'Mimetype of the attachment.';
-COMMENT ON COLUMN message_attachments.message_id IS 'URI for of the attachment data.';
+COMMENT ON COLUMN message_attachments.file_name IS 'Friendly name of the attachment.';
+COMMENT ON COLUMN message_attachments.mime_type IS 'Mimetype of the attachment.';
+COMMENT ON COLUMN message_attachments.url IS 'URI for of the attachment data.';
 
 DROP TYPE IF EXISTS user_type;
 CREATE TYPE user_type AS ENUM ('tutor', 'student');
