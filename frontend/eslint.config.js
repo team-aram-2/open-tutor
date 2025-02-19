@@ -26,7 +26,8 @@ export default tseslint.config(
 			}
 		},
 		rules: {
-			'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }]
+			'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+			'@typescript-eslint/no-unused-vars': 'error'
 		}
 	},
 	{

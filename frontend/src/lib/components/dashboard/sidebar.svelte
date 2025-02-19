@@ -10,15 +10,16 @@
 	<h2 class="sidebar-title">Student</h2>
 	<nav class="sidebar-items">
 		<a
-			href="#"
+			href="/my_people/student"
 			class="no-decoration"
 			class:selected-sidebar-item={selectedItem === 'view'}
 			on:click={() => setSelectedItem('view')}
 		>
 			<p>View Tutors</p>
 		</a>
+		<!-- TODO: MOVE THIS HREF BACK TO THE APPOINTMENTS <a> tag -->
 		<a
-			href="#"
+			href="#/"
 			class="no-decoration"
 			class:selected-sidebar-item={selectedItem === 'apt'}
 			on:click={() => setSelectedItem('apt')}
@@ -26,7 +27,7 @@
 			<p>Appointments</p>
 		</a>
 		<a
-			href="#"
+			href="/messages/student"
 			class="no-decoration"
 			class:selected-sidebar-item={selectedItem === 'msg'}
 			on:click={() => setSelectedItem('msg')}
@@ -34,7 +35,7 @@
 			<p>Messages</p>
 		</a>
 		<a
-			href="#"
+			href="#/"
 			class="no-decoration"
 			class:selected-sidebar-item={selectedItem === 'pym'}
 			on:click={() => setSelectedItem('pym')}
@@ -62,7 +63,10 @@
 		flex-direction: column;
 
 		background-color: #453a69;
+
+		z-index: 1000;
 	}
+
 	.sidebar-title {
 		display: flex;
 		flex-direction: column;
@@ -83,6 +87,7 @@
 		color: white;
 		/* border: 2px solid blue */
 	}
+
 	.sidebar-items {
 		display: flex;
 		flex-direction: column;

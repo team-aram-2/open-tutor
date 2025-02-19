@@ -1,6 +1,6 @@
 <script lang="ts">
 	import TutorPage from '$lib/components/cards/tutor-page.svelte';
-	import tutorsData from '$lib/mock/my_tutors_mock.json';
+	// import tutorsData from '$lib/mock/my_tutors_mock.json';
 	export let data: {
 		user: {
 			firstName: string;
@@ -18,8 +18,8 @@
 			name="{data.user.firstName} {data.user.lastName}"
 			rating={data.user.overallRating}
 			skills={data.user.skills}
-			userId={data.user.userId}
 		></TutorPage>
+		<!-- userId={data.user.userId} -->
 	</div>
 </div>
 
