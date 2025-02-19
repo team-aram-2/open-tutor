@@ -6,7 +6,8 @@ CREATE TABLE users (
   "first_name" TEXT NOT NULL,
   "last_name" TEXT NOT NULL,
   "account_locked" BOOLEAN DEFAULT 'f',
-  "password_hash" TEXT NOT NULL
+  "password_hash" TEXT NOT NULL,
+  "role_mask" SMALLSERIAL NOT NULL DEFAULT 1
 );
 COMMENT ON TABLE "users" IS 'Base User object containing shared details needed for all users.';
 

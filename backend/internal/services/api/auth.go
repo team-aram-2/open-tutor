@@ -17,7 +17,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func generateSessionTokenForUser(userId string) (string, error) {
+func generateSessionTokenForUser(userId string, roleMask uint16) (string, error) {
 	jwtKeyPair, err := util.GetKeyPair("user-auth-jwt")
 	if err != nil {
 		return "", err
@@ -26,6 +26,7 @@ func generateSessionTokenForUser(userId string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256,
 		jwt.MapClaims{
 			"user_id": userId,
+			"roles": roleMask,
 		})
 
 	tokenString, err := token.SignedString(jwtKeyPair.PrivateKey)
@@ -36,8 +37,8 @@ func generateSessionTokenForUser(userId string) (string, error) {
 	return tokenString, nil
 }
 
-func applySessionTokenForUserId(userId string, w http.ResponseWriter) error {
-	sessionToken, err := generateSessionTokenForUser(userId)
+func applySessionTokenForUserId(userId string, roleMask uint16, w http.ResponseWriter) error {
+	sessionToken, err := generateSessionTokenForUser(userId, roleMask)
 	if err != nil {
 		return err
 	}
@@ -79,16 +80,17 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 	loginData.Password = r.FormValue("password")
 
 	var (
-		userId            string
-		savedPasswordHash string
+		userId            	string
+		savedPasswordHash 	string
+		roleMask			uint16
 	)
 	err = db.GetDB().QueryRow(`
-		SELECT user_id, password_hash
+		SELECT user_id, password_hash, role_mask
 		FROM users
 		WHERE email = $1;
 	`,
 		loginData.Email,
-	).Scan(&userId, &savedPasswordHash)
+	).Scan(&userId, &savedPasswordHash, &roleMask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err := "Invalid login"
@@ -112,7 +114,8 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = applySessionTokenForUserId(userId, w)
+	// pass in userId and userRole bitmask
+	err = applySessionTokenForUserId(userId, ,role_mask, w)
 	if err != nil {
 		fmt.Printf("failed to apply session token: %v\n", err)
 		sendError(w, http.StatusInternalServerError, "failed to apply session token")
