@@ -9,12 +9,11 @@
 	let messagesData;
 	let messages: MessageItem[] = [];
 	let messageContent = '';
-
 	const fetchMessages = async () => {
 		try {
 			messages = [];
 			const res = await fetch(
-				PUBLIC_API_HOST + '/conversation/messages/7260a8a8-4df0-4a1f-b25e-af98d86e8d3c'
+				PUBLIC_API_HOST + '/conversation/messages/5425b439-4e2b-4a2b-8808-76c8fb406a13'
 			);
 			messagesData = await res.json();
 			console.log(messagesData);
@@ -49,8 +48,8 @@
 						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify({
-						originId: 'df6be7c6-19b2-4e47-a96e-5729c10508bf',
-						conversationId: '7260a8a8-4df0-4a1f-b25e-af98d86e8d3c',
+						originId: '50df85b9-cb07-45f5-a7e1-95b40cb5b2fb',
+						conversationId: '5425b439-4e2b-4a2b-8808-76c8fb406a13',
 						message: messageContent
 					})
 				});
@@ -89,7 +88,7 @@
 		<Message
 			originId={message.originId}
 			messageContent={message.messageContent}
-			userId="df6be7c6-19b2-4e47-a96e-5729c10508bf"
+			userId="50df85b9-cb07-45f5-a7e1-95b40cb5b2fb"
 		></Message>
 	{/each}
 	<!-- Sort messages by timestamp -->

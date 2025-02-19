@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -10,6 +11,21 @@ import (
 	"github.com/google/uuid"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
+
+func checkMessage(messageId openapi_types.UUID) (bool, error) {
+	var exist bool
+	err := db.GetDB().QueryRow(`
+		SELECT EXISTS (
+			SELECT 1
+			FROM messages
+			WHERE id = $1
+		)
+	`, messageId).Scan(&exist)
+	if err != nil {
+		return false, err
+	}
+	return exist, nil
+}
 
 func (t *OpenTutor) CreateMessage(w http.ResponseWriter, r *http.Request) {
 	var proto ProtoMessage
@@ -42,6 +58,17 @@ func (t *OpenTutor) CreateMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *OpenTutor) DeleteMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID) {
+	var exist bool
+	var err error
+	exist, err = checkMessage(messageId)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, "Database Error")
+		return
+	}
+	if !exist {
+		sendError(w, http.StatusNotFound, "Message not found")
+		return
+	}
 	_, deleteErr := db.GetDB().Exec(`
 		DELETE FROM messages
 		WHERE id = $1
@@ -55,10 +82,75 @@ func (t *OpenTutor) DeleteMessageById(w http.ResponseWriter, r *http.Request, me
 }
 
 func (t *OpenTutor) GetMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-	// TODO: DECIDE ON THE FUTURE OF THIS CALL
+	var exist bool
+	var err error
+	exist, err = checkMessage(messageId)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, "Database Error")
+		return
+	}
+	if !exist {
+		sendError(w, http.StatusNotFound, "Message not found")
+		return
+	}
+	message := &Message{}
+	selectErr := db.GetDB().QueryRow(`
+	SELECT *
+	FROM messages
+	WHERE id = $1
+	`, messageId).Scan(
+		&message.Id,
+		&message.SentOn,
+		&message.OriginId,
+		&message.ConversationId,
+		&message.Message,
+	)
+
+	if selectErr != nil {
+		sendError(w, http.StatusInternalServerError, "Database Error")
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(message)
 }
 
 func (t *OpenTutor) UpdateMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
+	var exist bool
+	var err error
+	exist, err = checkMessage(messageId)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, "Database Error")
+		return
+	}
+	if !exist {
+		sendError(w, http.StatusNotFound, "Message not found")
+		return
+	}
+	var message Message
+	var updatedMessage Message
+	if err := json.NewDecoder(r.Body).Decode(&message); err != nil {
+		fmt.Printf("Error: %v\n", err)
+		sendError(w, http.StatusBadRequest, "Invalid format")
+		return
+	}
+
+	updateErr := db.GetDB().QueryRow(`
+	UPDATE messages
+	SET message = $1
+	WHERE id = $2
+	RETURNING sent_at, origin_id, conversation_id, message;
+	`, message.Message, messageId).Scan(
+		&updatedMessage.SentOn,
+		&updatedMessage.OriginId,
+		&updatedMessage.ConversationId,
+		&updatedMessage.Message,
+	)
+	updatedMessage.Id = message.Id
+
+	if updateErr != nil {
+		sendError(w, http.StatusInternalServerError, "Database error")
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(updatedMessage)
 }
