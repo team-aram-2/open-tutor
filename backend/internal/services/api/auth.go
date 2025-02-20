@@ -17,7 +17,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func generateSessionTokenForUser(userId string, roleMask uint16) (string, error) {
+func generateSessionTokenForUser(userId string, roleMask util.Role) (string, error) {
 	jwtKeyPair, err := util.GetKeyPair("user-auth-jwt")
 	if err != nil {
 		return "", err
@@ -25,8 +25,8 @@ func generateSessionTokenForUser(userId string, roleMask uint16) (string, error)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256,
 		jwt.MapClaims{
-			"user_id": userId,
-			"roles": roleMask,
+			"user_id":      userId,
+			"role_bitmask": roleMask,
 		})
 
 	tokenString, err := token.SignedString(jwtKeyPair.PrivateKey)
@@ -37,7 +37,7 @@ func generateSessionTokenForUser(userId string, roleMask uint16) (string, error)
 	return tokenString, nil
 }
 
-func applySessionTokenForUserId(userId string, roleMask uint16, w http.ResponseWriter) error {
+func applySessionTokenForUserId(userId string, roleMask util.Role, w http.ResponseWriter) error {
 	sessionToken, err := generateSessionTokenForUser(userId, roleMask)
 	if err != nil {
 		return err
@@ -80,9 +80,9 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 	loginData.Password = r.FormValue("password")
 
 	var (
-		userId            	string
-		savedPasswordHash 	string
-		roleMask			uint16
+		userId            string
+		savedPasswordHash string
+		roleMask          util.Role
 	)
 	err = db.GetDB().QueryRow(`
 		SELECT user_id, password_hash, role_mask
@@ -115,7 +115,7 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// pass in userId and userRole bitmask
-	err = applySessionTokenForUserId(userId, ,role_mask, w)
+	err = applySessionTokenForUserId(userId, roleMask, w)
 	if err != nil {
 		fmt.Printf("failed to apply session token: %v\n", err)
 		sendError(w, http.StatusInternalServerError, "failed to apply session token")
@@ -126,7 +126,10 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
-	var signupData UserSignup
+	var (
+		signupData UserSignup
+		roleMask   util.Role
+	)
 	err := r.ParseForm()
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("error parsing form data: %v", err))
@@ -138,6 +141,7 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 	signupData.Password = r.FormValue("password")
 	signupData.FirstName = &firstName
 	signupData.LastName = &lastName
+	roleMask = 0
 
 	// Generate user id //
 	userId := uuid.New().String()
@@ -149,10 +153,11 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	passwordHash := string(hashBytes)
+	roleMask = roleMask.Add(util.User)
 
 	_, err = db.GetDB().Exec(`
 		INSERT INTO users (user_id, email, first_name, last_name, password_hash)
-		VALUES ($1, $2, $3, $4, $5)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING user_id, email, first_name, last_name;
 	`,
 		userId,
@@ -160,6 +165,7 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 		signupData.FirstName,
 		signupData.LastName,
 		passwordHash,
+		roleMask,
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value") {
@@ -172,7 +178,7 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = applySessionTokenForUserId(userId, w)
+	err = applySessionTokenForUserId(userId, roleMask, w)
 	if err != nil {
 		fmt.Printf("failed to apply session token: %v\n", err)
 		sendError(w, http.StatusInternalServerError, "failed to apply session token")
