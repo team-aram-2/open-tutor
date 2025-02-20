@@ -1,8 +1,6 @@
 package util
 
-type (
-	Role uint16 // would use uint8 here but the smallest serial type in pgsql is uint16 compatible
-)
+type Role uint16 // would use uint8 here but the smallest serial type in pgsql is uint16 compatible
 
 const (
 	User      Role = 1 << iota // 1
@@ -11,14 +9,32 @@ const (
 	Admin                      // 8
 )
 
-func (r Role) Add(toAdd Role) Role {
-	return r | toAdd
+func (mask *Role) Add(toAdd Role) Role {
+	return *mask | toAdd
 }
 
-func (r Role) Remove(toRemove Role) Role {
-	return r & ^toRemove
+func (mask *Role) Remove(toRemove Role) Role {
+	return *mask & ^toRemove
 }
 
-func (r Role) Has(wanted Role) bool {
-	return (r)&(wanted) == wanted
+func (mask *Role) Has(wanted Role) bool {
+	return (*mask)&(wanted) == wanted
+}
+
+func Roles() []Role {
+	return []Role{
+		User,
+		Tutor,
+		Moderator,
+		Admin,
+	}
+}
+
+func (mask Role) Label() string {
+	return map[Role]string{
+		User:      "User",
+		Tutor:     "Tutor",
+		Moderator: "Moderator",
+		Admin:     "Admin",
+	}[mask]
 }
