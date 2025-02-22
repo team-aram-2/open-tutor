@@ -59,6 +59,7 @@ CREATE TABLE conversations (
   "id" TEXT NOT NULL PRIMARY KEY,
   "user_ids" TEXT[] NOT NULL
 );
+CREATE INDEX idx_user_ids ON conversations USING GIN (user_ids);
 
 DROP TABLE IF EXISTS messages;
 CREATE TABLE messages (

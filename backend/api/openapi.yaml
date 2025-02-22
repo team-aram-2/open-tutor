@@ -341,14 +341,13 @@ paths:
               schema:
                 type: array
                 items:
-                    $ref: "#/components/schemas/Rating"
+                  $ref: "#/components/schemas/Rating"
         "400":
           description: Post rating request malformed or denied.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
-
 
   # Post a rating
   /rating:
@@ -386,7 +385,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/ProtoMessage"
-              
+
       responses:
         "201":
           description: Message created
@@ -558,7 +557,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/Conversation"
 
-
   /conversation/{conversationId}:
     get:
       summary: Get all userIds in the conversation via conversationId
@@ -611,7 +609,34 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Message"
-
+  /conversation/user/{userId}:
+    get:
+      summary: Get all conversations the user is a member in
+      operationId: getConversationsByUserId
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "404":
+          description: Conversation/User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "200":
+          description: Conversations found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uuid
 
 components:
   securitySchemes:
@@ -636,320 +661,320 @@ components:
             email: "Grants access to the user's email address"
             profile: "Grants access to the user's profile information"
   schemas:
-      ErrorModel:
-        type: object
-        required:
+    ErrorModel:
+      type: object
+      required:
         - message
         - code
-        example:
-          message: Resource not found.
-          code: 400
-        properties:
-          message:
-            type: string
-          code:
-            type: integer
-            minimum: 100
-            maximum: 600
+      example:
+        message: Resource not found.
+        code: 400
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+          minimum: 100
+          maximum: 600
 
-      User:
-        type: object
-        example:
-          userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
-          email: email@example.com
-          firstName: Jacob
-          lastName: Hochstetler
-        description: Base User object containing shared details needed for all users.
-        required:
-          - userId
-          - email
-          - firstName
-          - lastName
-        properties:
-          userId:
-            type: string
-            format: uuid
-          email:
-            type: string
-            format: email
-          signedUpAt:
-            type: string
-            format: date-time
-          firstName:
-            type: string
-          lastName:
-            type: string
-          accountLocked:
-            type: boolean
-          passwordHash:
-            type: string
+    User:
+      type: object
+      example:
+        userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
+        email: email@example.com
+        firstName: Jacob
+        lastName: Hochstetler
+      description: Base User object containing shared details needed for all users.
+      required:
+        - userId
+        - email
+        - firstName
+        - lastName
+      properties:
+        userId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        signedUpAt:
+          type: string
+          format: date-time
+        firstName:
+          type: string
+        lastName:
+          type: string
+        accountLocked:
+          type: boolean
+        passwordHash:
+          type: string
 
-      UserLogin:
-        type: object
-        example:
-          email: email@example.com
-          password: N3v3rG0nn4G1veY0uUp!
-        description: Payload for user logins
-        required:
-          - email
-          - password
-        properties:
-          email:
-            type: string
-            format: email
-          password:
-            type: string
-            format: password
+    UserLogin:
+      type: object
+      example:
+        email: email@example.com
+        password: N3v3rG0nn4G1veY0uUp!
+      description: Payload for user logins
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
 
-      UserSignup:
-        type: object
-        example:
-          email: email@example.com
-          password: N3v3rG0nn4G1veY0uUp!
-          firstName: Jacob
-          lastName: Hochstetler
-        description: Payload for user signups
-        required:
-          - email
-          - password
-          - firstName
-          - lastName
-        properties:
-          email:
-            type: string
-            format: email
-          password:
-            type: string
-            format: password
-          first_name:
-            type: string
-          last_name:
-            type: string
+    UserSignup:
+      type: object
+      example:
+        email: email@example.com
+        password: N3v3rG0nn4G1veY0uUp!
+        firstName: Jacob
+        lastName: Hochstetler
+      description: Payload for user signups
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        first_name:
+          type: string
+        last_name:
+          type: string
 
-      Tutor:
-        description: Extends user to include student specific information.
-        allOf:
-          - $ref: "#/components/schemas/User"
-          - type: object
-            required:
-              - calendar
-              - ratings
-            example:
-              userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
-            properties:
-              totalHours: # not sure if this is total hours worked or???
-                type: integer
-              skills:
-                type: array
-                items:
-                  type: string
+    Tutor:
+      description: Extends user to include student specific information.
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          required:
+            - calendar
+            - ratings
+          example:
+            userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
+          properties:
+            totalHours: # not sure if this is total hours worked or???
+              type: integer
+            skills:
+              type: array
+              items:
+                type: string
 
-      Rating:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-          ratingType:
-            type: string
-            enum: [tutor, student]
-          userId:
-            type: string
-            format: uuid
-          reviewerUserId:
-            type: string
-            format: uuid
-          meetingId:
-            type: string
-            format: uuid
-          ratings:
-            type: object
-            required:
+    Rating:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ratingType:
+          type: string
+          enum: [tutor, student]
+        userId:
+          type: string
+          format: uuid
+        reviewerUserId:
+          type: string
+          format: uuid
+        meetingId:
+          type: string
+          format: uuid
+        ratings:
+          type: object
+          required:
             - overall
             - professionalism
             - knowledge
             - communication
             - punctuality
-            properties: # Subject to change?
-              professionalism:
-                type: integer
-                minimum: 1
-                maximum: 5
-              knowledge:
-                type: integer
-                minimum: 1
-                maximum: 5
-              communication:
-                type: integer
-                minimum: 1
-                maximum: 5
-              punctuality:
-                type: integer
-                minimum: 1
-                maximum: 5
-              overall:
-                type: integer
-                minimum: 1
-                maximum: 5
-          comment:
+          properties: # Subject to change?
+            professionalism:
+              type: integer
+              minimum: 1
+              maximum: 5
+            knowledge:
+              type: integer
+              minimum: 1
+              maximum: 5
+            communication:
+              type: integer
+              minimum: 1
+              maximum: 5
+            punctuality:
+              type: integer
+              minimum: 1
+              maximum: 5
+            overall:
+              type: integer
+              minimum: 1
+              maximum: 5
+        comment:
+          type: string
+
+    Meeting:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tutorId:
+          type: string
+          format: uuid
+        studentId:
+          type: string
+          format: uuid
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+
+    Calendar:
+      type: object
+      properties:
+        meetings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meeting"
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the message.
+        sentOn:
+          type: string
+          format: date-time
+        originId:
+          type: string
+          format: uuid
+          description: Unique identifier for the originID for the message.
+        conversationId:
+          type: string
+          format: uuid
+          description: Unique identifier for the conversation for the message.
+        message:
+          type: string
+          description: Message content.
+        MessageAttachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageAttachment"
+          description: Array of message attachments
+      required:
+        - id
+        - sentOn
+        - originId
+        - conversationId
+        - message
+
+    ProtoMessage:
+      type: object
+      properties:
+        originId:
+          type: string
+          format: uuid
+          description: Unique identifier for the ID of the sender.
+        conversationId:
+          type: string
+          format: uuid
+          description: Unique identifier for the conversation.
+        message:
+          type: string
+          description: Message content.
+      required:
+        - originId
+        - conversationId
+        - message
+
+    MessageAttachment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the message the attachment belongs to.
+        filename:
+          type: string
+          description: Name of the attachment.
+        mimetype:
+          type: string
+          description: Mimetype of the attachment.
+        url:
+          type: string
+          format: uri
+          description: Source of the attachment.
+      required:
+        - id
+        - filename
+        - mimetype
+        - url
+
+    AvailableSkill:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the skill.
+        title:
+          type: string
+          description: title/name for the skill
+        description:
+          type: string
+          description: Description for the skill
+      required:
+        - id
+        - title
+        - description
+
+    TutorSkill:
+      allOf:
+        - $ref: "#/components/schemas/AvailableSkill"
+        - type: object
+          properties:
+            validated:
+              type: boolean
+              description: If the skill is validated
+          required:
+            - validated
+
+    Question:
+      type: object
+      properties:
+        question:
+          type: string
+          description: The literal question being asked.
+        valid:
+          type: string
+          description: The valid answer to the question
+        invalid:
+          type: array
+          items:
             type: string
 
-      Meeting:
-        type: object
-        properties:
-          id:
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        users:
+          type: array
+          items:
             type: string
             format: uuid
-          tutorId:
-            type: string
-            format: uuid
-          studentId:
-            type: string
-            format: uuid
-          startAt:
-            type: string
-            format: date-time
-          endAt:
-            type: string
-            format: date-time
-
-      Calendar:
-        type: object
-        properties:
-          meetings:
-            type: array
-            items:
-              $ref: "#/components/schemas/Meeting"
-
-      Message:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-            description: Unique identifier for the message.
-          sentOn:
-            type: string
-            format: date-time
-          originId:
-            type: string
-            format: uuid
-            description: Unique identifier for the originID for the message.
-          conversationId:
-            type: string
-            format: uuid
-            description: Unique identifier for the conversation for the message.
-          message:
-            type: string
-            description: Message content.
-          MessageAttachments:
-            type: array
-            items:
-              $ref: "#/components/schemas/MessageAttachment"
-            description: Array of message attachments
-        required:
-          - id
-          - sentOn
-          - originId
-          - conversationId
-          - message
-
-      ProtoMessage:
-        type: object
-        properties:
-          originId:
-            type: string
-            format: uuid
-            description: Unique identifier for the ID of the sender.
-          conversationId:
-            type: string
-            format: uuid
-            description: Unique identifier for the conversation.
-          message:
-            type: string
-            description: Message content.
-        required:
-          - originId
-          - conversationId
-          - message
-
-      MessageAttachment:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-            description: Unique identifier for the message the attachment belongs to.
-          filename:
-            type: string
-            description: Name of the attachment.
-          mimetype:
-            type: string
-            description: Mimetype of the attachment.
-          url:
-            type: string
-            format: uri
-            description: Source of the attachment.
-        required:
-          - id
-          - filename
-          - mimetype
-          - url
-
-      AvailableSkill:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-            description: Unique identifier for the skill.
-          title:
-            type: string
-            description: title/name for the skill
-          description:
-            type: string
-            description: Description for the skill
-        required:
-          - id
-          - title
-          - description
-
-      TutorSkill:
-        allOf:
-          - $ref: "#/components/schemas/AvailableSkill"
-          - type: object
-            properties:
-              validated:
-                type: boolean
-                description: If the skill is validated
-            required:
-              - validated
-
-      Question:
-        type: object
-        properties:
-          question:
-            type: string
-            description: The literal question being asked.
-          valid:
-            type: string
-            description: The valid answer to the question
-          invalid:
-            type: array
-            items:
-              type: string
-
-      Conversation:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-          users:
-            type: array
-            items:
-              type: string
-              format: uuid
 security:
   - GitHubOAuth:
       - read:user

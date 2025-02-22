@@ -215,6 +215,9 @@ type ServerInterface interface {
 	// Get all messages in the conversation via conversationId
 	// (GET /conversation/messages/{conversationId})
 	GetMessagesByConversationId(w http.ResponseWriter, r *http.Request, conversationId openapi_types.UUID)
+	// Get all conversations the user is a member in
+	// (GET /conversation/user/{userId})
+	GetConversationsByUserId(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID)
 	// Get all userIds in the conversation via conversationId
 	// (GET /conversation/{conversationId})
 	GetUsersByConversationId(w http.ResponseWriter, r *http.Request, conversationId openapi_types.UUID)
@@ -373,6 +376,39 @@ func (siw *ServerInterfaceWrapper) GetMessagesByConversationId(w http.ResponseWr
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetMessagesByConversationId(w, r, conversationId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetConversationsByUserId operation middleware
+func (siw *ServerInterfaceWrapper) GetConversationsByUserId(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", r.PathValue("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "userId", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
+
+	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetConversationsByUserId(w, r, userId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1089,6 +1125,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("POST "+options.BaseURL+"/auth/register", wrapper.UserRegister)
 	m.HandleFunc("POST "+options.BaseURL+"/conversation", wrapper.CreateConversation)
 	m.HandleFunc("GET "+options.BaseURL+"/conversation/messages/{conversationId}", wrapper.GetMessagesByConversationId)
+	m.HandleFunc("GET "+options.BaseURL+"/conversation/user/{userId}", wrapper.GetConversationsByUserId)
 	m.HandleFunc("GET "+options.BaseURL+"/conversation/{conversationId}", wrapper.GetUsersByConversationId)
 	m.HandleFunc("POST "+options.BaseURL+"/meeting", wrapper.CreateMeeting)
 	m.HandleFunc("DELETE "+options.BaseURL+"/meeting/{meetingId}", wrapper.DeleteMeetingById)

@@ -12,6 +12,21 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+func checkConversation(conversationId openapi_types.UUID) (bool, error) {
+	var exist bool
+	err := db.GetDB().QueryRow(`
+		SELECT EXISTS (
+			SELECT 1
+			FROM users
+			WHERE id = $1
+		)
+	`, conversationId).Scan(&exist)
+	if err != nil {
+		return false, err
+	}
+	return exist, nil
+}
+
 func (t *OpenTutor) CreateConversation(w http.ResponseWriter, r *http.Request) {
 	var users []openapi_types.UUID
 	var convo Conversation
@@ -85,4 +100,44 @@ func (t *OpenTutor) GetMessagesByConversationId(w http.ResponseWriter, r *http.R
 
 func (t *OpenTutor) GetUsersByConversationId(w http.ResponseWriter, r *http.Request, conversationId openapi_types.UUID) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
+}
+
+func (t *OpenTutor) GetConversationsByUserId(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {
+	var exist bool
+	var err error
+	exist, err = checkUser(userId)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, "Database error")
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	if !exist {
+		sendError(w, http.StatusNotFound, "User not found")
+		return
+	}
+
+	rows, err := db.GetDB().Query(`
+		SELECT id
+		FROM conversations
+		WHERE $1 = ANY(user_ids)
+	`, userId)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, "Database Error")
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	defer rows.Close()
+
+	var conversations []string
+
+	for rows.Next() {
+		var temp string
+		if err := rows.Scan(&temp); err != nil {
+			sendError(w, http.StatusInternalServerError, "Server error")
+			return
+		}
+		conversations = append(conversations, temp)
+	}
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(conversations)
 }
