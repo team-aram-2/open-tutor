@@ -4,7 +4,7 @@
 	// Export props for external customization.
 	export let open = false; // Whether the menu is open (X) or closed (hamburger)
 	export let size = 24; // Button size in pixels
-	export let backgroundColor = '#FFF';
+	export const backgroundColor = '#FFF';
 	export let lineColor = '#000'; // Line color
 	export let label = 'Toggle menu';
 
