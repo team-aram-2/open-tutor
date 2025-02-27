@@ -45,7 +45,6 @@
 
 <style>
 	.messagecontainer {
-		border: 2px solid chartreuse;
 		width: auto;
 		display: flex;
 		flex-direction: column;

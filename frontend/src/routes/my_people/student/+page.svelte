@@ -23,6 +23,6 @@
 		flex-wrap: wrap;
 		gap: 50px;
 		flex: 0 0 33%;
-		padding-left: 30px;
+		padding: 30px 30px 0 30px;
 	}
 </style>
