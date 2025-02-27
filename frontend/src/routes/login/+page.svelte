@@ -3,11 +3,11 @@
 	import { onMount } from 'svelte';
 
 	enum Tab {
-		Login = 'LOGIN',
-		Register = 'REGISTER'
+		_Login = 'LOGIN',
+		_Register = 'REGISTER'
 	}
 
-	$: selectedTab = Tab.Login;
+	$: selectedTab = Tab._Login;
 	$: submittingForm = false;
 	$: submissionError = '';
 	$: loginError = '';
@@ -26,15 +26,15 @@
 			<div class="flex flex-row h-10">
 				<button
 					class={`flex-grow transition-colors cursor-pointer ${
-						selectedTab === Tab.Login ? 'bg-sky-700/40' : 'bg-white/0 hover:bg-white/20'
+						selectedTab === Tab._Login ? 'bg-sky-700/40' : 'bg-white/0 hover:bg-white/20'
 					}`}
-					on:click={() => (selectedTab = Tab.Login)}>Login</button
+					on:click={() => (selectedTab = Tab._Login)}>Login</button
 				>
 				<button
 					class={`flex-grow transition-colors cursor-pointer ${
-						selectedTab === Tab.Register ? 'bg-sky-700/40' : 'bg-white/0 hover:bg-white/20'
+						selectedTab === Tab._Register ? 'bg-sky-700/40' : 'bg-white/0 hover:bg-white/20'
 					}`}
-					on:click={() => (selectedTab = Tab.Register)}>Register</button
+					on:click={() => (selectedTab = Tab._Register)}>Register</button
 				>
 			</div>
 			<hr class="border-gray-600 border-dashed" />
@@ -47,7 +47,7 @@
 			method="POST"
 			action="{PUBLIC_API_HOST}/auth/{selectedTab.toLowerCase()}"
 		>
-			{#if selectedTab === Tab.Login}
+			{#if selectedTab === Tab._Login}
 				<input
 					class="bg-gray-900 px-4 py-2 rounded-md"
 					name="email"
@@ -66,7 +66,7 @@
 					value="Login"
 					disabled={submittingForm}
 				/>
-			{:else if selectedTab === Tab.Register}
+			{:else if selectedTab === Tab._Register}
 				<input
 					class="bg-gray-900 px-4 py-2 rounded-md"
 					name="first_name"
