@@ -45,6 +45,7 @@
 
 <style>
 	.messagecontainer {
+		border: 2px solid chartreuse;
 		width: auto;
 		display: flex;
 		flex-direction: column;
@@ -52,6 +53,8 @@
 		flex: 1 1 auto;
 		overflow-y: scroll;
 		height: calc(100vh - 100px);
+		left: 0;
+		top: 0;
 		z-index: 0;
 	}
 	.textboxcontainer {
