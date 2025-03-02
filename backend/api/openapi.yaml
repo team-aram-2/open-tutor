@@ -263,11 +263,11 @@ paths:
       summary: Create Tutor Profile for User
       operationId: signUpAsTutor
       requestBody:
-        required: true
+        required: false
         content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Tutor"
+          application/json: {}
+      security:
+        - BearerAuth: []
       responses:
         "201":
           description: Tutor signed up
@@ -537,6 +537,10 @@ paths:
 
 components:
   securitySchemes:
+    BearerAuth:
+      type: http
+      schema: bearer
+
     GitHubOAuth:
       type: oauth2
       flows:
@@ -841,8 +845,3 @@ components:
           type: array
           items:
             type: string
-security:
-  - GitHubOAuth:
-      - read:user
-  - GoogleOAuth:
-      - openid
