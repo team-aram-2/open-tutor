@@ -16,8 +16,7 @@ import (
 )
 
 const (
-	GitHubOAuthScopes = "GitHubOAuth.Scopes"
-	GoogleOAuthScopes = "GoogleOAuth.Scopes"
+	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
 // Defines values for RatingRatingType.
@@ -147,6 +146,9 @@ type GetRatingByIdParams struct {
 // GetRatingByIdParamsUserType defines parameters for GetRatingById.
 type GetRatingByIdParamsUserType string
 
+// SignUpAsTutorJSONBody defines parameters for SignUpAsTutor.
+type SignUpAsTutorJSONBody interface{}
+
 // UserLoginJSONRequestBody defines body for UserLogin for application/json ContentType.
 type UserLoginJSONRequestBody = UserLogin
 
@@ -172,7 +174,7 @@ type CreateMessageAttachmentJSONRequestBody = MessageAttachment
 type PostRatingJSONRequestBody = Rating
 
 // SignUpAsTutorJSONRequestBody defines body for SignUpAsTutor for application/json ContentType.
-type SignUpAsTutorJSONRequestBody = Tutor
+type SignUpAsTutorJSONRequestBody SignUpAsTutorJSONBody
 
 // UpdateUserByIdJSONRequestBody defines body for UpdateUserById for application/json ContentType.
 type UpdateUserByIdJSONRequestBody = User
@@ -253,14 +255,6 @@ type MiddlewareFunc func(http.Handler) http.Handler
 // UserLogin operation middleware
 func (siw *ServerInterfaceWrapper) UserLogin(w http.ResponseWriter, r *http.Request) {
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UserLogin(w, r)
 	}))
@@ -275,14 +269,6 @@ func (siw *ServerInterfaceWrapper) UserLogin(w http.ResponseWriter, r *http.Requ
 // UserRegister operation middleware
 func (siw *ServerInterfaceWrapper) UserRegister(w http.ResponseWriter, r *http.Request) {
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UserRegister(w, r)
 	}))
@@ -296,14 +282,6 @@ func (siw *ServerInterfaceWrapper) UserRegister(w http.ResponseWriter, r *http.R
 
 // CreateMeeting operation middleware
 func (siw *ServerInterfaceWrapper) CreateMeeting(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateMeeting(w, r)
@@ -330,14 +308,6 @@ func (siw *ServerInterfaceWrapper) DeleteMeetingById(w http.ResponseWriter, r *h
 		return
 	}
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteMeetingById(w, r, meetingId)
 	}))
@@ -362,14 +332,6 @@ func (siw *ServerInterfaceWrapper) GetMeetingById(w http.ResponseWriter, r *http
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "meetingId", Err: err})
 		return
 	}
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetMeetingById(w, r, meetingId)
@@ -396,14 +358,6 @@ func (siw *ServerInterfaceWrapper) UpdateMeetingById(w http.ResponseWriter, r *h
 		return
 	}
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateMeetingById(w, r, meetingId)
 	}))
@@ -417,14 +371,6 @@ func (siw *ServerInterfaceWrapper) UpdateMeetingById(w http.ResponseWriter, r *h
 
 // CreateMessage operation middleware
 func (siw *ServerInterfaceWrapper) CreateMessage(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateMessage(w, r)
@@ -451,14 +397,6 @@ func (siw *ServerInterfaceWrapper) DeleteMessageById(w http.ResponseWriter, r *h
 		return
 	}
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteMessageById(w, r, messageId)
 	}))
@@ -483,14 +421,6 @@ func (siw *ServerInterfaceWrapper) GetMessageById(w http.ResponseWriter, r *http
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "messageId", Err: err})
 		return
 	}
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetMessageById(w, r, messageId)
@@ -517,14 +447,6 @@ func (siw *ServerInterfaceWrapper) UpdateMessageById(w http.ResponseWriter, r *h
 		return
 	}
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateMessageById(w, r, messageId)
 	}))
@@ -538,14 +460,6 @@ func (siw *ServerInterfaceWrapper) UpdateMessageById(w http.ResponseWriter, r *h
 
 // CreateMessageAttachment operation middleware
 func (siw *ServerInterfaceWrapper) CreateMessageAttachment(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateMessageAttachment(w, r)
@@ -572,14 +486,6 @@ func (siw *ServerInterfaceWrapper) DeleteMessageAttachmentById(w http.ResponseWr
 		return
 	}
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteMessageAttachmentById(w, r, messageAttachmentId)
 	}))
@@ -605,14 +511,6 @@ func (siw *ServerInterfaceWrapper) GetMessageAttachmentById(w http.ResponseWrite
 		return
 	}
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetMessageAttachmentById(w, r, messageAttachmentId)
 	}))
@@ -626,14 +524,6 @@ func (siw *ServerInterfaceWrapper) GetMessageAttachmentById(w http.ResponseWrite
 
 // PostRating operation middleware
 func (siw *ServerInterfaceWrapper) PostRating(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PostRating(w, r)
@@ -659,14 +549,6 @@ func (siw *ServerInterfaceWrapper) GetRatingById(w http.ResponseWriter, r *http.
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "userId", Err: err})
 		return
 	}
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params GetRatingByIdParams
@@ -695,9 +577,7 @@ func (siw *ServerInterfaceWrapper) SignUpAsTutor(w http.ResponseWriter, r *http.
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
 
 	r = r.WithContext(ctx)
 
@@ -726,14 +606,6 @@ func (siw *ServerInterfaceWrapper) GetTutorById(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetTutorById(w, r, tutorId)
 	}))
@@ -758,14 +630,6 @@ func (siw *ServerInterfaceWrapper) DeleteUserById(w http.ResponseWriter, r *http
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "userId", Err: err})
 		return
 	}
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.DeleteUserById(w, r, userId)
@@ -792,14 +656,6 @@ func (siw *ServerInterfaceWrapper) GetUserById(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetUserById(w, r, userId)
 	}))
@@ -824,14 +680,6 @@ func (siw *ServerInterfaceWrapper) UpdateUserById(w http.ResponseWriter, r *http
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "userId", Err: err})
 		return
 	}
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateUserById(w, r, userId)
