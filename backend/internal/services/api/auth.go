@@ -47,7 +47,7 @@ func applySessionTokenForUserId(userId string, w http.ResponseWriter) error {
 		Name:     "session_token",
 		Value:    responseToken,
 		Path:     "/",
-		HttpOnly: true,
+		HttpOnly: false,
 		MaxAge:   86400 * 1, // 1 day expiry
 	})
 	return nil
