@@ -26,7 +26,7 @@ func generateSessionTokenForUser(userId string, rememberLogin bool) (string, err
 	}
 
 	type sessionClaims struct {
-		UserID string `json:"userId"`
+		UserID string `json:"user_id"`
 		jwt.StandardClaims
 	}
 
@@ -40,8 +40,8 @@ func generateSessionTokenForUser(userId string, rememberLogin bool) (string, err
 	claims := sessionClaims{
 		userId,
 		jwt.StandardClaims{
-			IssuedAt: time.Now().Unix(),
-			ExpiresAt: time.Now().Unix() + int64(time.Hour.Seconds()) * 24 * daysUntilExpiry,
+			IssuedAt:  time.Now().Unix(),
+			ExpiresAt: time.Now().Unix() + int64(time.Hour.Seconds())*24*daysUntilExpiry,
 			Issuer:    "OpenTutor",
 		},
 	}
@@ -91,17 +91,21 @@ func sendBack(w http.ResponseWriter, r *http.Request, errMsg *string) {
 }
 
 func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
-	var loginData UserLogin
 	err := r.ParseForm()
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("error parsing form data: %v", err))
 		return
 	}
-	loginData.Email = types.Email(r.FormValue("email"))
-	loginData.Password = r.FormValue("password")
-	*loginData.RememberLogin, err = strconv.ParseBool(r.FormValue("rememberLogin"))
+	loginData := UserLogin{
+		Email:         types.Email(r.FormValue("email")),
+		Password:      r.FormValue("password"),
+		RememberLogin: new(bool),
+	}
+	parsedBool, err := strconv.ParseBool(r.FormValue("rememberLogin"))
 	if err != nil {
 		*loginData.RememberLogin = false
+	} else {
+		*loginData.RememberLogin = parsedBool
 	}
 
 	var (

@@ -1,14 +1,17 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"open-tutor/internal/services/db"
 	"open-tutor/middleware"
 
+	"github.com/lib/pq"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
@@ -20,8 +23,23 @@ type TutorResponse struct {
 
 func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 	authInfo := middleware.GetAuthenticationInfo(r)
-	if authInfo == nil {
+	if authInfo.UserID == "" {
 		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	// Check if user exists
+	var exists bool
+	err := db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE user_id = $1)", authInfo.UserID).Scan(&exists)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Database error: %s\n", err)
+		return
+	}
+
+	if !exists {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "User with ID:{} does not exist\n")
 		return
 	}
 
@@ -35,18 +53,110 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+func (t *OpenTutor) GetTutors(w http.ResponseWriter, r *http.Request, params GetTutorsParams) {
+	// Base query for tutor details
+	query := `
+		SELECT u.user_id, u.first_name, u.last_name, u.email, u.signed_up_at,
+			   t.total_hours, ARRAY_REMOVE(ARRAY_AGG(ts.skill_id), NULL) AS skills,
+			   COALESCE(AVG(r.communication), 0), COALESCE(AVG(r.knowledge), 0),
+			   COALESCE(AVG(r.overall), 0), COALESCE(AVG(r.professionalism), 0),
+			   COALESCE(AVG(r.punctuality), 0), COUNT(r.user_id)
+		FROM tutors t
+		INNER JOIN users u ON t.user_id = u.user_id
+		LEFT JOIN tutor_skills ts ON t.user_id = ts.tutor_id
+		LEFT JOIN ratings r ON t.user_id = r.user_id AND r.rating_type = 'tutor'
+	`
+
+	// Filters
+	var args []interface{}
+	conditions := []string{}
+
+	argIndex := 1
+
+	if params.MinRating != nil {
+		conditions = append(conditions, fmt.Sprintf("COALESCE(AVG(r.overall), 0) >= $%d", argIndex))
+		args = append(args, *params.MinRating)
+		argIndex++
+	}
+
+	if params.SkillsInclude != nil && len(*params.SkillsInclude) > 0 {
+		conditions = append(conditions, fmt.Sprintf("t.user_id IN (SELECT tutor_id FROM tutor_skills WHERE skill_id = ANY($%d))", argIndex))
+		args = append(args, pq.Array(*params.SkillsInclude))
+		argIndex++
+	}
+
+	// Apply conditions if any
+	if len(conditions) > 0 {
+		query += " WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	// Grouping and pagination
+	query += " GROUP BY u.user_id, u.first_name, u.last_name, u.email, u.signed_up_at, t.total_hours, u.account_locked"
+
+	query += fmt.Sprintf(" ORDER BY AVG(r.overall) DESC LIMIT $%d OFFSET $%d", argIndex, argIndex+1)
+	args = append(args, params.PageSize, params.PageSize*params.PageIndex)
+
+	// Execute query
+	rows, err := db.GetDB().Query(query, args...)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Database error: %v", err), http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	// Parse results
+	var tutorResponses []TutorResponse
+	for rows.Next() {
+		var tutor Tutor
+		var skills []string
+		var ratingScores RatingScores
+		var ratingCount int
+
+		err := rows.Scan(
+			&tutor.UserId, &tutor.FirstName, &tutor.LastName, &tutor.Email, &tutor.SignedUpAt,
+			&tutor.TotalHours, pq.Array(&skills),
+			&ratingScores.Communication, &ratingScores.Knowledge, &ratingScores.Overall,
+			&ratingScores.Professionalism, &ratingScores.Punctuality, &ratingCount,
+		)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to parse tutors: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		tutor.Skills = &skills
+
+		tutorResponse := TutorResponse{
+			Info:         tutor,
+			RatingScores: ratingScores,
+			RatingCount:  ratingCount,
+		}
+
+		tutorResponses = append(tutorResponses, tutorResponse)
+	}
+
+	// Send response
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(tutorResponses)
+	if err != nil {
+		log.Println("Error: ", err)
+	}
+}
+
 func (t *OpenTutor) GetTutorById(w http.ResponseWriter, r *http.Request, tutorId openapi_types.UUID) {
-	tutor := &Tutor{}
+	tutor := &Tutor{
+		Skills: new([]string),
+	}
 	selectErr := db.GetDB().QueryRow(
 		`
 		SELECT
 			first_name,
 			last_name,
 			signed_up_at,
-			total_hours
+			total_hours,
+			tutors.user_id
 		FROM users
 		INNER JOIN tutors ON users.user_id = tutors.user_id
-		WHERE user_id = $1
+		WHERE tutors.user_id = $1
 		`,
 		tutorId,
 	).Scan(
@@ -54,6 +164,7 @@ func (t *OpenTutor) GetTutorById(w http.ResponseWriter, r *http.Request, tutorId
 		&tutor.LastName,
 		&tutor.SignedUpAt,
 		&tutor.TotalHours,
+		&tutor.UserId,
 	)
 
 	if selectErr != nil {
@@ -62,7 +173,7 @@ func (t *OpenTutor) GetTutorById(w http.ResponseWriter, r *http.Request, tutorId
 		return
 	}
 	// Get skills arr from tutor_skills
-	var skills []string
+	var skills sql.NullString
 	selectErr = db.GetDB().QueryRow(`
 		SELECT ARRAY_AGG(skill_id) AS skills
 		FROM tutor_skills
@@ -76,7 +187,18 @@ func (t *OpenTutor) GetTutorById(w http.ResponseWriter, r *http.Request, tutorId
 		return
 	}
 
-	*tutor.Skills = skills
+	var skillList []string
+	if skills.Valid { // Only parse if NOT NULL
+		err := json.Unmarshal([]byte(skills.String), &skillList)
+		if err != nil {
+			log.Printf("Failed to unmarshal skills: %v", err)
+			skillList = []string{} // Set an empty slice if NULL
+		}
+	} else {
+		skillList = []string{} // Set an empty slice if NULL
+	}
+
+	*tutor.Skills = skillList
 
 	// Get all ratings for a tutor
 	rows, selectErr := db.GetDB().Query(`
@@ -128,7 +250,11 @@ func (t *OpenTutor) GetTutorById(w http.ResponseWriter, r *http.Request, tutorId
 		RatingScores: aggregate,
 		RatingCount:  ratingCount,
 	}
+	fmt.Println(response)
 
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(response)
+	err := json.NewEncoder(w).Encode(response)
+	if err != nil {
+		fmt.Println("Error encoding json: ", err)
+	}
 }

@@ -105,26 +105,26 @@ type RatingScores struct {
 
 // Tutor defines model for Tutor.
 type Tutor struct {
-	AccountLocked *bool               `json:"accountLocked,omitempty"`
-	Email         openapi_types.Email `json:"email"`
-	FirstName     string              `json:"firstName"`
-	LastName      string              `json:"lastName"`
-	PasswordHash  *string             `json:"passwordHash,omitempty"`
-	SignedUpAt    *time.Time          `json:"signedUpAt,omitempty"`
-	Skills        *[]string           `json:"skills,omitempty"`
-	TotalHours    *int                `json:"totalHours,omitempty"`
-	UserId        openapi_types.UUID  `json:"userId"`
+	AccountLocked *bool                `json:"accountLocked,omitempty"`
+	Email         *openapi_types.Email `json:"email,omitempty"`
+	FirstName     string               `json:"firstName"`
+	LastName      string               `json:"lastName"`
+	PasswordHash  *string              `json:"passwordHash,omitempty"`
+	SignedUpAt    *time.Time           `json:"signedUpAt,omitempty"`
+	Skills        *[]string            `json:"skills,omitempty"`
+	TotalHours    *int                 `json:"totalHours,omitempty"`
+	UserId        openapi_types.UUID   `json:"userId"`
 }
 
 // User Base User object containing shared details needed for all users.
 type User struct {
-	AccountLocked *bool               `json:"accountLocked,omitempty"`
-	Email         openapi_types.Email `json:"email"`
-	FirstName     string              `json:"firstName"`
-	LastName      string              `json:"lastName"`
-	PasswordHash  *string             `json:"passwordHash,omitempty"`
-	SignedUpAt    *time.Time          `json:"signedUpAt,omitempty"`
-	UserId        openapi_types.UUID  `json:"userId"`
+	AccountLocked *bool                `json:"accountLocked,omitempty"`
+	Email         *openapi_types.Email `json:"email,omitempty"`
+	FirstName     string               `json:"firstName"`
+	LastName      string               `json:"lastName"`
+	PasswordHash  *string              `json:"passwordHash,omitempty"`
+	SignedUpAt    *time.Time           `json:"signedUpAt,omitempty"`
+	UserId        openapi_types.UUID   `json:"userId"`
 }
 
 // UserLogin Payload for user logins
@@ -149,6 +149,21 @@ type GetRatingByIdParams struct {
 
 // GetRatingByIdParamsUserType defines parameters for GetRatingById.
 type GetRatingByIdParamsUserType string
+
+// GetTutorsParams defines parameters for GetTutors.
+type GetTutorsParams struct {
+	// PageSize The ID of the tutor to get
+	PageSize int `form:"pageSize" json:"pageSize"`
+
+	// PageIndex The ID of the tutor to get
+	PageIndex int `form:"pageIndex" json:"pageIndex"`
+
+	// MinRating The minimum rating of tutor to get.
+	MinRating *int `form:"minRating,omitempty" json:"minRating,omitempty"`
+
+	// SkillsInclude The skills a tutor should have.
+	SkillsInclude *[]openapi_types.UUID `form:"skillsInclude,omitempty" json:"skillsInclude,omitempty"`
+}
 
 // SignUpAsTutorJSONBody defines parameters for SignUpAsTutor.
 type SignUpAsTutorJSONBody interface{}
@@ -230,6 +245,9 @@ type ServerInterface interface {
 	// Get a user's rating by user ID, optionally filtering by usertype.
 	// (GET /rating/{userId})
 	GetRatingById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID, params GetRatingByIdParams)
+	// Search All Tutors
+	// (GET /tutor)
+	GetTutors(w http.ResponseWriter, r *http.Request, params GetTutorsParams)
 	// Create Tutor Profile for User
 	// (POST /tutor)
 	SignUpAsTutor(w http.ResponseWriter, r *http.Request)
@@ -576,6 +594,71 @@ func (siw *ServerInterfaceWrapper) GetRatingById(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r)
 }
 
+// GetTutors operation middleware
+func (siw *ServerInterfaceWrapper) GetTutors(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetTutorsParams
+
+	// ------------- Required query parameter "pageSize" -------------
+
+	if paramValue := r.URL.Query().Get("pageSize"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageSize"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "pageSize", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		return
+	}
+
+	// ------------- Required query parameter "pageIndex" -------------
+
+	if paramValue := r.URL.Query().Get("pageIndex"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "pageIndex"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "pageIndex", r.URL.Query(), &params.PageIndex)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageIndex", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "minRating" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "minRating", r.URL.Query(), &params.MinRating)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "minRating", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "skillsInclude" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "skillsInclude", r.URL.Query(), &params.SkillsInclude)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "skillsInclude", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetTutors(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // SignUpAsTutor operation middleware
 func (siw *ServerInterfaceWrapper) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 
@@ -831,6 +914,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("GET "+options.BaseURL+"/messageAttachment/{messageAttachmentId}", wrapper.GetMessageAttachmentById)
 	m.HandleFunc("POST "+options.BaseURL+"/rating", wrapper.PostRating)
 	m.HandleFunc("GET "+options.BaseURL+"/rating/{userId}", wrapper.GetRatingById)
+	m.HandleFunc("GET "+options.BaseURL+"/tutor", wrapper.GetTutors)
 	m.HandleFunc("POST "+options.BaseURL+"/tutor", wrapper.SignUpAsTutor)
 	m.HandleFunc("GET "+options.BaseURL+"/tutor/{tutorId}", wrapper.GetTutorById)
 	m.HandleFunc("DELETE "+options.BaseURL+"/user/{userId}", wrapper.DeleteUserById)
