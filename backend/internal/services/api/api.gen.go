@@ -126,8 +126,9 @@ type User struct {
 
 // UserLogin Payload for user logins
 type UserLogin struct {
-	Email    openapi_types.Email `json:"email"`
-	Password string              `json:"password"`
+	Email         openapi_types.Email `json:"email"`
+	Password      string              `json:"password"`
+	RememberLogin *bool               `json:"rememberLogin,omitempty"`
 }
 
 // UserSignup Payload for user signups

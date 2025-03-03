@@ -626,6 +626,8 @@ components:
         password:
           type: string
           format: password
+        rememberLogin:
+          type: boolean
 
     UserSignup:
       type: object
