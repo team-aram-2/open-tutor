@@ -13,7 +13,7 @@
 		loginError = params.get('err') ?? '';
 	});
 
-	const onSubmit = async (e: any) => {
+	const onSubmit = async (e: SubmitEvent) => {
 		// if (submittingForm) return;
 
 		submittingForm = true;
