@@ -7,13 +7,9 @@
 	import '../app.css';
 	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
 
-	// Load student my people dashboard by default TEMPORARY
-	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 
-	onMount(() => {
-		// goto('/my_people/student');
-	});
+	onMount(() => {});
 </script>
 
 <!-- Page Content -->
@@ -28,9 +24,6 @@
 
 <!-- Style for the page goes here -->
 <style>
-	/* Import Inter font */
-	@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700');
-
 	/* Apply these globally */
 	* {
 		font-family: 'Inter', sans-serif;
@@ -52,6 +45,13 @@
 
 		/* font:  */
 	}
+
+	/* * .content {
+		padding-left: 0px;
+		padding-top: 0px;
+		width: auto;
+		flex-grow: 1;
+	} */
 
 	/* .page-title {
         padding-left: 30px;
