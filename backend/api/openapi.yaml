@@ -271,10 +271,6 @@ paths:
       responses:
         "201":
           description: Tutor signed up
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Tutor"
         "400":
           description: Create tutor request malformed or denied.
           content:
