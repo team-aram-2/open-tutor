@@ -8,12 +8,15 @@ import (
 
 	api "open-tutor/internal/services/api"
 	middleware "open-tutor/middleware"
+	zoom "open-tutor/zoom"
 )
 
 type Middleware func(http.Handler) http.HandlerFunc
 
 func main() {
-	port := flag.String("port", "8080", "test port")
+	zoom.LoadAccessToken()
+
+	port := flag.String("port", "8080", "OpenTutor API port")
 	flag.Parse()
 
 	openTutor := api.Init()

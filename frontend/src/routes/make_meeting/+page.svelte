@@ -15,7 +15,7 @@
 	});
 
 	const onSubmit = async (e: any) => {
-		if (submittingForm) return;
+		// if (submittingForm) return;
 
 		submittingForm = true;
 		submissionError = '';
@@ -24,12 +24,13 @@
 
 		const requestBody = {
 			studentId: studentIdInput,
-			startAtInput: startAtInput,
-			endAtInput: endAtInput
+			startAt: new Date(startAtInput).toISOString(),
+			endAt: new Date(endAtInput).toISOString()
 		};
-		const reqPromise = fetch(`${PUBLIC_API_HOST}/meetings`, {
+		const reqPromise = fetch(`${PUBLIC_API_HOST}/meeting`, {
 			method: 'POST',
-			body: JSON.stringify(requestBody)
+			body: JSON.stringify(requestBody),
+			credentials: 'include'
 		});
 
 		const response = await reqPromise;
@@ -39,7 +40,6 @@
 		}
 
 		window.localStorage.setItem('SessionToken', response.headers.get('X-Session-Token')!);
-		// window.location.href = '/';
 	};
 </script>
 
@@ -65,7 +65,7 @@
 				<input
 					class="bg-gray-900 px-4 py-2 w-full rounded-md"
 					id="start_at"
-					type="date"
+					type="datetime-local"
 					bind:value={startAtInput}
 				/>
 			</div>
@@ -74,7 +74,7 @@
 				<input
 					class="bg-gray-900 px-4 py-2 w-full rounded-md"
 					id="end_at"
-					type="date"
+					type="datetime-local"
 					bind:value={endAtInput}
 				/>
 			</div>
@@ -82,7 +82,7 @@
 				class="rounded-md bg-blue-600 py-2 enabled:cursor-pointer disabled:opacity-50 mt-3"
 				type="submit"
 				value="Schedule"
-				disabled={submittingForm}
+				disabled={false}
 			/>
 		</form>
 		<span class="text-red-600 text-center">{submissionError}</span>

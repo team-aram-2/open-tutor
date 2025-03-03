@@ -33,6 +33,7 @@ func sendError(w http.ResponseWriter, code int, message string) {
 	}
 	w.WriteHeader(code)
 	_ = json.NewEncoder(w).Encode(sendError)
+	fmt.Printf("error on web request %+v\n", sendError)
 }
 
 func (t *OpenTutor) CreateUser(w http.ResponseWriter, r *http.Request) {

@@ -9,6 +9,7 @@ import (
 	"open-tutor/util"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 )
 
 const (
@@ -16,7 +17,7 @@ const (
 )
 
 type Claims struct {
-	UserID string `json:"user_id"`
+	UserID *string `json:"user_id"`
 	jwt.StandardClaims
 }
 
@@ -42,6 +43,7 @@ func Authenticate(next http.Handler) http.HandlerFunc {
 		cookie, err := r.Cookie("session_token")
 		if err != nil {
 			// No session_token cookie found //
+			fmt.Printf("[Authenticate] error reading session_token cookie: %v\n", err)
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -66,10 +68,19 @@ func Authenticate(next http.Handler) http.HandlerFunc {
 			next.ServeHTTP(w, r)
 			return
 		}
+		var userId uuid.UUID
+		if claims.UserID != nil {
+			userId, err = uuid.Parse(*claims.UserID)
+		}
+		if err != nil {
+			fmt.Printf("[Authenticate] failed to parse uuid from user id: %v\n", err)
+			next.ServeHTTP(w, r)
+			return
+		}
 
 		// Add the userId to authentication context //
 		authInfo := AuthenticationInfo{
-			UserID: claims.UserID,
+			UserID: userId.String(),
 		}
 		ctx := context.WithValue(r.Context(), AuthenticationContextKey, authInfo)
 		next.ServeHTTP(w, r.WithContext(ctx))
