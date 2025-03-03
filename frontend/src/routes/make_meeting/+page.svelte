@@ -7,6 +7,7 @@
 	$: endAtInput = '';
 	$: submissionError = '';
 	$: loginError = '';
+	$: submittingForm = false;
 
 	onMount(() => {
 		const params = new URLSearchParams(window.location.search);
@@ -14,7 +15,7 @@
 	});
 
 	const onSubmit = async (e: SubmitEvent) => {
-		// if (submittingForm) return;
+		if (submittingForm) return;
 
 		submittingForm = true;
 		submissionError = '';
