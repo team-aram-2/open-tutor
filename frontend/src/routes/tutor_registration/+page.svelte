@@ -51,7 +51,7 @@
 				>.
 			</p>
 		</div>
-		<form class="flex flex-col gap-3" method="POST" action="{PUBLIC_API_HOST}/tutor}">
+		<form class="flex flex-col gap-3" method="POST" action="{PUBLIC_API_HOST}/tutor">
 			<div
 				class="flex justify-left items-center gap-4 p-4 my-2 border border-black-200 rounded-sm dark:border-gray-700"
 			>
