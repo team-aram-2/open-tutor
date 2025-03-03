@@ -95,7 +95,7 @@ func (t *OpenTutor) GetMeetings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var meetings []Meeting
+	meetings := []Meeting{}
 	for meetingRows.Next() {
 		var meeting Meeting
 		err := meetingRows.Scan(
