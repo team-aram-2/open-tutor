@@ -5,7 +5,6 @@
 	$: studentIdInput = '';
 	$: startAtInput = '';
 	$: endAtInput = '';
-	$: submittingForm = false;
 	$: submissionError = '';
 	$: loginError = '';
 
