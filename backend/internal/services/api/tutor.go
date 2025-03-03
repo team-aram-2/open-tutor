@@ -43,6 +43,19 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if user exists
+	err = db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM tutors WHERE user_id = $1)", authInfo.UserID).Scan(&exists)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Database error: %s\n", err)
+		return
+	}
+	if exists {
+		w.WriteHeader(http.StatusConflict)
+		fmt.Fprintf(w, "User with ID:{} is already registered as a tutor.\n")
+		return
+	}
+
 	_, insertErr := db.GetDB().Exec("INSERT INTO tutors (user_id) VALUES ($1)", authInfo.UserID)
 	if insertErr != nil {
 		w.WriteHeader(http.StatusInternalServerError)
