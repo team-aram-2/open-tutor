@@ -32,6 +32,13 @@ const (
 	GetRatingByIdParamsUserTypeTutor   GetRatingByIdParamsUserType = "tutor"
 )
 
+// CreateMeetingBody defines model for CreateMeetingBody.
+type CreateMeetingBody struct {
+	EndAt     *time.Time          `json:"endAt,omitempty"`
+	StartAt   *time.Time          `json:"startAt,omitempty"`
+	StudentId *openapi_types.UUID `json:"studentId,omitempty"`
+}
+
 // ErrorModel defines model for ErrorModel.
 type ErrorModel struct {
 	Code    int    `json:"code"`
@@ -40,11 +47,13 @@ type ErrorModel struct {
 
 // Meeting defines model for Meeting.
 type Meeting struct {
-	EndAt     *time.Time          `json:"endAt,omitempty"`
-	Id        *openapi_types.UUID `json:"id,omitempty"`
-	StartAt   *time.Time          `json:"startAt,omitempty"`
-	StudentId *openapi_types.UUID `json:"studentId,omitempty"`
-	TutorId   *openapi_types.UUID `json:"tutorId,omitempty"`
+	EndAt        time.Time          `json:"endAt"`
+	Id           openapi_types.UUID `json:"id"`
+	StartAt      time.Time          `json:"startAt"`
+	StudentId    openapi_types.UUID `json:"studentId"`
+	TutorId      openapi_types.UUID `json:"tutorId"`
+	ZoomHostLink *string            `json:"zoomHostLink,omitempty"`
+	ZoomJoinLink *string            `json:"zoomJoinLink,omitempty"`
 }
 
 // Message defines model for Message.
@@ -154,10 +163,7 @@ type UserLoginJSONRequestBody = UserLogin
 type UserRegisterFormdataRequestBody = UserSignup
 
 // CreateMeetingJSONRequestBody defines body for CreateMeeting for application/json ContentType.
-type CreateMeetingJSONRequestBody = Meeting
-
-// UpdateMeetingByIdJSONRequestBody defines body for UpdateMeetingById for application/json ContentType.
-type UpdateMeetingByIdJSONRequestBody = Meeting
+type CreateMeetingJSONRequestBody = CreateMeetingBody
 
 // CreateMessageJSONRequestBody defines body for CreateMessage for application/json ContentType.
 type CreateMessageJSONRequestBody = Message
@@ -188,15 +194,9 @@ type ServerInterface interface {
 	// Create a new meeting
 	// (POST /meeting)
 	CreateMeeting(w http.ResponseWriter, r *http.Request)
-	// Delete a meeting by ID
-	// (DELETE /meeting/{meetingId})
-	DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
-	// Get a meeting by ID
-	// (GET /meeting/{meetingId})
-	GetMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
-	// Update meeting information
-	// (PUT /meeting/{meetingId})
-	UpdateMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
+	// Get meetings for user
+	// (GET /meetings)
+	GetMeetings(w http.ResponseWriter, r *http.Request)
 	// Creates a new message
 	// (POST /message)
 	CreateMessage(w http.ResponseWriter, r *http.Request)
@@ -316,19 +316,8 @@ func (siw *ServerInterfaceWrapper) CreateMeeting(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r)
 }
 
-// DeleteMeetingById operation middleware
-func (siw *ServerInterfaceWrapper) DeleteMeetingById(w http.ResponseWriter, r *http.Request) {
-
-	var err error
-
-	// ------------- Path parameter "meetingId" -------------
-	var meetingId openapi_types.UUID
-
-	err = runtime.BindStyledParameterWithOptions("simple", "meetingId", r.PathValue("meetingId"), &meetingId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "meetingId", Err: err})
-		return
-	}
+// GetMeetings operation middleware
+func (siw *ServerInterfaceWrapper) GetMeetings(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 
@@ -339,73 +328,7 @@ func (siw *ServerInterfaceWrapper) DeleteMeetingById(w http.ResponseWriter, r *h
 	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteMeetingById(w, r, meetingId)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// GetMeetingById operation middleware
-func (siw *ServerInterfaceWrapper) GetMeetingById(w http.ResponseWriter, r *http.Request) {
-
-	var err error
-
-	// ------------- Path parameter "meetingId" -------------
-	var meetingId openapi_types.UUID
-
-	err = runtime.BindStyledParameterWithOptions("simple", "meetingId", r.PathValue("meetingId"), &meetingId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "meetingId", Err: err})
-		return
-	}
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetMeetingById(w, r, meetingId)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// UpdateMeetingById operation middleware
-func (siw *ServerInterfaceWrapper) UpdateMeetingById(w http.ResponseWriter, r *http.Request) {
-
-	var err error
-
-	// ------------- Path parameter "meetingId" -------------
-	var meetingId openapi_types.UUID
-
-	err = runtime.BindStyledParameterWithOptions("simple", "meetingId", r.PathValue("meetingId"), &meetingId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "meetingId", Err: err})
-		return
-	}
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.UpdateMeetingById(w, r, meetingId)
+		siw.Handler.GetMeetings(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -967,9 +890,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("POST "+options.BaseURL+"/auth/login", wrapper.UserLogin)
 	m.HandleFunc("POST "+options.BaseURL+"/auth/register", wrapper.UserRegister)
 	m.HandleFunc("POST "+options.BaseURL+"/meeting", wrapper.CreateMeeting)
-	m.HandleFunc("DELETE "+options.BaseURL+"/meeting/{meetingId}", wrapper.DeleteMeetingById)
-	m.HandleFunc("GET "+options.BaseURL+"/meeting/{meetingId}", wrapper.GetMeetingById)
-	m.HandleFunc("PUT "+options.BaseURL+"/meeting/{meetingId}", wrapper.UpdateMeetingById)
+	m.HandleFunc("GET "+options.BaseURL+"/meetings", wrapper.GetMeetings)
 	m.HandleFunc("POST "+options.BaseURL+"/message", wrapper.CreateMessage)
 	m.HandleFunc("DELETE "+options.BaseURL+"/message/{messageId}", wrapper.DeleteMessageById)
 	m.HandleFunc("GET "+options.BaseURL+"/message/{messageId}", wrapper.GetMessageById)
