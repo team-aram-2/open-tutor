@@ -56,43 +56,52 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 func (t *OpenTutor) GetTutors(w http.ResponseWriter, r *http.Request, params GetTutorsParams) {
 	// Base query for tutor details
 	query := `
-		SELECT u.user_id, u.first_name, u.last_name, u.email, u.signed_up_at,
-			   t.total_hours, ARRAY_REMOVE(ARRAY_AGG(ts.skill_id), NULL) AS skills,
-			   COALESCE(AVG(r.communication), 0), COALESCE(AVG(r.knowledge), 0),
-			   COALESCE(AVG(r.overall), 0), COALESCE(AVG(r.professionalism), 0),
-			   COALESCE(AVG(r.punctuality), 0), COUNT(r.user_id)
-		FROM tutors t
-		INNER JOIN users u ON t.user_id = u.user_id
-		LEFT JOIN tutor_skills ts ON t.user_id = ts.tutor_id
-		LEFT JOIN ratings r ON t.user_id = r.user_id AND r.rating_type = 'tutor'
-	`
-
-	// Filters
+	SELECT u.user_id, u.first_name, u.last_name, u.email, u.signed_up_at,
+		   t.total_hours, ARRAY_REMOVE(ARRAY_AGG(ts.skill_id), NULL) AS skills,
+		   COALESCE(AVG(r.communication), 0), COALESCE(AVG(r.knowledge), 0),
+		   COALESCE(AVG(r.overall), 0), COALESCE(AVG(r.professionalism), 0),
+		   COALESCE(AVG(r.punctuality), 0), COUNT(r.user_id)
+	FROM tutors t
+	INNER JOIN users u ON t.user_id = u.user_id
+	LEFT JOIN tutor_skills ts ON t.user_id = ts.tutor_id
+	LEFT JOIN ratings r ON t.user_id = r.user_id AND r.rating_type = 'tutor'
+`
 	var args []interface{}
 	conditions := []string{}
+	havingConditions := []string{}
 
-	argIndex := 1
+	argIndex := 1 // PostgreSQL parameters start from $1
 
-	if params.MinRating != nil {
-		conditions = append(conditions, fmt.Sprintf("COALESCE(AVG(r.overall), 0) >= $%d", argIndex))
-		args = append(args, *params.MinRating)
-		argIndex++
-	}
-
+	// Handle Skills Include Filter
 	if params.SkillsInclude != nil && len(*params.SkillsInclude) > 0 {
 		conditions = append(conditions, fmt.Sprintf("t.user_id IN (SELECT tutor_id FROM tutor_skills WHERE skill_id = ANY($%d))", argIndex))
 		args = append(args, pq.Array(*params.SkillsInclude))
 		argIndex++
 	}
 
-	// Apply conditions if any
+	// Apply conditions before GROUP BY
 	if len(conditions) > 0 {
 		query += " WHERE " + strings.Join(conditions, " AND ")
 	}
 
-	// Grouping and pagination
-	query += " GROUP BY u.user_id, u.first_name, u.last_name, u.email, u.signed_up_at, t.total_hours, u.account_locked"
+	// GROUP BY (needed for aggregation)
+	query += `
+	GROUP BY u.user_id, u.first_name, u.last_name, u.email, u.signed_up_at, t.total_hours, u.account_locked
+`
 
+	// Move minRating filter to HAVING clause
+	if params.MinRating != nil {
+		havingConditions = append(havingConditions, fmt.Sprintf("COALESCE(AVG(r.overall), 0) >= $%d", argIndex))
+		args = append(args, *params.MinRating)
+		argIndex++
+	}
+
+	// Apply HAVING clause if needed
+	if len(havingConditions) > 0 {
+		query += " HAVING " + strings.Join(havingConditions, " AND ")
+	}
+
+	// ORDER, LIMIT, and OFFSET
 	query += fmt.Sprintf(" ORDER BY AVG(r.overall) DESC LIMIT $%d OFFSET $%d", argIndex, argIndex+1)
 	args = append(args, params.PageSize, params.PageSize*params.PageIndex)
 

@@ -159,7 +159,7 @@ type GetTutorsParams struct {
 	PageIndex int `form:"pageIndex" json:"pageIndex"`
 
 	// MinRating The minimum rating of tutor to get.
-	MinRating *int `form:"minRating,omitempty" json:"minRating,omitempty"`
+	MinRating *float32 `form:"minRating,omitempty" json:"minRating,omitempty"`
 
 	// SkillsInclude The skills a tutor should have.
 	SkillsInclude *[]openapi_types.UUID `form:"skillsInclude,omitempty" json:"skillsInclude,omitempty"`
