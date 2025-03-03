@@ -45,12 +45,13 @@
 			</p>
 			<p>
 				By agreeing to the above, you can be expected to be held accountable on these terms-- as
-				well as the terms of the <a class="underline text-purple-300 hover:text-orange-300" href="#"
-					>general OpenTutor user agreement</a
+				well as the terms of the <a
+					class="underline text-purple-300 hover:text-orange-300"
+					href="#top">general OpenTutor user agreement</a
 				>.
 			</p>
 		</div>
-		<form class="flex flex-col gap-3" method="POST" action="{PUBLIC_API_HOST}/tutor">
+		<form class="flex flex-col gap-3" method="POST" action="{PUBLIC_API_HOST}/tutor}">
 			<div
 				class="flex justify-left items-center gap-4 p-4 my-2 border border-black-200 rounded-sm dark:border-gray-700"
 			>
