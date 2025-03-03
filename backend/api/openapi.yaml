@@ -297,7 +297,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Tutor"
+                type: object
+                properties:
+                  info:
+                    $ref: "#/components/schemas/Tutor"
+                  ratingScores:
+                    $ref: "#/components/schemas/RatingScores"
+                  ratingCount:
+                    type: integer
         "400":
           description: Get tutor request malformed or denied.
           content:
@@ -664,9 +671,36 @@ components:
               type: array
               items:
                 type: string
-            rating:
-              type: object
-              ref: "#/components/schemas/Rating"
+
+    RatingScores:
+      type: object
+      required:
+        - overall
+        - professionalism
+        - knowledge
+        - communication
+        - punctuality
+      properties: # Subject to change?
+        professionalism:
+          type: integer
+          minimum: 1
+          maximum: 5
+        knowledge:
+          type: integer
+          minimum: 1
+          maximum: 5
+        communication:
+          type: integer
+          minimum: 1
+          maximum: 5
+        punctuality:
+          type: integer
+          minimum: 1
+          maximum: 5
+        overall:
+          type: integer
+          minimum: 1
+          maximum: 5
 
     Rating:
       type: object
@@ -686,35 +720,9 @@ components:
         meetingId:
           type: string
           format: uuid
-        ratings:
+        scores:
           type: object
-          required:
-            - overall
-            - professionalism
-            - knowledge
-            - communication
-            - punctuality
-          properties: # Subject to change?
-            professionalism:
-              type: integer
-              minimum: 1
-              maximum: 5
-            knowledge:
-              type: integer
-              minimum: 1
-              maximum: 5
-            communication:
-              type: integer
-              minimum: 1
-              maximum: 5
-            punctuality:
-              type: integer
-              minimum: 1
-              maximum: 5
-            overall:
-              type: integer
-              minimum: 1
-              maximum: 5
+          ref: "#/components/schemas/RatingScores"
         comment:
           type: string
 

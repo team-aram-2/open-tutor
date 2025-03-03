@@ -82,36 +82,38 @@ type MessageAttachment struct {
 
 // Rating defines model for Rating.
 type Rating struct {
-	Comment    *string             `json:"comment,omitempty"`
-	Id         *openapi_types.UUID `json:"id,omitempty"`
-	MeetingId  *openapi_types.UUID `json:"meetingId,omitempty"`
-	RatingType *RatingRatingType   `json:"ratingType,omitempty"`
-	Ratings    *struct {
-		Communication   int `json:"communication"`
-		Knowledge       int `json:"knowledge"`
-		Overall         int `json:"overall"`
-		Professionalism int `json:"professionalism"`
-		Punctuality     int `json:"punctuality"`
-	} `json:"ratings,omitempty"`
-	ReviewerUserId *openapi_types.UUID `json:"reviewerUserId,omitempty"`
-	UserId         *openapi_types.UUID `json:"userId,omitempty"`
+	Comment        *string                 `json:"comment,omitempty"`
+	Id             *openapi_types.UUID     `json:"id,omitempty"`
+	MeetingId      *openapi_types.UUID     `json:"meetingId,omitempty"`
+	RatingType     *RatingRatingType       `json:"ratingType,omitempty"`
+	ReviewerUserId *openapi_types.UUID     `json:"reviewerUserId,omitempty"`
+	Scores         *map[string]interface{} `json:"scores,omitempty"`
+	UserId         *openapi_types.UUID     `json:"userId,omitempty"`
 }
 
 // RatingRatingType defines model for Rating.RatingType.
 type RatingRatingType string
 
+// RatingScores defines model for RatingScores.
+type RatingScores struct {
+	Communication   int `json:"communication"`
+	Knowledge       int `json:"knowledge"`
+	Overall         int `json:"overall"`
+	Professionalism int `json:"professionalism"`
+	Punctuality     int `json:"punctuality"`
+}
+
 // Tutor defines model for Tutor.
 type Tutor struct {
-	AccountLocked *bool                   `json:"accountLocked,omitempty"`
-	Email         openapi_types.Email     `json:"email"`
-	FirstName     string                  `json:"firstName"`
-	LastName      string                  `json:"lastName"`
-	PasswordHash  *string                 `json:"passwordHash,omitempty"`
-	Rating        *map[string]interface{} `json:"rating,omitempty"`
-	SignedUpAt    *time.Time              `json:"signedUpAt,omitempty"`
-	Skills        *[]string               `json:"skills,omitempty"`
-	TotalHours    *int                    `json:"totalHours,omitempty"`
-	UserId        openapi_types.UUID      `json:"userId"`
+	AccountLocked *bool               `json:"accountLocked,omitempty"`
+	Email         openapi_types.Email `json:"email"`
+	FirstName     string              `json:"firstName"`
+	LastName      string              `json:"lastName"`
+	PasswordHash  *string             `json:"passwordHash,omitempty"`
+	SignedUpAt    *time.Time          `json:"signedUpAt,omitempty"`
+	Skills        *[]string           `json:"skills,omitempty"`
+	TotalHours    *int                `json:"totalHours,omitempty"`
+	UserId        openapi_types.UUID  `json:"userId"`
 }
 
 // User Base User object containing shared details needed for all users.
