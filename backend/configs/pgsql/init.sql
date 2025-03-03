@@ -30,7 +30,7 @@ COMMENT ON COLUMN available_skills.description IS 'Description for the skill';
 
 DROP TABLE IF EXISTS tutor_skills;
 CREATE TABLE tutor_skills (
-  "entry_id" INT NOT NULL PRIMARY KEY,
+  "entry_id" SERIAL PRIMARY KEY,
   "skill_id" TEXT NOT NULL,
   "tutor_id" TEXT NOT NULL,
   "validated" BOOLEAN DEFAULT 'f',

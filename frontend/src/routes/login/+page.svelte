@@ -60,12 +60,25 @@
 					type="password"
 					placeholder="Password"
 				/>
-				<input
-					class="rounded-md bg-blue-600 py-2 enabled:cursor-pointer disabled:opacity-50"
-					type="submit"
-					value="Login"
-					disabled={submittingForm}
-				/>
+				<div
+					class="flex justify-left items-center gap-4 p-4 my-2 border border-black-200 rounded-sm dark:border-gray-700"
+				>
+					<input
+						id="remember-login-checkbox"
+						class="bg-gray-800 border border-gray-700 rounded-md shadow-inner
+						checked:bg-blue-600 checked:border-blue-500 transition-all duration-200
+						hover:ring-2 hover:ring-blue-400 focus:ring-2 focus:ring-blue-400 cursor-pointer"
+						name="rememberLogin"
+						type="checkbox"
+					/>
+					<label for="remember-login-checkbox" class="w-2/3">Remember login for 30 Days.</label>
+					<input
+						class="w-full rounded-md bg-blue-600 py-2 enabled:cursor-pointer disabled:opacity-50"
+						type="submit"
+						value="Login"
+						disabled={submittingForm}
+					/>
+				</div>
 			{:else if selectedTab === Tab._Register}
 				<input
 					class="bg-gray-900 px-4 py-2 rounded-md"
@@ -102,3 +115,10 @@
 		<span class="text-red-600 text-center">{submissionError}</span>
 	</div>
 </div>
+
+<style>
+	input[id='remember-login-checkbox'] {
+		transform: scale(1.5);
+		margin: 10px;
+	}
+</style>
