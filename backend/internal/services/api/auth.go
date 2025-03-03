@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
@@ -101,12 +100,7 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 		Password:      r.FormValue("password"),
 		RememberLogin: new(bool),
 	}
-	parsedBool, err := strconv.ParseBool(r.FormValue("rememberLogin"))
-	if err != nil {
-		*loginData.RememberLogin = false
-	} else {
-		*loginData.RememberLogin = parsedBool
-	}
+	*loginData.RememberLogin = r.FormValue("rememberLogin") == "on"
 
 	var (
 		userId            string
