@@ -1,2 +1,5 @@
 **/node_modules/
 .DS_Store
+
+# .env files contain secrets that should not be committed to repository even in dev environments #
+.env
