@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"open-tutor/internal/services/db"
-	"open-tutor/middleware"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
@@ -123,30 +122,6 @@ func (t *OpenTutor) GetStudentByID(w http.ResponseWriter, r *http.Request, stude
 }
 
 func (t *OpenTutor) GetRatingById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID, params GetRatingByIdParams) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
-	authInfo := middleware.GetAuthenticationInfo(r)
-	if authInfo == nil {
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
-
-	_, insertErr := db.GetDB().Exec("INSERT INTO tutors (user_id) VALUES ($1)", authInfo.UserID)
-	if insertErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%s\n", insertErr)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(map[string]string{
-		"userId": userId,
-	})
-}
-
-func (t *OpenTutor) GetTutorById(w http.ResponseWriter, r *http.Request, tutorId openapi_types.UUID) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
 

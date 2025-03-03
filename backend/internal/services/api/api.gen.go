@@ -102,15 +102,16 @@ type RatingRatingType string
 
 // Tutor defines model for Tutor.
 type Tutor struct {
-	AccountLocked *bool               `json:"accountLocked,omitempty"`
-	Email         openapi_types.Email `json:"email"`
-	FirstName     string              `json:"firstName"`
-	LastName      string              `json:"lastName"`
-	PasswordHash  *string             `json:"passwordHash,omitempty"`
-	SignedUpAt    *time.Time          `json:"signedUpAt,omitempty"`
-	Skills        *[]string           `json:"skills,omitempty"`
-	TotalHours    *int                `json:"totalHours,omitempty"`
-	UserId        openapi_types.UUID  `json:"userId"`
+	AccountLocked *bool                   `json:"accountLocked,omitempty"`
+	Email         openapi_types.Email     `json:"email"`
+	FirstName     string                  `json:"firstName"`
+	LastName      string                  `json:"lastName"`
+	PasswordHash  *string                 `json:"passwordHash,omitempty"`
+	Rating        *map[string]interface{} `json:"rating,omitempty"`
+	SignedUpAt    *time.Time              `json:"signedUpAt,omitempty"`
+	Skills        *[]string               `json:"skills,omitempty"`
+	TotalHours    *int                    `json:"totalHours,omitempty"`
+	UserId        openapi_types.UUID      `json:"userId"`
 }
 
 // User Base User object containing shared details needed for all users.

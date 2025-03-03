@@ -655,18 +655,18 @@ components:
       allOf:
         - $ref: "#/components/schemas/User"
         - type: object
-          required:
-            - calendar
-            - ratings
           example:
             userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
           properties:
-            totalHours: # not sure if this is total hours worked or???
+            totalHours: # total hours worked
               type: integer
             skills:
               type: array
               items:
                 type: string
+            rating:
+              type: object
+              ref: "#/components/schemas/Rating"
 
     Rating:
       type: object
