@@ -16,7 +16,7 @@
 <div class="dashboard-layout">
 	<Sidebar></Sidebar>
 
-	<main class="w-full px-20 py-20">
+	<main class="w-full">
 		<slot />
 		<!-- Where page content will be rendered -->
 	</main>
