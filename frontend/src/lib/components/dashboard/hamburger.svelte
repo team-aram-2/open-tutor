@@ -2,7 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 
 	// Export props for external customization.
-	export let open = false; // Whether the menu is open (X) or closed (hamburger)
+	export let open = true; // Whether the menu is open (X) or closed (hamburger)
 	export let size = 24; // Button size in pixels
 	export const backgroundColor = '#FFF';
 	export let lineColor = '#000'; // Line color
@@ -17,7 +17,7 @@
 </script>
 
 <button
-	class="hamburger {open ? 'open' : ''}"
+	class="hamburger {open ? ' ' : 'open'}"
 	on:click={toggle}
 	aria-label={label}
 	style="--size: {size}px; --color: {lineColor};"
