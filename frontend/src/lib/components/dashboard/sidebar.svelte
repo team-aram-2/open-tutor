@@ -134,7 +134,7 @@
 			</div>
 		</a>
 		<a
-			href="#/"
+			href="/settings_page"
 			class="no-decoration"
 			class:selected-sidebar-item={selectedItem === 'set'}
 			on:click={() => setSelectedItem('set')}
@@ -222,9 +222,6 @@
 							fill="#ccc"
 							transform="translate(69,31) rotate(315)"
 						/>
-
-						<!-- Center hole -->
-						<circle cx="50" cy="50" r="8" fill="none" stroke="#ccc" stroke-width="4" />
 					</g>
 				</svg>
 			</div>
