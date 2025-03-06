@@ -24,8 +24,6 @@
 
 		height: 100%;
 		width: 100%;
-
-		/* border: 2px solid salmon; */
 	}
 	.setting-categories {
 		display: flex;
@@ -44,8 +42,6 @@
 		flex-direction: column;
 
 		height: 100%;
-
-		/* border-left: 5px solid var(--purple-very-dark); */
 	}
 
 	.setting-entry {
@@ -58,8 +54,6 @@
 		width: 100%;
 		height: 7em;
 
-		/* margin-bottom: 5px; */
-
 		border-bottom: 5px solid var(--purple-very-dark);
 		border-left: 5px solid var(--purple-very-dark);
 		border-radius: 15px;
@@ -71,14 +65,11 @@
 
 		text-align: left;
 
-		/* height: 100%; */
-
 		margin-left: 3%;
 		padding: 0;
 
 		font-size: 4em;
 		font-weight: bolder;
 		color: var(--yellow-very-light);
-		/* border: 2px solid salmon; */
 	}
 </style>
