@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { PUBLIC_API_HOST } from '$env/static/public';
+	import { sessionToken } from '$lib/stores';
 	import { onMount } from 'svelte';
 
 	enum Tab {
@@ -27,19 +28,40 @@
 		const form = event.target as HTMLFormElement;
 		const formData = new FormData(form);
 
+		// Set up body and headers
+		let body: BodyInit = formData;
+		let headers: HeadersInit = {};
+
+		// For registration convert form data to application/x-www-form-urlencoded
+		if (selectedTab === Tab._Register) {
+			body = new URLSearchParams(formData as any);
+			headers['Content-Type'] = 'application/x-www-form-urlencoded';
+		}
+
 		console.log('here');
 		try {
 			console.log('response:');
 			console.log({
 				method: 'POST',
-				body: formData
+				body,
+				headers
 			});
+
 			const response = await fetch(form.action, {
 				method: 'POST',
-				body: formData
+				body,
+				headers
 			});
 
 			if (response.ok) {
+				// Extract JWT from x-session-token header
+				const session_token = response.headers.get('x-session-token');
+				if (session_token) {
+					console.log(session_token);
+					// Store the token if auth was successful
+					sessionToken.set(session_token);
+				}
+
 				// Redirect to my_tutors page
 				goto('/my_people/student');
 			} else {
