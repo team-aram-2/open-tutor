@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { PUBLIC_API_HOST } from '$env/static/public';
 	import { onMount } from 'svelte';
 
@@ -16,6 +17,41 @@
 		const params = new URLSearchParams(window.location.search);
 		loginError = params.get('err') ?? '';
 	});
+
+	// Handle submitting the form so the page redirects to the right place
+	async function handleSubmit(event: Event) {
+		event.preventDefault();
+		submittingForm = true;
+
+		// Get form element and set up form data
+		const form = event.target as HTMLFormElement;
+		const formData = new FormData(form);
+
+		console.log('here');
+		try {
+			console.log('response:');
+			console.log({
+				method: 'POST',
+				body: formData
+			});
+			const response = await fetch(form.action, {
+				method: 'POST',
+				body: formData
+			});
+
+			if (response.ok) {
+				// Redirect to my_tutors page
+				goto('/my_people/student');
+			} else {
+				// Error
+				console.error('Submission failed');
+			}
+		} catch (error) {
+			console.error('Submission error: ', error);
+		} finally {
+			submittingForm = false;
+		}
+	}
 </script>
 
 <div class="w-full flex flex-col text-white">
@@ -46,6 +82,7 @@
 			class="flex flex-col gap-3"
 			method="POST"
 			action="{PUBLIC_API_HOST}/auth/{selectedTab.toLowerCase()}"
+			on:submit={handleSubmit}
 		>
 			{#if selectedTab === Tab._Login}
 				<input

@@ -1,26 +1,23 @@
-<script lang="ts">
-	import TutorPage from '$lib/components/cards/tutor-page.svelte';
-	// import tutorsData from '$lib/mock/my_tutors_mock.json';
-	export let data: {
-		user: {
-			firstName: string;
-			lastName: string;
-			userId: string;
-			skills: string[];
-			overallRating: number;
-		};
-	};
+<script>
+	import Tutor from '$lib/components/cards/tutor-card.svelte';
+	import tutorsData from '$lib/mock/my_tutors_mock.json';
 </script>
 
 <div>
 	<div class="cardcontainer">
-		<TutorPage
-			name="{data.user.firstName} {data.user.lastName}"
-			rating={data.user.overallRating}
-			skills={data.user.skills}
-		></TutorPage>
-		<!-- userId={data.user.userId} -->
+		{#each tutorsData.tutors as tutor}
+			<Tutor
+				name="{tutor.firstName} {tutor.lastName}"
+				rating={tutor.overallRating}
+				skills={tutor.skills}
+				userId={tutor.userId}
+			></Tutor>
+		{/each}
 	</div>
+	<p class="bottomText">
+		Not what you're looking for?<a href="_#" class="bottomTextLink">Search again</a>
+	</p>
+	<!-- TODO: TURN THIS INTO AN ACTUAL LINK -->
 </div>
 
 <style>
@@ -28,6 +25,20 @@
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
-		height: 100%;
+		gap: 50px;
+		flex: 0 0 33%;
+		padding: 30px 30px 0 30px;
+	}
+	.bottomText {
+		display: flex;
+		width: 100%;
+		font-weight: bold;
+		font-size: 30px;
+		color: var(--yellow-very-light);
+		justify-content: center;
+	}
+	.bottomTextLink {
+		color: var(--yellow-neutral);
+		margin-left: 0.25em;
 	}
 </style>
