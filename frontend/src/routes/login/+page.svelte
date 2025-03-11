@@ -38,7 +38,6 @@
 			headers['Content-Type'] = 'application/x-www-form-urlencoded';
 		}
 
-		console.log('here');
 		try {
 			console.log('response:');
 			console.log({
