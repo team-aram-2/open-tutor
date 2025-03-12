@@ -46,9 +46,11 @@ CREATE TABLE meetings (
   "id" TEXT NOT NULL PRIMARY KEY,
   "tutor_id" TEXT NOT NULL,
   "student_id" TEXT NOT NULL,
-  "date_created" TIMESTAMP NOT NULL,
   "start_at" TIMESTAMP NOT NULL,
   "end_at" TIMESTAMP NOT NULL,
+  "zoom_join_link" TEXT NOT NULL,
+  "zoom_host_link" TEXT NOT NULL,
+  "created_at" TIMESTAMP DEFAULT NOW(),
   FOREIGN KEY (student_id) REFERENCES users(user_id),
   FOREIGN KEY (tutor_id) REFERENCES tutors(user_id)
 );
