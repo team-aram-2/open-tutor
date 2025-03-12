@@ -2,6 +2,7 @@
 	import Hamburger from './hamburger.svelte';
 	let selectedItem = 'view';
 	let collapsed = false;
+	import { logged_in } from '$lib/stores';
 
 	const setSelectedItem = (item: string) => {
 		selectedItem = item;
@@ -30,39 +31,50 @@
 	</div>
 
 	<nav class="sidebar-items">
-		<a
-			href="/my_people/student"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'view'}
-			on:click={() => setSelectedItem('view')}
-		>
-			<p>View Tutors</p>
-		</a>
-		<!-- TODO: MOVE THIS HREF BACK TO THE APPOINTMENTS <a> tag -->
-		<a
-			href="#/"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'apt'}
-			on:click={() => setSelectedItem('apt')}
-		>
-			<p>Appointments</p>
-		</a>
-		<a
-			href="/messages/student"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'msg'}
-			on:click={() => setSelectedItem('msg')}
-		>
-			<p>Messages</p>
-		</a>
-		<a
-			href="#/"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'pym'}
-			on:click={() => setSelectedItem('pym')}
-		>
-			<p>Payments</p>
-		</a>
+		{#if $logged_in}
+			<a
+				href="/my_people/student"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'view'}
+				on:click={() => setSelectedItem('view')}
+			>
+				<p>View Tutors</p>
+			</a>
+			<!-- TODO: MOVE THIS HREF BACK TO THE APPOINTMENTS <a> tag -->
+			<a
+				href="#/"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'apt'}
+				on:click={() => setSelectedItem('apt')}
+			>
+				<p>Appointments</p>
+			</a>
+			<a
+				href="/messages/student"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'msg'}
+				on:click={() => setSelectedItem('msg')}
+			>
+				<p>Messages</p>
+			</a>
+			<a
+				href="#/"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'pym'}
+				on:click={() => setSelectedItem('pym')}
+			>
+				<p>Payments</p>
+			</a>
+		{:else}
+			<a
+				href="/login"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'log'}
+				on:click={() => setSelectedItem('log')}
+			>
+				<p>Login</p>
+			</a>
+		{/if}
 	</nav>
 </div>
 

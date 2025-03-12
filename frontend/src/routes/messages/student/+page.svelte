@@ -2,19 +2,33 @@
 	import Message from '$lib/components/messaging/message.svelte';
 	//import messagesData from '$lib/mock/messages_mock.json';
 	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 
 	import type { MessageItem } from '$lib/types/types';
 	import { PUBLIC_API_HOST } from '$env/static/public';
+	import { user_id } from '$lib/stores';
 
+	$: current_id = $user_id;
 	let messagesData;
 	let messages: MessageItem[] = [];
 	let messageContent = '';
+	let conversationId = '';
+	let conversations: string[] = [];
+	let isInitialized = false;
+	$: if ($user_id && !isInitialized) {
+		isInitialized = true;
+		loadData($user_id);
+	}
+	async function loadData(userId: string) {
+		await fetchConversations(userId);
+		if (conversationId) {
+			fetchMessages();
+		}
+	}
 	const fetchMessages = async () => {
 		try {
 			messages = [];
-			const res = await fetch(
-				PUBLIC_API_HOST + '/conversation/messages/5425b439-4e2b-4a2b-8808-76c8fb406a13'
-			);
+			const res = await fetch(PUBLIC_API_HOST + '/conversation/messages/' + conversationId);
 			messagesData = await res.json();
 			console.log(messagesData);
 			for (let item of messagesData.messages) {
@@ -48,8 +62,8 @@
 						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify({
-						originId: '50df85b9-cb07-45f5-a7e1-95b40cb5b2fb',
-						conversationId: '5425b439-4e2b-4a2b-8808-76c8fb406a13',
+						originId: current_id,
+						conversationId: conversationId,
 						message: messageContent
 					})
 				});
@@ -67,15 +81,23 @@
 			}
 		}
 	};
+	const fetchConversations = async (userId: string) => {
+		try {
+			const res = await fetch(PUBLIC_API_HOST + '/conversation/user/' + userId);
+			conversations = await res.json();
+			console.log(conversations);
+			conversationId = conversations[0];
+		} catch (err) {
+			console.log('Error in the process of fetching messages:', err);
+		}
+	};
 	const handleKeydown = (event: KeyboardEvent) => {
 		if (event.key === 'Enter' && messageContent.trim()) {
 			event.preventDefault();
 			sendMessage();
 		}
 	};
-	onMount(async () => {
-		fetchMessages(); // Now fetchMessages is called on component mount
-	});
+	onMount(async () => {});
 </script>
 
 <div class="messagecontainer">
@@ -85,10 +107,7 @@
   messageId={message.messageId}
   messageAttachments={message.messageAttachments}
   sentOn={message.sentOn} -->
-		<Message
-			originId={message.originId}
-			messageContent={message.messageContent}
-			userId="50df85b9-cb07-45f5-a7e1-95b40cb5b2fb"
+		<Message originId={message.originId} messageContent={message.messageContent} userId={current_id}
 		></Message>
 	{/each}
 	<!-- Sort messages by timestamp -->

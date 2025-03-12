@@ -6,10 +6,13 @@
 	// Shared logic across pages goes here
 	import '../app.css';
 	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
+	import { autoLogin } from '$lib/scripts/auth';
 
 	import { onMount } from 'svelte';
 
-	onMount(() => {});
+	onMount(() => {
+		autoLogin();
+	});
 </script>
 
 <!-- Page Content -->
