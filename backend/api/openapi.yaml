@@ -201,20 +201,82 @@ paths:
       summary: Create Tutor Profile for User
       operationId: signUpAsTutor
       requestBody:
-        required: true
+        required: false
         content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Tutor"
+          application/json: {}
+      security:
+        - BearerAuth: []
       responses:
         "201":
           description: Tutor signed up
+        "400":
+          description: Create tutor request malformed or denied.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Tutor"
+                $ref: "#/components/schemas/ErrorModel"
+    get:
+      summary: Search All Tutors
+      operationId: getTutors
+      parameters:
+        - name: pageSize
+          in: query
+          required: true
+          description: The ID of the tutor to get
+          schema:
+            type: integer
+        - name: pageIndex
+          in: query
+          required: true
+          description: The ID of the tutor to get
+          schema:
+            type: integer
+        - name: minRating
+          in: query
+          required: false
+          description: The minimum rating of tutor to get.
+          schema:
+            type: number
+        - name: skillsInclude
+          in: query
+          required: false
+          description: The skills a tutor should have.
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+
+      responses:
+        "200":
+          description: Found tutors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    info:
+                      $ref: "#/components/schemas/Tutor"
+                    ratingScores:
+                      $ref: "#/components/schemas/RatingScores"
+                    ratingCount:
+                      type: integer
         "400":
-          description: Create tutor request malformed or denied.
+          description: Get tutor request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "403":
+          description: Not authorized.
+          constent:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: Tutors not found.
           content:
             application/json:
               schema:
@@ -239,7 +301,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Tutor"
+                type: object
+                properties:
+                  info:
+                    $ref: "#/components/schemas/Tutor"
+                  ratingScores:
+                    $ref: "#/components/schemas/RatingScores"
+                  ratingCount:
+                    type: integer
         "400":
           description: Get tutor request malformed or denied.
           content:
@@ -279,14 +348,13 @@ paths:
               schema:
                 type: array
                 items:
-                    $ref: "#/components/schemas/Rating"
+                  $ref: "#/components/schemas/Rating"
         "400":
           description: Post rating request malformed or denied.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
-
 
   # Post a rating
   /rating:
@@ -476,6 +544,10 @@ paths:
 
 components:
   securitySchemes:
+    BearerAuth:
+      type: http
+      schema: bearer
+
     GitHubOAuth:
       type: oauth2
       flows:
@@ -497,313 +569,311 @@ components:
             email: "Grants access to the user's email address"
             profile: "Grants access to the user's profile information"
   schemas:
-      ErrorModel:
-        type: object
-        required:
+    ErrorModel:
+      type: object
+      required:
         - message
         - code
-        example:
-          message: Resource not found.
-          code: 400
-        properties:
-          message:
-            type: string
-          code:
-            type: integer
-            minimum: 100
-            maximum: 600
+      example:
+        message: Resource not found.
+        code: 400
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+          minimum: 100
+          maximum: 600
 
-      User:
-        type: object
-        example:
-          userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
-          email: email@example.com
-          firstName: Jacob
-          lastName: Hochstetler
-        description: Base User object containing shared details needed for all users.
-        required:
-          - userId
-          - email
-          - firstName
-          - lastName
-        properties:
-          userId:
-            type: string
-            format: uuid
-          email:
-            type: string
-            format: email
-          signedUpAt:
-            type: string
-            format: date-time
-          firstName:
-            type: string
-          lastName:
-            type: string
-          accountLocked:
-            type: boolean
-          passwordHash:
-            type: string
+    User:
+      type: object
+      example:
+        userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
+        email: email@example.com
+        firstName: Jacob
+        lastName: Hochstetler
+      description: Base User object containing shared details needed for all users.
+      required:
+        - userId
+        - firstName
+        - lastName
+      properties:
+        userId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        signedUpAt:
+          type: string
+          format: date-time
+        firstName:
+          type: string
+        lastName:
+          type: string
+        accountLocked:
+          type: boolean
+        passwordHash:
+          type: string
 
-      UserLogin:
-        type: object
-        example:
-          email: email@example.com
-          password: N3v3rG0nn4G1veY0uUp!
-        description: Payload for user logins
-        required:
-          - email
-          - password
-        properties:
-          email:
-            type: string
-            format: email
-          password:
-            type: string
-            format: password
+    UserLogin:
+      type: object
+      example:
+        email: email@example.com
+        password: N3v3rG0nn4G1veY0uUp!
+      description: Payload for user logins
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        rememberLogin:
+          type: boolean
 
-      UserSignup:
-        type: object
-        example:
-          email: email@example.com
-          password: N3v3rG0nn4G1veY0uUp!
-          firstName: Jacob
-          lastName: Hochstetler
-        description: Payload for user signups
-        required:
-          - email
-          - password
-          - firstName
-          - lastName
-        properties:
-          email:
-            type: string
-            format: email
-          password:
-            type: string
-            format: password
-          first_name:
-            type: string
-          last_name:
-            type: string
+    UserSignup:
+      type: object
+      example:
+        email: email@example.com
+        password: N3v3rG0nn4G1veY0uUp!
+        firstName: Jacob
+        lastName: Hochstetler
+      description: Payload for user signups
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        first_name:
+          type: string
+        last_name:
+          type: string
 
-      Tutor:
-        description: Extends user to include student specific information.
-        allOf:
-          - $ref: "#/components/schemas/User"
-          - type: object
-            required:
-              - calendar
-              - ratings
-            example:
-              userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
-            properties:
-              totalHours: # not sure if this is total hours worked or???
-                type: integer
-              skills:
-                type: array
-                items:
-                  type: string
+    Tutor:
+      description: Extends user to include student specific information.
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          example:
+            userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
+          properties:
+            totalHours: # total hours worked
+              type: integer
+            skills:
+              type: array
+              items:
+                type: string
 
-      Rating:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-          ratingType:
-            type: string
-            enum: [tutor, student]
-          userId:
-            type: string
-            format: uuid
-          reviewerUserId:
-            type: string
-            format: uuid
-          meetingId:
-            type: string
-            format: uuid
-          ratings:
-            type: object
-            required:
-            - overall
-            - professionalism
-            - knowledge
-            - communication
-            - punctuality
-            properties: # Subject to change?
-              professionalism:
-                type: integer
-                minimum: 1
-                maximum: 5
-              knowledge:
-                type: integer
-                minimum: 1
-                maximum: 5
-              communication:
-                type: integer
-                minimum: 1
-                maximum: 5
-              punctuality:
-                type: integer
-                minimum: 1
-                maximum: 5
-              overall:
-                type: integer
-                minimum: 1
-                maximum: 5
-          comment:
-            type: string
+    RatingScores:
+      type: object
+      required:
+        - overall
+        - professionalism
+        - knowledge
+        - communication
+        - punctuality
+      properties: # Subject to change?
+        professionalism:
+          type: integer
+          minimum: 1
+          maximum: 5
+        knowledge:
+          type: integer
+          minimum: 1
+          maximum: 5
+        communication:
+          type: integer
+          minimum: 1
+          maximum: 5
+        punctuality:
+          type: integer
+          minimum: 1
+          maximum: 5
+        overall:
+          type: integer
+          minimum: 1
+          maximum: 5
 
-      Meeting:
-        type: object
-        required:
-          - id
-          - tutorId
-          - studentId
-          - startAt
-          - endAt
-        properties:
-          id:
-            type: string
-            format: uuid
-          tutorId:
-            type: string
-            format: uuid
-          studentId:
-            type: string
-            format: uuid
-          startAt:
-            type: string
-            format: date-time
-          endAt:
-            type: string
-            format: date-time
-          zoomJoinLink:
-            type: string
-          zoomHostLink:
-            type: string
-      CreateMeetingBody:
-        type: object
-        properties:
-          studentId:
-            type: string
-            format: uuid
-          startAt:
-            type: string
-            format: date-time
-          endAt:
-            type: string
-            format: date-time
+    Rating:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ratingType:
+          type: string
+          enum: [tutor, student]
+        userId:
+          type: string
+          format: uuid
+        reviewerUserId:
+          type: string
+          format: uuid
+        meetingId:
+          type: string
+          format: uuid
+        scores:
+          type: object
+          ref: "#/components/schemas/RatingScores"
+        comment:
+          type: string
 
-      Calendar:
-        type: object
-        properties:
-          meetings:
-            type: array
-            items:
-              $ref: "#/components/schemas/Meeting"
+    Meeting:
+      type: object
+      required:
+        - id
+        - tutorId
+        - studentId
+        - startAt
+        - endAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tutorId:
+          type: string
+          format: uuid
+        studentId:
+          type: string
+          format: uuid
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        zoomJoinLink:
+          type: string
+        zoomHostLink:
+          type: string
 
-      Message:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-            description: Unique identifier for the message.
-          sentOn:
-            type: string
-            format: date-time
-          originId:
-            type: string
-            format: uuid
-            description: Unique identifier for the originID for the message.
-          recipientId:
-            type: string
-            format: uuid
-            description: Unique identifier for the recipient of the message.
-          message:
-            type: string
-            description: Message content.
-          MessageAttachments:
-            type: array
-            items:
-              $ref: "#/components/schemas/MessageAttachment"
-            description: Array of message attachments
-        required:
-          - id
-          - sentOn
-          - originId
-          - recipientId
-          - message
+    CreateMeetingBody:
+      type: object
+      properties:
+        studentId:
+          type: string
+          format: uuid
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
 
-      MessageAttachment:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-            description: Unique identifier for the message the attachment belongs to.
-          filename:
-            type: string
-            description: Name of the attachment.
-          mimetype:
-            type: string
-            description: Mimetype of the attachment.
-          url:
-            type: string
-            format: uri
-            description: Source of the attachment.
-        required:
-          - id
-          - filename
-          - mimetype
-          - url
+    Calendar:
+      type: object
+      properties:
+        meetings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meeting"
 
-      AvailableSkill:
-        type: object
-        properties:
-          id:
-            type: string
-            format: uuid
-            description: Unique identifier for the skill.
-          title:
-            type: string
-            description: title/name for the skill
-          description:
-            type: string
-            description: Description for the skill
-        required:
-          - id
-          - title
-          - description
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the message.
+        sentOn:
+          type: string
+          format: date-time
+        originId:
+          type: string
+          format: uuid
+          description: Unique identifier for the originID for the message.
+        recipientId:
+          type: string
+          format: uuid
+          description: Unique identifier for the recipient of the message.
+        message:
+          type: string
+          description: Message content.
+        MessageAttachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageAttachment"
+          description: Array of message attachments
+      required:
+        - id
+        - sentOn
+        - originId
+        - recipientId
+        - message
 
-      TutorSkill:
-        allOf:
-          - $ref: "#/components/schemas/AvailableSkill"
-          - type: object
-            properties:
-              validated:
-                type: boolean
-                description: If the skill is validated
-            required:
-              - validated
+    MessageAttachment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the message the attachment belongs to.
+        filename:
+          type: string
+          description: Name of the attachment.
+        mimetype:
+          type: string
+          description: Mimetype of the attachment.
+        url:
+          type: string
+          format: uri
+          description: Source of the attachment.
+      required:
+        - id
+        - filename
+        - mimetype
+        - url
 
-      Question:
-        type: object
-        properties:
-          question:
+    AvailableSkill:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the skill.
+        title:
+          type: string
+          description: title/name for the skill
+        description:
+          type: string
+          description: Description for the skill
+      required:
+        - id
+        - title
+        - description
+
+    TutorSkill:
+      allOf:
+        - $ref: "#/components/schemas/AvailableSkill"
+        - type: object
+          properties:
+            validated:
+              type: boolean
+              description: If the skill is validated
+          required:
+            - validated
+
+    Question:
+      type: object
+      properties:
+        question:
+          type: string
+          description: The literal question being asked.
+        valid:
+          type: string
+          description: The valid answer to the question
+        invalid:
+          type: array
+          items:
             type: string
-            description: The literal question being asked.
-          valid:
-            type: string
-            description: The valid answer to the question
-          invalid:
-            type: array
-            items:
-              type: string
-security:
-  - GitHubOAuth:
-      - read:user
-  - GoogleOAuth:
-      - openid
