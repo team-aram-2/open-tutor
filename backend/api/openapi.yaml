@@ -20,7 +20,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Meeting"
+              $ref: "#/components/schemas/CreateMeetingBody"
       responses:
         "201":
           description: Meeting created
@@ -29,82 +29,20 @@ paths:
               schema:
                 $ref: "#/components/schemas/Meeting"
 
-  # Read or change a meeting
-  /meeting/{meetingId}:
+  /meetings:
+    # Get user's scheduled meetings #
     get:
-      summary: Get a meeting by ID
-      operationId: getMeetingById
-      parameters:
-        - name: meetingId
-          in: path
-          required: true
-          description: The ID of the meeting to get
-          schema:
-            type: string
-            format: uuid
-      responses:
-        "200":
-          description: Meeting found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Meeting"
-        "404":
-          description: Meeting not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-    put:
-      summary: Update meeting information
-      operationId: updateMeetingById
-      parameters:
-        - name: meetingId
-          in: path
-          required: true
-          description: The ID of the meeting to update
-          schema:
-            type: string
-            format: uuid
+      summary: Get meetings for user
+      operationId: getMeetings
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Meeting"
       responses:
         "200":
-          description: Meeting updated
+          description: Meetings returned
           content:
             application/json:
               schema:
+                type: array
                 $ref: "#/components/schemas/Meeting"
-        "404":
-          description: Meeting not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
-    delete:
-      summary: Delete a meeting by ID
-      operationId: deleteMeetingById
-      parameters:
-        - name: meetingId
-          in: path
-          required: true
-          description: The ID of the meeting to delete
-          schema:
-            type: string
-            format: uuid
-      responses:
-        "204":
-          description: Meeting deleted
-        "404":
-          description: Meeting not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorModel"
 
   # User login
   /auth/login:
@@ -793,6 +731,12 @@ components:
 
     Meeting:
       type: object
+      required:
+        - id
+        - tutorId
+        - studentId
+        - startAt
+        - endAt
       properties:
         id:
           type: string
@@ -800,6 +744,23 @@ components:
         tutorId:
           type: string
           format: uuid
+        studentId:
+          type: string
+          format: uuid
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        zoomJoinLink:
+          type: string
+        zoomHostLink:
+          type: string
+
+    CreateMeetingBody:
+      type: object
+      properties:
         studentId:
           type: string
           format: uuid

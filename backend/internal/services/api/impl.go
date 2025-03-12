@@ -33,6 +33,7 @@ func sendError(w http.ResponseWriter, code int, message string) {
 	}
 	w.WriteHeader(code)
 	_ = json.NewEncoder(w).Encode(sendError)
+	fmt.Printf("error on web request %+v\n", sendError)
 }
 
 func (t *OpenTutor) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -63,22 +64,6 @@ func (t *OpenTutor) CreateUser(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(map[string]string{
 		"userId": userId,
 	})
-}
-
-func (t *OpenTutor) CreateMeeting(w http.ResponseWriter, r *http.Request) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) DeleteMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) GetMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) UpdateMeetingById(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
 
 func (t *OpenTutor) CreateMessage(w http.ResponseWriter, r *http.Request) {

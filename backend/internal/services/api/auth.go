@@ -70,6 +70,7 @@ func applySessionTokenForUserId(userId string, rememberLogin bool, w http.Respon
 		Path:     "/",
 		HttpOnly: false,
 		MaxAge:   30 * seconds_in_day, // 30 day expiry, max of JWT expiry lengths
+		SameSite: http.SameSiteLaxMode,
 	})
 	return nil
 }
