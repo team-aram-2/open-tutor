@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"open-tutor/internal/services/db"
 	"open-tutor/util"
@@ -17,16 +18,34 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func generateSessionTokenForUser(userId string) (string, error) {
+func generateSessionTokenForUser(userId string, rememberLogin bool) (string, error) {
 	jwtKeyPair, err := util.GetKeyPair("user-auth-jwt")
 	if err != nil {
 		return "", err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256,
-		jwt.MapClaims{
-			"user_id": userId,
-		})
+	type sessionClaims struct {
+		UserID string `json:"user_id"`
+		jwt.StandardClaims
+	}
+
+	var daysUntilExpiry int64
+	if rememberLogin {
+		daysUntilExpiry = 30
+	} else {
+		daysUntilExpiry = 1
+	}
+
+	claims := sessionClaims{
+		userId,
+		jwt.StandardClaims{
+			IssuedAt:  time.Now().Unix(),
+			ExpiresAt: time.Now().Unix() + int64(time.Hour.Seconds())*24*daysUntilExpiry,
+			Issuer:    "OpenTutor",
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 
 	tokenString, err := token.SignedString(jwtKeyPair.PrivateKey)
 	if err != nil {
@@ -36,19 +55,21 @@ func generateSessionTokenForUser(userId string) (string, error) {
 	return tokenString, nil
 }
 
-func applySessionTokenForUserId(userId string, w http.ResponseWriter) error {
-	sessionToken, err := generateSessionTokenForUser(userId)
+func applySessionTokenForUserId(userId string, rememberLogin bool, w http.ResponseWriter) error {
+	sessionToken, err := generateSessionTokenForUser(userId, rememberLogin)
 	if err != nil {
 		return err
 	}
 
 	responseToken := fmt.Sprintf("Bearer %s", sessionToken)
+
+	seconds_in_day := int(time.Hour.Seconds() * 24)
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_token",
 		Value:    responseToken,
 		Path:     "/",
-		HttpOnly: true,
-		MaxAge:   86400 * 1, // 1 day expiry
+		HttpOnly: false,
+		MaxAge:   30 * seconds_in_day, // 30 day expiry, max of JWT expiry lengths
 		SameSite: http.SameSiteLaxMode,
 	})
 	return nil
@@ -70,14 +91,17 @@ func sendBack(w http.ResponseWriter, r *http.Request, errMsg *string) {
 }
 
 func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
-	var loginData UserLogin
 	err := r.ParseForm()
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("error parsing form data: %v", err))
 		return
 	}
-	loginData.Email = types.Email(r.FormValue("email"))
-	loginData.Password = r.FormValue("password")
+	loginData := UserLogin{
+		Email:         types.Email(r.FormValue("email")),
+		Password:      r.FormValue("password"),
+		RememberLogin: new(bool),
+	}
+	*loginData.RememberLogin = r.FormValue("rememberLogin") == "on"
 
 	var (
 		userId            string
@@ -113,7 +137,7 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = applySessionTokenForUserId(userId, w)
+	err = applySessionTokenForUserId(userId, *loginData.RememberLogin, w)
 	if err != nil {
 		fmt.Printf("failed to apply session token: %v\n", err)
 		sendError(w, http.StatusInternalServerError, "failed to apply session token")
@@ -170,7 +194,7 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = applySessionTokenForUserId(userId, w)
+	err = applySessionTokenForUserId(userId, false, w)
 	if err != nil {
 		fmt.Printf("failed to apply session token: %v\n", err)
 		sendError(w, http.StatusInternalServerError, "failed to apply session token")
