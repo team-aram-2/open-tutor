@@ -33,7 +33,7 @@
 		display: flex;
 		width: 100%;
 		font-weight: bold;
-		font-size: 30px;
+		font-size: var(--font-size);
 		color: var(--yellow-very-light);
 		justify-content: center;
 	}
