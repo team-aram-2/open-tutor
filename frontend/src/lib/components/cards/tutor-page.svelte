@@ -38,10 +38,7 @@
 		padding-bottom: 50px;
 		margin-bottom: 25px;
 
-		border-top-right-radius: 25px;
-		border-bottom-right-radius: 25px;
-		border-top-left-radius: 25px;
-		border-bottom-left-radius: 25px;
+		border-radius: 25px;
 
 		display: flex;
 		flex-direction: column;
@@ -54,16 +51,16 @@
 		display: flex;
 		flex-direction: row;
 		/* border: 2px solid blue; */
-		max-height: 9rem;
-		height: 9em;
+		height: calc(var(--font-size) * 3.5);
 	}
 	.tutor-name {
-		height: 4.5rem;
+		height: calc(var(--font-size) * 1.5);
 		width: 90%;
 		max-width: 90%;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		line-height: 110%;
 
 		position: relative;
 		top: 0;
@@ -73,40 +70,41 @@
 		padding-right: 15px;
 		margin: 0;
 
-		font-size: 3rem;
+		font-size: calc(var(--font-size) * 1.3);
 		font-weight: bold;
 		color: var(--yellow-very-dark);
 	}
 
 	.pfp {
-		width: 120px;
-		height: 120px;
+		width: calc(var(--font-size) * 2.7);
+		height: calc(var(--font-size) * 2.7);
 
 		margin-left: 20px;
-		margin: 15px 0 20px 20px;
+		margin: calc(var(--font-size) * 0.25) 0 20px 20px;
 
-		border-radius: 25px;
+		border-radius: calc(var(--font-size) * 0.25);
 		border: 3px solid var(--yellow-neutral);
 	}
 
 	.rating {
-		/* border: 2px solid chartreuse; */
 		display: flex;
+		justify-content: flex-start;
 		flex-direction: row;
 		overflow: visible;
-		height: 4em;
+
+		height: calc(var(--font-size) * 0.5);
 		width: 100%;
 		margin-left: 10px;
 		bottom: 0;
-		justify-content: flex-start;
+
+		background-color: transparent;
 	}
 
 	.star {
 		font-size: inherit;
 		max-width: 20%;
-		width: 3.75em;
-		height: 3.75em;
-		max-height: 3.75em;
+		width: auto;
+		height: calc(var(--font-size) * 1.25);
 		margin-right: 5px;
 		fill: var(--yellow-neutral);
 		overflow: visible;
@@ -125,6 +123,9 @@
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
+		flex: 1;
+		align-items: start;
+
 		padding-top: 3px;
 		height: 50%;
 		margin: 5px 10px 5px 20px;
@@ -136,13 +137,13 @@
 		justify-content: center;
 
 		width: auto;
-		height: 1.75em;
+		height: calc(var(--font-size));
 		margin: 0 5px 7px 0;
-		padding: 3px 5px 3px 5px;
+		padding: 3px calc(var(--font-size) * 0.25) 3px calc(var(--font-size) * 0.25);
 
-		border-radius: 25px;
+		border-radius: calc(var(--font-size) * 0.5);
 
-		font-size: 1.2rem;
+		font-size: calc(var(--font-size) * 0.6);
 		font-weight: bold;
 		text-align: center;
 
