@@ -7,7 +7,7 @@
 	// hacked this together cause I couldn't figure out how in the world to get the cards
 	// to be of a uniform width while also adapting to the current font size. Bon appetit. -Caleb
 
-	// Stuff to automatically change the width of the cards
+	// Variables to automatically update the width of the cards to accommodate font size changes
 	let container: HTMLDivElement;
 	let containerWidth = 0;
 	const gap = 15;
@@ -17,7 +17,7 @@
 
 	// Calculates minimum width for children based off of the global font size
 	const calculateChildMinWidth = (): number => {
-		// min-width: calc(var(--font-size) * 12);
+		// NOTE: minimum width of a card (to accommodate content) is as follows: calc(var(--font-size) * 12);
 		const style = getComputedStyle(document.documentElement);
 		return parseInt(style.getPropertyValue('--font-size').slice(0, -2), 10) * 11;
 	};
@@ -28,7 +28,6 @@
 			console.log('container width: ' + String(containerWidth));
 			const childMinWidth = calculateChildMinWidth();
 
-			// console.log('Number of children: ' + string(containerWidth / childMinWidth));
 			// Calculate number of children per row
 			const numOfChildren = Math.floor((containerWidth + gap) / (childMinWidth + gap));
 			console.log('num of children: ' + String(numOfChildren));
