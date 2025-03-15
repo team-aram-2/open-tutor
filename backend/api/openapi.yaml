@@ -34,7 +34,6 @@ paths:
     get:
       summary: Get meetings for user
       operationId: getMeetings
-      requestBody:
       responses:
         "200":
           description: Meetings returned
@@ -42,7 +41,8 @@ paths:
             application/json:
               schema:
                 type: array
-                $ref: "#/components/schemas/Meeting"
+                items:
+                  $ref: "#/components/schemas/Meeting"
 
   # User login
   /auth/login:
@@ -201,20 +201,82 @@ paths:
       summary: Create Tutor Profile for User
       operationId: signUpAsTutor
       requestBody:
-        required: true
+        required: false
         content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Tutor"
+          application/json: {}
+      security:
+        - BearerAuth: []
       responses:
         "201":
           description: Tutor signed up
+        "400":
+          description: Create tutor request malformed or denied.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Tutor"
+                $ref: "#/components/schemas/ErrorModel"
+    get:
+      summary: Search All Tutors
+      operationId: getTutors
+      parameters:
+        - name: pageSize
+          in: query
+          required: true
+          description: The ID of the tutor to get
+          schema:
+            type: integer
+        - name: pageIndex
+          in: query
+          required: true
+          description: The ID of the tutor to get
+          schema:
+            type: integer
+        - name: minRating
+          in: query
+          required: false
+          description: The minimum rating of tutor to get.
+          schema:
+            type: number
+        - name: skillsInclude
+          in: query
+          required: false
+          description: The skills a tutor should have.
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+
+      responses:
+        "200":
+          description: Found tutors.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    info:
+                      $ref: "#/components/schemas/Tutor"
+                    ratingScores:
+                      $ref: "#/components/schemas/RatingScores"
+                    ratingCount:
+                      type: integer
         "400":
-          description: Create tutor request malformed or denied.
+          description: Get tutor request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "403":
+          description: Not authorized.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: Tutors not found.
           content:
             application/json:
               schema:
@@ -239,7 +301,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Tutor"
+                type: object
+                properties:
+                  info:
+                    $ref: "#/components/schemas/Tutor"
+                  ratingScores:
+                    $ref: "#/components/schemas/RatingScores"
+                  ratingCount:
+                    type: integer
         "400":
           description: Get tutor request malformed or denied.
           content:
@@ -578,6 +647,10 @@ paths:
 
 components:
   securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
     GitHubOAuth:
       type: oauth2
       flows:
@@ -625,7 +698,6 @@ components:
       description: Base User object containing shared details needed for all users.
       required:
         - userId
-        - email
         - firstName
         - lastName
       properties:
@@ -663,6 +735,8 @@ components:
         password:
           type: string
           format: password
+        rememberLogin:
+          type: boolean
 
     UserSignup:
       type: object
@@ -694,18 +768,45 @@ components:
       allOf:
         - $ref: "#/components/schemas/User"
         - type: object
-          required:
-            - calendar
-            - ratings
           example:
             userId: 78fcb19e-5ae8-4c5f-a468-b08135a16235
           properties:
-            totalHours: # not sure if this is total hours worked or???
+            totalHours: # total hours worked
               type: integer
             skills:
               type: array
               items:
                 type: string
+
+    RatingScores:
+      type: object
+      required:
+        - overall
+        - professionalism
+        - knowledge
+        - communication
+        - punctuality
+      properties: # Subject to change?
+        professionalism:
+          type: integer
+          minimum: 1
+          maximum: 5
+        knowledge:
+          type: integer
+          minimum: 1
+          maximum: 5
+        communication:
+          type: integer
+          minimum: 1
+          maximum: 5
+        punctuality:
+          type: integer
+          minimum: 1
+          maximum: 5
+        overall:
+          type: integer
+          minimum: 1
+          maximum: 5
 
     Rating:
       type: object
@@ -725,78 +826,53 @@ components:
         meetingId:
           type: string
           format: uuid
-        ratings:
+        scores:
           type: object
-          required:
-            - overall
-            - professionalism
-            - knowledge
-            - communication
-            - punctuality
-          properties: # Subject to change?
-            professionalism:
-              type: integer
-              minimum: 1
-              maximum: 5
-            knowledge:
-              type: integer
-              minimum: 1
-              maximum: 5
-            communication:
-              type: integer
-              minimum: 1
-              maximum: 5
-            punctuality:
-              type: integer
-              minimum: 1
-              maximum: 5
-            overall:
-              type: integer
-              minimum: 1
-              maximum: 5
+          $ref: "#/components/schemas/RatingScores"
         comment:
           type: string
 
-      Meeting:
-        type: object
-        required:
-          - id
-          - tutorId
-          - studentId
-          - startAt
-          - endAt
-        properties:
-          id:
-            type: string
-            format: uuid
-          tutorId:
-            type: string
-            format: uuid
-          studentId:
-            type: string
-            format: uuid
-          startAt:
-            type: string
-            format: date-time
-          endAt:
-            type: string
-            format: date-time
-          zoomJoinLink:
-            type: string
-          zoomHostLink:
-            type: string
-      CreateMeetingBody:
-        type: object
-        properties:
-          studentId:
-            type: string
-            format: uuid
-          startAt:
-            type: string
-            format: date-time
-          endAt:
-            type: string
-            format: date-time
+    Meeting:
+      type: object
+      required:
+        - id
+        - tutorId
+        - studentId
+        - startAt
+        - endAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tutorId:
+          type: string
+          format: uuid
+        studentId:
+          type: string
+          format: uuid
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        zoomJoinLink:
+          type: string
+        zoomHostLink:
+          type: string
+
+    CreateMeetingBody:
+      type: object
+      properties:
+        studentId:
+          type: string
+          format: uuid
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
 
     Calendar:
       type: object
@@ -935,8 +1011,3 @@ components:
           items:
             type: string
             format: uuid
-security:
-  - GitHubOAuth:
-      - read:user
-  - GoogleOAuth:
-      - openid

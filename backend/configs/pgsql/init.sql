@@ -29,16 +29,18 @@ COMMENT ON COLUMN available_skills.title IS 'title/name for the skill';
 COMMENT ON COLUMN available_skills.description IS 'Description for the skill';
 
 DROP TABLE IF EXISTS tutor_skills;
+
 CREATE TABLE tutor_skills (
-  "entry_id" INT NOT NULL PRIMARY KEY,
-  "skill_id" TEXT NOT NULL,
-  "tutor_id" TEXT NOT NULL,
-  "validated" BOOLEAN DEFAULT 'f',
-  FOREIGN KEY (skill_id) REFERENCES available_skills(id),
-  FOREIGN KEY (tutor_id) REFERENCES tutors(user_id)
+  skill_id UUID NOT NULL,
+  tutor_id UUID NOT NULL,
+  validated BOOLEAN DEFAULT FALSE,
+  PRIMARY KEY (skill_id, tutor_id),
+  FOREIGN KEY (skill_id) REFERENCES available_skills(id) ON DELETE CASCADE,
+  FOREIGN KEY (tutor_id) REFERENCES tutors(user_id) ON DELETE CASCADE
 );
+
 COMMENT ON COLUMN tutor_skills.skill_id IS 'Unique identifier for the skill.';
-COMMENT ON COLUMN tutor_skills.tutor_id IS 'Tutor uuid.';
+COMMENT ON COLUMN tutor_skills.tutor_id IS 'Tutor UUID.';
 COMMENT ON COLUMN tutor_skills.validated IS 'If tutor skill is validated.';
 
 DROP TABLE IF EXISTS meetings;
@@ -46,6 +48,7 @@ CREATE TABLE meetings (
   "id" TEXT NOT NULL PRIMARY KEY,
   "tutor_id" TEXT NOT NULL,
   "student_id" TEXT NOT NULL,
+  "date_created" TIMESTAMP NOT NULL,
   "start_at" TIMESTAMP NOT NULL,
   "end_at" TIMESTAMP NOT NULL,
   "zoom_join_link" TEXT NOT NULL,

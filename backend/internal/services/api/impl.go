@@ -63,11 +63,3 @@ func (t *OpenTutor) GetStudentByID(w http.ResponseWriter, r *http.Request, stude
 func (t *OpenTutor) GetRatingById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID, params GetRatingByIdParams) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
-
-func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
-func (t *OpenTutor) GetTutorById(w http.ResponseWriter, r *http.Request, tutorId openapi_types.UUID) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
