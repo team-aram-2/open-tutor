@@ -123,3 +123,10 @@ CREATE TABLE key_pairs (
   "private_key" TEXT NOT NULL,
   "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE OR REPLACE FUNCTION array_sort (arr TEXT[]) RETURNS TEXT[] IMMUTABLE AS
+$$
+  SELECT array_agg(x ORDER BY x) FROM UNNEST(arr) x;
+$$ LANGUAGE SQL;
+
+CREATE UNIQUE INDEX unique_ids ON conversations (array_sort(user_ids));

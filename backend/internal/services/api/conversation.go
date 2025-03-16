@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"open-tutor/internal/services/db"
+	"open-tutor/middleware"
 
 	"github.com/google/uuid"
 	"github.com/lib/pq"
@@ -17,7 +18,7 @@ func checkConversation(conversationId openapi_types.UUID) (bool, error) {
 	err := db.GetDB().QueryRow(`
 		SELECT EXISTS (
 			SELECT 1
-			FROM users
+			FROM conversations
 			WHERE id = $1
 		)
 	`, conversationId).Scan(&exist)
@@ -59,6 +60,51 @@ func (t *OpenTutor) CreateConversation(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *OpenTutor) GetMessagesByConversationId(w http.ResponseWriter, r *http.Request, conversationId openapi_types.UUID) {
+	authInfo := middleware.GetAuthenticationInfo(r)
+	if authInfo.UserID == "" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	userid := authInfo.UserID
+	var exists bool
+	err := db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE user_id = $1)", userid).Scan(&exists)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Database error: %s\n", err)
+		return
+	}
+
+	if !exists {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "User with ID:{} does not exist\n")
+		return
+	}
+	var exist bool
+	var existErr error
+	exist, existErr = checkConversation(conversationId)
+	if existErr != nil {
+		sendError(w, http.StatusInternalServerError, "Database Error (Exist)")
+		return
+	}
+	if !exist {
+		sendError(w, http.StatusNotFound, "Conversation not found")
+		return
+	}
+
+	var access bool
+	err = db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM conversations where id = $1 AND $2 = ANY(user_ids))", conversationId, authInfo.UserID).Scan(&access)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Database error: %s\n", err)
+		return
+	}
+	if !access {
+		w.WriteHeader(http.StatusUnauthorized)
+		fmt.Fprintf(w, "Unauthorized")
+		return
+	}
+
 	rows, err := db.GetDB().Query(`
 	SELECT *
 	FROM messages

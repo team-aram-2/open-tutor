@@ -31,17 +31,17 @@ const (
 	GetRatingByIdParamsUserTypeTutor   GetRatingByIdParamsUserType = "tutor"
 )
 
+// Conversation defines model for Conversation.
+type Conversation struct {
+	Id    *openapi_types.UUID   `json:"id,omitempty"`
+	Users *[]openapi_types.UUID `json:"users,omitempty"`
+}
+
 // CreateMeetingBody defines model for CreateMeetingBody.
 type CreateMeetingBody struct {
 	EndAt     *time.Time          `json:"endAt,omitempty"`
 	StartAt   *time.Time          `json:"startAt,omitempty"`
 	StudentId *openapi_types.UUID `json:"studentId,omitempty"`
-}
-
-// Conversation defines model for Conversation.
-type Conversation struct {
-	Id    *openapi_types.UUID   `json:"id,omitempty"`
-	Users *[]openapi_types.UUID `json:"users,omitempty"`
 }
 
 // ErrorModel defines model for ErrorModel.
@@ -109,13 +109,13 @@ type ProtoMessage struct {
 
 // Rating defines model for Rating.
 type Rating struct {
-	Comment        *string                 `json:"comment,omitempty"`
-	Id             *openapi_types.UUID     `json:"id,omitempty"`
-	MeetingId      *openapi_types.UUID     `json:"meetingId,omitempty"`
-	RatingType     *RatingRatingType       `json:"ratingType,omitempty"`
-	ReviewerUserId *openapi_types.UUID     `json:"reviewerUserId,omitempty"`
-	Scores         *map[string]interface{} `json:"scores,omitempty"`
-	UserId         *openapi_types.UUID     `json:"userId,omitempty"`
+	Comment        *string             `json:"comment,omitempty"`
+	Id             *openapi_types.UUID `json:"id,omitempty"`
+	MeetingId      *openapi_types.UUID `json:"meetingId,omitempty"`
+	RatingType     *RatingRatingType   `json:"ratingType,omitempty"`
+	ReviewerUserId *openapi_types.UUID `json:"reviewerUserId,omitempty"`
+	Scores         *RatingScores       `json:"scores,omitempty"`
+	UserId         *openapi_types.UUID `json:"userId,omitempty"`
 }
 
 // RatingRatingType defines model for Rating.RatingType.
@@ -341,14 +341,6 @@ func (siw *ServerInterfaceWrapper) UserRegister(w http.ResponseWriter, r *http.R
 // CreateConversation operation middleware
 func (siw *ServerInterfaceWrapper) CreateConversation(w http.ResponseWriter, r *http.Request) {
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateConversation(w, r)
 	}))
@@ -373,14 +365,6 @@ func (siw *ServerInterfaceWrapper) GetMessagesByConversationId(w http.ResponseWr
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "conversationId", Err: err})
 		return
 	}
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetMessagesByConversationId(w, r, conversationId)
@@ -407,14 +391,6 @@ func (siw *ServerInterfaceWrapper) GetConversationsByUserId(w http.ResponseWrite
 		return
 	}
 
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
-
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetConversationsByUserId(w, r, userId)
 	}))
@@ -439,14 +415,6 @@ func (siw *ServerInterfaceWrapper) GetUsersByConversationId(w http.ResponseWrite
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "conversationId", Err: err})
 		return
 	}
-
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, GitHubOAuthScopes, []string{"read:user"})
-
-	ctx = context.WithValue(ctx, GoogleOAuthScopes, []string{"openid"})
-
-	r = r.WithContext(ctx)
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetUsersByConversationId(w, r, conversationId)

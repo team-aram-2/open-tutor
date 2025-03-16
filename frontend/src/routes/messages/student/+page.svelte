@@ -2,7 +2,6 @@
 	import Message from '$lib/components/messaging/message.svelte';
 	//import messagesData from '$lib/mock/messages_mock.json';
 	import { onMount } from 'svelte';
-	import { get } from 'svelte/store';
 
 	import type { MessageItem } from '$lib/types/types';
 	import { PUBLIC_API_HOST } from '$env/static/public';
@@ -28,7 +27,9 @@
 	const fetchMessages = async () => {
 		try {
 			messages = [];
-			const res = await fetch(PUBLIC_API_HOST + '/conversation/messages/' + conversationId);
+			const res = await fetch(PUBLIC_API_HOST + '/conversation/messages/' + conversationId, {
+				credentials: 'include'
+			});
 			messagesData = await res.json();
 			console.log(messagesData);
 			for (let item of messagesData.messages) {
@@ -49,7 +50,7 @@
 			});
 			console.log(messages);
 		} catch (err) {
-			console.log('fetch failed.');
+			console.log('fetch failed.', err);
 		}
 	};
 
