@@ -1,16 +1,62 @@
-<script>
+<script lang="ts">
 	import Tutor from '$lib/components/cards/tutor-card.svelte';
 	import tutorsData from '$lib/mock/my_tutors_mock.json';
+	import { onDestroy, onMount } from 'svelte';
+
+	// While waiting on Alex to finish up his changes to the messages page, I
+	// hacked this together cause I couldn't figure out how in the world to get the cards
+	// to be of a uniform width while also adapting to the current font size. Bon appetit. -Caleb
+
+	// Variables to automatically update the width of the cards to accommodate font size changes
+	let container: HTMLDivElement;
+	let containerWidth = 0;
+	const gap = 10;
+	let maxChildrenPerRow = 3;
+	let childrenPerRow = 1;
+	let cardWidth = 100;
+
+	// Calculates minimum width for children based off of the global font size
+	const calculateChildMinWidth = (): number => {
+		// NOTE: minimum width of a card (to accommodate content) is as follows: calc(var(--font-size) * 12);
+		const style = getComputedStyle(document.documentElement);
+		return parseInt(style.getPropertyValue('--font-size').slice(0, -2), 10) * 11;
+	};
+	// Calculates number of cards that can fit per row in the flexbox (max 3 per row)
+	const updateLayout = (): void => {
+		if (container) {
+			containerWidth = container.clientWidth;
+			console.log('container width: ' + String(containerWidth));
+			const childMinWidth = calculateChildMinWidth();
+
+			// Calculate number of children per row
+			const numOfChildren = Math.floor((containerWidth + gap) / (childMinWidth + gap));
+			console.log('num of children: ' + String(numOfChildren));
+			childrenPerRow = Math.min(maxChildrenPerRow, numOfChildren || 1);
+
+			// Evenly distribute children along row
+			cardWidth = (containerWidth - gap * (childrenPerRow - 1)) / childrenPerRow - 1;
+		}
+	};
+
+	onMount(() => {
+		updateLayout();
+		// Recalculate width of cards every time that the window size changes
+		window.addEventListener('resize', updateLayout);
+	});
+	onDestroy(() => {
+		window.removeEventListener('resize', updateLayout);
+	});
 </script>
 
-<div>
-	<div class="cardcontainer">
+<div style="height: 100%; overflow-y: scroll;">
+	<div bind:this={container} class="cardcontainer" style="gap: {gap}px; row-gap: {gap * 1.125}px;">
 		{#each tutorsData.tutors as tutor}
 			<Tutor
 				name="{tutor.firstName} {tutor.lastName}"
 				rating={tutor.overallRating}
 				skills={tutor.skills}
 				userId={tutor.userId}
+				width={String(cardWidth)}
 			></Tutor>
 		{/each}
 	</div>
@@ -23,17 +69,22 @@
 <style>
 	.cardcontainer {
 		display: flex;
-		flex-direction: row;
 		flex-wrap: wrap;
-		gap: 50px;
-		flex: 0 0 33%;
-		padding: 30px 30px 0 30px;
+		flex-direction: row;
+		align-content: flex-start;
+
+		width: calc(100% - 40px);
+		height: auto;
+
+		margin: 10px 20px 0px 20px;
 	}
+
 	.bottomText {
 		display: flex;
 		width: 100%;
+		height: auto;
 		font-weight: bold;
-		font-size: 30px;
+		font-size: var(--font-size);
 		color: var(--yellow-very-light);
 		justify-content: center;
 	}
