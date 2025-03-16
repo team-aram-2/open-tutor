@@ -1,21 +1,20 @@
 <!-- src/routes/+layout.svelte -->
 
 <!-- This will contain all shared layouts across the site -->
-
 <script>
 	// Shared logic across pages goes here
+	import { onMount } from 'svelte';
+	import { fontSize } from '$lib/stores';
+	import { autoLogin } from '$lib/scripts/auth';
 	import '../app.css';
 	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
 
-	import { onMount } from 'svelte';
-	import { fontSize } from '$lib/stores';
-
-	// Load page settings
 	onMount(() => {
 		fontSize.subscribe((value) => {
 			// Set global font size
 			document.documentElement.style.setProperty('--font-size', String(value));
 		});
+		autoLogin();
 	});
 </script>
 
