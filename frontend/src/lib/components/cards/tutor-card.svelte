@@ -4,9 +4,10 @@
 	export let rating = 2;
 	export let skills = [''];
 	export let userId = '';
+	export let width = '';
 </script>
 
-<div class="tutor-card flex h-screen">
+<div class="tutor-card flex h-screen" style="width: {width}px;">
 	<h1 class="tutor-header">
 		<img class="pfp" src={profilePicture} alt="" />
 		<a href={`/my_people/student/my_tutor/${userId}`} class="tutor-info">
@@ -31,39 +32,33 @@
 
 <style>
 	.tutor-card {
-		padding-right: 20px;
-		padding-bottom: 50px;
-		margin-bottom: 25px;
-
-		border-radius: 25px;
-
-		min-width: 500px;
-		min-height: 0px;
-		height: 16em;
-		width: 29%;
-		max-height: 1000px;
-
 		display: flex;
 		flex-direction: column;
 
+		margin: 0px 0px 0px 0px;
+
+		border-radius: calc(var(--font-size) * 0.75);
+
+		/* min-width: 250px; */
+		height: calc(var(--font-size) * 6);
+
 		background: #fdf8ed;
-		border: 5px solid #ebad33;
+		border: 3px solid var(--yellow-neutral);
 	}
 
 	.tutor-header {
 		display: flex;
 		flex-direction: row;
-		/* border: 2px solid blue; */
-		max-height: 9rem;
-		height: 9em;
+		height: calc(55% + max(0px, (10px - (var(--font-size) * 0.125))));
 	}
 	.tutor-name {
-		height: 4.5rem;
+		height: calc(var(--font-size) * 1.5);
 		width: 90%;
 		max-width: 90%;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		line-height: 110%;
 
 		position: relative;
 		top: 0;
@@ -71,40 +66,41 @@
 
 		padding-left: 15px;
 		padding-right: 15px;
-		margin: 0;
 
-		font-size: 3rem;
+		font-size: calc(var(--font-size) * 1.3);
 		font-weight: bold;
 		color: var(--yellow-very-dark);
 	}
 	.pfp {
-		width: 120px;
-		height: 120px;
+		width: calc(var(--font-size) * 2.7);
+		height: calc(var(--font-size) * 2.7);
 
 		margin-left: 20px;
-		margin: 15px 0 20px 20px;
+		margin: calc(var(--font-size) * 0.25) 0 20px 20px;
 
-		border-radius: 25px;
+		border-radius: calc(var(--font-size) * 0.25);
 		border: 3px solid var(--yellow-neutral);
 	}
 
 	.rating {
-		/* border: 2px solid chartreuse; */
 		display: flex;
+		justify-content: flex-start;
 		flex-direction: row;
 		overflow: visible;
-		height: 4em;
+
+		height: calc(var(--font-size) * 0.5);
 		width: 100%;
 		margin-left: 10px;
 		bottom: 0;
-		justify-content: flex-start;
+
+		background-color: transparent;
 	}
 
 	.star {
 		font-size: inherit;
 		max-width: 20%;
-		width: 3.75em;
-		height: 3.75em;
+		width: auto;
+		height: calc(var(--font-size) * 1.25);
 		margin-right: 5px;
 		fill: var(--yellow-neutral);
 		overflow: visible;
@@ -123,24 +119,25 @@
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap;
-		padding-top: 3px;
-		height: 50%;
-		margin: 5px 10px 5px 20px;
-	}
+		align-items: start;
 
+		gap: 5px;
+		margin: 0px 10px 0px 20px;
+		overflow: scroll;
+	}
 	.skill-tag {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 
 		width: auto;
-		height: 1.75em;
+		height: calc(var(--font-size));
 		margin: 0 5px 7px 0;
-		padding: 3px 5px 3px 5px;
+		padding: 3px calc(var(--font-size) * 0.25) 3px calc(var(--font-size) * 0.25);
 
-		border-radius: 25px;
+		border-radius: calc(var(--font-size) * 0.5);
 
-		font-size: 1.2rem;
+		font-size: calc(var(--font-size) * 0.6);
 		font-weight: bold;
 		text-align: center;
 

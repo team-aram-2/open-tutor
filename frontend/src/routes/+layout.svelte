@@ -8,8 +8,15 @@
 	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
 
 	import { onMount } from 'svelte';
+	import { fontSize } from '$lib/stores';
 
-	onMount(() => {});
+	// Load page settings
+	onMount(() => {
+		fontSize.subscribe((value) => {
+			// Set global font size
+			document.documentElement.style.setProperty('--font-size', String(value));
+		});
+	});
 </script>
 
 <!-- Page Content -->
