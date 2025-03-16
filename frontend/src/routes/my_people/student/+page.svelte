@@ -10,7 +10,7 @@
 	// Variables to automatically update the width of the cards to accommodate font size changes
 	let container: HTMLDivElement;
 	let containerWidth = 0;
-	const gap = 15;
+	const gap = 10;
 	let maxChildrenPerRow = 3;
 	let childrenPerRow = 1;
 	let cardWidth = 100;
@@ -34,7 +34,7 @@
 			childrenPerRow = Math.min(maxChildrenPerRow, numOfChildren || 1);
 
 			// Evenly distribute children along row
-			cardWidth = (containerWidth - gap * (childrenPerRow - 1)) / childrenPerRow;
+			cardWidth = (containerWidth - gap * (childrenPerRow - 1)) / childrenPerRow - 1;
 		}
 	};
 

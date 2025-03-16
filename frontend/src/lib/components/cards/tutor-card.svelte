@@ -35,7 +35,6 @@
 		display: flex;
 		flex-direction: column;
 
-		padding-right: 20px;
 		margin: 0px 0px 0px 0px;
 
 		border-radius: calc(var(--font-size) * 0.75);
