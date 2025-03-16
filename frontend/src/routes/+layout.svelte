@@ -3,12 +3,20 @@
 <!-- This will contain all shared layouts across the site -->
 <script>
 	// Shared logic across pages goes here
+<<<<<<< Updated upstream
 	import { onMount } from 'svelte';
 	import { fontSize } from '$lib/stores';
+=======
+>>>>>>> Stashed changes
 	import { autoLogin } from '$lib/scripts/auth';
 	import '../app.css';
 	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
 
+<<<<<<< Updated upstream
+=======
+	import { onMount } from 'svelte';
+
+>>>>>>> Stashed changes
 	onMount(() => {
 		fontSize.subscribe((value) => {
 			// Set global font size

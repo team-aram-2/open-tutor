@@ -48,12 +48,12 @@
 		</a>
 		<!-- TODO: MOVE THIS HREF BACK TO THE APPOINTMENTS <a> tag -->
 		<a
-			href="#/"
+			href="/meetings/student"
 			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'apt'}
-			on:click={() => setSelectedItem('apt')}
+			class:selected-sidebar-item={selectedItem === 'mtgs'}
+			on:click={() => setSelectedItem('mtgs')}
 		>
-			<p class="sidebar-item-text">Appointments</p>
+			<p class="sidebar-item-text">Meetings</p>
 
 			<!-- Icon that appears when sidebar is collapsed -->
 			<div class="collapsed-sidebar-item-icon">
