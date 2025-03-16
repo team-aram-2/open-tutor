@@ -1,5 +1,12 @@
 <script lang="ts">
 	import Hamburger from './hamburger.svelte';
+	import Icons from '$lib/components/dashboard/sidebar-icons';
+	import CalendarIcon from './sidebar-icons/calendar_icon.svelte';
+	import SpeechBubbleIcon from './sidebar-icons/speechBubble_icon.svelte';
+	import CreditCardIcon from './sidebar-icons/creditCard_icon.svelte';
+	import GearIcon from './sidebar-icons/gear_icon.svelte';
+	import PersonHeadIcon from './sidebar-icons/personHead_icon.svelte';
+
 	let selectedItem = 'view';
 	let collapsed = false;
 
@@ -16,10 +23,7 @@
 
 <div class="sidebar flex h-screen" style="border-top-right-radius: 25px;" class:collapsed>
 	<!-- Sidebar Title -->
-	<div
-		class="title-container"
-		style="display: inline-flex; flex-direction: row; flex-wrap: nowrap; border-top-right-radius: 25px; width: 100%;"
-	>
+	<div class="title-container">
 		<h2 class="sidebar-title">Student</h2>
 
 		<div
@@ -42,10 +46,8 @@
 
 			<!-- Icon that appears when sidebar is collapsed -->
 			<div class="collapsed-sidebar-item-icon">
-				<svg viewBox="0 0 100 100" width="100" height="100" fill="gray">
-					<ellipse cx="50" cy="33" rx="20" ry="18" fill="#ccc" />
-					<path d="M10 85 Q50 50 90 85" fill="#ccc" />
-				</svg>
+				<!-- Person Head -->
+				<PersonHeadIcon />
 			</div>
 		</a>
 		<!-- TODO: MOVE THIS HREF BACK TO THE APPOINTMENTS <a> tag -->
@@ -60,40 +62,7 @@
 			<!-- Icon that appears when sidebar is collapsed -->
 			<div class="collapsed-sidebar-item-icon">
 				<!-- Calendar -->
-				<svg viewBox="0 0 100 100" width="100" height="100" fill="gray">
-					<!-- Calendar base -->
-					<rect x="12" y="27" width="76" height="59" rx="5" fill="#ccc" />
-					<!-- Calendar rings -->
-					<rect x="10" y="15" width="80" height="15" rx="4" fill="#888" />
-					<!-- Number 1 -->
-					<line
-						x1="41"
-						y1="47"
-						x2="52"
-						y2="40"
-						stroke="#888"
-						stroke-width="6"
-						stroke-linecap="round"
-					/>
-					<line
-						x1="52"
-						y1="40"
-						x2="52"
-						y2="72"
-						stroke="#888"
-						stroke-width="6"
-						stroke-linecap="round"
-					/>
-					<line
-						x1="41"
-						y1="72"
-						x2="61"
-						y2="72"
-						stroke="#888"
-						stroke-width="6"
-						stroke-linecap="round"
-					/>
-				</svg>
+				<CalendarIcon />
 			</div>
 		</a>
 		<a
@@ -107,12 +76,7 @@
 			<!-- Icon that appears when sidebar is collapsed -->
 			<div class="collapsed-sidebar-item-icon">
 				<!-- Speech Bubble -->
-				<svg viewBox="0 0 100 100" width="100" height="100" fill="gray">
-					<!-- Bubble body-->
-					<rect x="10" y="15" width="80" height="50" rx="10" fill="#ccc" />
-					<!-- Bubble tail -->
-					<polygon points="30,65 40,85 50,65" fill="#ccc" />
-				</svg>
+				<SpeechBubbleIcon />
 			</div>
 		</a>
 		<a
@@ -125,12 +89,8 @@
 
 			<!-- Icon that appears when sidebar is collapsed -->
 			<div class="collapsed-sidebar-item-icon">
-				<svg viewBox="0 0 100 100" width="100" height="100" fill="gray">
-					<!-- Credit card base -->
-					<rect x="10" y="15" width="80" height="68" rx="6" fill="#ccc" />
-					<!-- Credit card stripe -->
-					<rect x="10" y="30" width="80" height="18" fill="#888" />
-				</svg>
+				<!-- Credit Card -->
+				<CreditCardIcon />
 			</div>
 		</a>
 		<a
@@ -144,86 +104,7 @@
 			<!-- Icon that appears when sidebar is collapsed -->
 			<div class="collapsed-sidebar-item-icon">
 				<!-- Gear -->
-				<svg viewBox="0 0 100 100" width="100" height="100">
-					<g transform="translate(50, 50) scale(1.25) translate(-50, -50)">
-						<!-- Gear body -->
-						<circle cx="50" cy="50" r="27" fill="#ccc" />
-
-						<!-- Gear teeth -->
-						<rect
-							x="-6"
-							y="-6"
-							width="12"
-							height="12"
-							rx="3"
-							fill="#ccc"
-							transform="translate(78,50) rotate(0)"
-						/>
-						<rect
-							x="-6"
-							y="-6"
-							width="12"
-							height="12"
-							rx="3"
-							fill="#ccc"
-							transform="translate(69,69) rotate(45)"
-						/>
-						<rect
-							x="-6"
-							y="-6"
-							width="12"
-							height="12"
-							rx="3"
-							fill="#ccc"
-							transform="translate(50,78) rotate(90)"
-						/>
-						<rect
-							x="-6"
-							y="-6"
-							width="12"
-							height="12"
-							rx="3"
-							fill="#ccc"
-							transform="translate(31,69) rotate(135)"
-						/>
-						<rect
-							x="-6"
-							y="-6"
-							width="12"
-							height="12"
-							rx="3"
-							fill="#ccc"
-							transform="translate(22,50) rotate(180)"
-						/>
-						<rect
-							x="-6"
-							y="-6"
-							width="12"
-							height="12"
-							rx="3"
-							fill="#ccc"
-							transform="translate(31,31) rotate(225)"
-						/>
-						<rect
-							x="-6"
-							y="-6"
-							width="12"
-							height="12"
-							rx="3"
-							fill="#ccc"
-							transform="translate(50,22) rotate(270)"
-						/>
-						<rect
-							x="-6"
-							y="-6"
-							width="12"
-							height="12"
-							rx="3"
-							fill="#ccc"
-							transform="translate(69,31) rotate(315)"
-						/>
-					</g>
-				</svg>
+				<GearIcon />
 			</div>
 		</a>
 	</nav>
@@ -237,11 +118,11 @@
 
 		padding-right: 0px;
 
-		border-top-right-radius: 25px;
-		border-bottom-right-radius: 25px;
+		border-bottom-right-radius: calc(min(25px, (var(--font-size) / 1.25)));
+		border-top-right-radius: calc(min(25px, (var(--font-size) / 1.25)));
 
-		min-width: 375px;
-		width: auto;
+		width: calc(11 * var(--font-size));
+		max-width: 100%;
 
 		display: flex;
 		flex-direction: column;
@@ -251,18 +132,21 @@
 		z-index: 100;
 	}
 	.sidebar.collapsed {
-		width: 140px;
-		min-width: 140px;
+		/* Calculation here narrows the sidebar more when the font is extremely small to preserve the pretty looks :3 */
+		width: calc((12 * var(--font-size)) - (197px - (12 * var(--font-size))));
 	}
+
 	.sidebar.collapsed .sidebar-title {
 		display: none;
+		margin: 0;
+		padding: 0;
 	}
 	.sidebar.collapsed .sidebar-item-text {
 		display: none;
 	}
 	.sidebar.collapsed .collapsed-sidebar-item-icon {
 		display: block;
-		width: 100px;
+		width: calc(var(--font-size) * 2.7);
 		left: 0;
 		margin-left: 7px;
 	}
@@ -273,6 +157,20 @@
 		font-size: 0;
 	}
 
+	.title-container {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		align-items: center;
+
+		width: 100%;
+		height: calc(2.75 * var(--font-size));
+		min-height: calc(var(--font-size) + 30px);
+
+		border-top-right-radius: 25px;
+		border-bottom: 3px solid transparent;
+		border-image: linear-gradient(to right, var(--yellow-light), 99%, transparent) 1;
+	}
 	.sidebar-title {
 		display: flex;
 		flex-direction: column;
@@ -281,14 +179,14 @@
 		top: 0;
 		left: 0;
 
-		padding-top: 0;
-		padding-left: 15px;
-		margin-top: 15px;
+		padding: 0;
+		margin-left: calc(max(7px, (var(--font-size) / 8)));
 
-		max-height: 50px;
+		height: fit-content;
 		margin-bottom: 0;
 
-		font-size: 70px;
+		font-size: calc(1.5 * var(--font-size));
+		line-height: calc(1.5 * var(--font-size));
 		font-weight: bold;
 		color: white;
 	}
@@ -297,31 +195,33 @@
 		display: flex;
 		flex-direction: column;
 
-		padding-left: 0px;
-		padding-top: 50px;
-		padding-bottom: 50px;
+		overflow-y: scroll;
 
-		margin: 0;
+		height: auto;
+
+		margin-left: 0px;
 
 		position: relative;
 		top: 0;
-
-		font-size: 40px;
-		font-weight: bold;
-		line-height: 1.75em;
 	}
 	.sidebar-items p {
-		padding: 15px 0px 15px 15px;
-		/* padding: 15px; */
+		margin-top: calc(0.75 * var(--font-size));
+		margin-bottom: calc(0.75 * var(--font-size));
+		margin-left: calc(min(20px, (0.75 * var(--font-size))));
+
+		font-size: var(--font-size);
+		font-weight: bold;
+		line-height: var(--font-size);
+
 		color: white;
 	}
 
 	.selected-sidebar-item {
 		background-color: #7261a8;
-		margin-right: 20px;
+		margin-right: calc(20px - max(0px, (20px - (var(--font-size) / 1.5))));
 
-		border-bottom-right-radius: 20px;
-		border-top-right-radius: 20px;
+		border-bottom-right-radius: calc(min(20px, (var(--font-size) / 1.25)));
+		border-top-right-radius: calc(min(20px, (var(--font-size) / 1.25)));
 	}
 	.selected-sidebar-item p {
 		margin-left: 20px;
