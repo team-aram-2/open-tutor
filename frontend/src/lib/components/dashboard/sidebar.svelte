@@ -26,10 +26,7 @@
 	<div class="title-container">
 		<h2 class="sidebar-title">Student</h2>
 
-		<div
-			class="hamburger mt-3"
-			style="align-self:stretch; display:flex; justify-content: flex-end; flex-direction: row; flex-grow: 1; border-top-right-radius: 25px; margin-right: 15px;"
-		>
+		<div class="hamburger">
 			<Hamburger open={collapsed} on:toggle={handleToggle}></Hamburger>
 		</div>
 	</div>
@@ -112,6 +109,9 @@
 
 <style>
 	.sidebar {
+		display: flex;
+		flex-direction: column;
+
 		top: 0;
 		bottom: 0;
 		left: 0;
@@ -124,16 +124,16 @@
 		width: calc(11 * var(--font-size));
 		max-width: 100%;
 
-		display: flex;
-		flex-direction: column;
-
 		background-color: #453a69;
 
 		z-index: 100;
 	}
 	.sidebar.collapsed {
-		/* Calculation here narrows the sidebar more when the font is extremely small to preserve the pretty looks :3 */
-		width: calc((12 * var(--font-size)) - (197px - (12 * var(--font-size))));
+		width: calc(4 * var(--font-size));
+	}
+
+	.sidebar.collapsed .title-container {
+		justify-content: center;
 	}
 
 	.sidebar.collapsed .sidebar-title {
@@ -162,6 +162,7 @@
 		flex-direction: row;
 		flex-wrap: nowrap;
 		align-items: center;
+		justify-content: space-between;
 
 		width: 100%;
 		height: calc(2.75 * var(--font-size));
@@ -173,7 +174,7 @@
 	}
 	.sidebar-title {
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 
 		position: relative;
 		top: 0;
@@ -231,6 +232,17 @@
 		display: none;
 	}
 
+	.hamburger {
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+
+		height: 100%;
+		margin-right: 10px;
+
+		right: 0px;
+		border-top-right-radius: 25px;
+	}
 	.no-decoration {
 		text-decoration: none;
 		color: inherit;
