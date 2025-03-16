@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Hamburger from './hamburger.svelte';
-	import Icons from '$lib/components/dashboard/sidebar-icons';
 	import CalendarIcon from './sidebar-icons/calendar_icon.svelte';
 	import SpeechBubbleIcon from './sidebar-icons/speechBubble_icon.svelte';
 	import CreditCardIcon from './sidebar-icons/creditCard_icon.svelte';

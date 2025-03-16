@@ -11,9 +11,8 @@
 	import { fontSize } from '$lib/stores';
 
 	// Load page settings
-	let unsubscribe;
 	onMount(() => {
-		unsubscribe = fontSize.subscribe((value) => {
+		fontSize.subscribe((value) => {
 			// Set global font size
 			document.documentElement.style.setProperty('--font-size', String(value));
 		});

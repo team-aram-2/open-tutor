@@ -1,15 +1,11 @@
 <script lang="ts">
 	import { fontSize } from '$lib/stores';
-	import { get } from 'svelte/store';
-	let size = get(fontSize);
 
 	function setFontSize(value: string) {
 		console.log('Setting font size to ' + value);
 		fontSize.set(value);
 		console.log();
 	}
-
-	let value = 'normal';
 </script>
 
 <div class="font-size-buttons-container">
