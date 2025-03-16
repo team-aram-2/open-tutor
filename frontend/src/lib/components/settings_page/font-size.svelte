@@ -1,6 +1,15 @@
 <script lang="ts">
 	import { fontSize } from '$lib/stores';
 
+	// Dictionary with labels and sizes
+	let sizeLabels = new Map<string, string>([
+		['very-small', '10px'],
+		['small', '25px'],
+		['normal', '45px'],
+		['large', '60px'],
+		['very-large', '90px']
+	]);
+
 	function setFontSize(value: string) {
 		console.log('Setting font size to ' + value);
 		fontSize.set(value);
@@ -15,51 +24,17 @@
 	>
 		A
 	</p>
-	<input
-		type="radio"
-		name="font-size"
-		value="very-small"
-		class="font-size-button rounded-l-2xl rounded-r-sm"
-		on:click={() => {
-			setFontSize('10px');
-		}}
-	/>
-	<input
-		type="radio"
-		name="font-size"
-		value="small"
-		class="font-size-button rounded-sm"
-		on:click={() => {
-			setFontSize('25px');
-		}}
-	/>
-	<input
-		type="radio"
-		name="font-size"
-		value="normal"
-		class="font-size-button rounded-sm"
-		on:click={() => {
-			setFontSize('45px');
-		}}
-	/>
-	<input
-		type="radio"
-		name="font-size"
-		value="large"
-		class="font-size-button rounded-sm"
-		on:click={() => {
-			setFontSize('60px');
-		}}
-	/>
-	<input
-		type="radio"
-		name="font-size"
-		value="very-large"
-		class="font-size-button rounded-r-2xl rounded-l-sm"
-		on:click={() => {
-			setFontSize('90px');
-		}}
-	/>
+	{#each [...sizeLabels] as [key, value]}
+		<input
+			type="radio"
+			name="font-size"
+			value={key}
+			class="font-size-button rounded-2xl"
+			on:click={() => {
+				setFontSize(value);
+			}}
+		/>
+	{/each}
 	<p
 		class="text-size-indicator"
 		style="font-size: calc(max(var(--font-size), 45px); padding-left: 0px;"
