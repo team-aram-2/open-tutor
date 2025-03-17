@@ -132,15 +132,16 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 	result, err := stripe_client.GetClient().Accounts.New(params)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to create Stripe account for tutor: %v", err))
+		return
 	}
-	fmt.Printf("stripe account id: %s\n", result.ID)
 
 	_, err = db.GetDB().Exec("UPDATE tutors SET stripe_account_id = $1 WHERE user_id = $2", result.ID, authInfo.UserID)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to save Stripe account id to tutor: %v", err))
+		return
 	}
-
-	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Location", r.Header.Get("Origin")+"/")
+	w.WriteHeader(http.StatusPermanentRedirect)
 }
 
 func (t *OpenTutor) GetTutors(w http.ResponseWriter, r *http.Request, params GetTutorsParams) {

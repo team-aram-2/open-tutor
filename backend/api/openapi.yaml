@@ -44,6 +44,22 @@ paths:
                 type: array
                 $ref: "#/components/schemas/Meeting"
 
+  /meeting/{meetingId}/finalize:
+    post:
+      summary: Finalize a meeting
+      operationId: finalizeMeeting
+      parameters:
+        - name: meetingId
+          in: path
+          required: true
+          description: The ID of the meeting
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Meeting finalized
+
   # User login
   /auth/login:
     post:
@@ -190,6 +206,20 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
         "404":
           description: User to be deleted not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  /billing_portal:
+    get:
+      summary: Redirects to your Stripe customer billing portal
+      operationId: viewBillingPortal
+      responses:
+        "301":
+          description: "Portal redirect success"
+        "400":
+          description: "Error redirecting to billing portal"
           content:
             application/json:
               schema:
