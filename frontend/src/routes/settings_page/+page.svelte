@@ -1,5 +1,6 @@
 <script lang="ts">
 	import FontSize from '$lib/components/settings_page/font-size.svelte';
+	import { PUBLIC_API_HOST } from '$env/static/public';
 </script>
 
 <div class="setting-container">
@@ -11,7 +12,14 @@
 			<FontSize></FontSize>
 		</div>
 		<div class="setting-entry">
-			<div class="setting-label">Some Other Setting</div>
+			<div class="setting-label">Billing portal</div>
+			<a
+				href="{PUBLIC_API_HOST}/billing_portal"
+				class="mr-4 px-4 py-1 bg-sky-400 rounded-md shadow-md cursor-pointer">Open billing portal</a
+			>
+		</div>
+		<div class="setting-entry">
+			<div class="setting-label">another setting</div>
 		</div>
 	</div>
 </div>
