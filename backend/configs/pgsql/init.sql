@@ -18,22 +18,69 @@ CREATE TABLE tutors (
 );
 COMMENT ON TABLE "tutors" IS 'Tutor object that extends user object with tutor specific information.';
 
-DROP TABLE IF EXISTS available_skills;
-CREATE TABLE available_skills (
-  "id" TEXT NOT NULL PRIMARY KEY,
-  "title" TEXT NOT NULL,
-  "description" TEXT NOT NULL
+-- Drop existing tables if they exist
+DROP TABLE IF EXISTS academic_categories CASCADE;
+-- Create the academic_categories table
+CREATE TABLE academic_categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL UNIQUE
 );
-COMMENT ON COLUMN available_skills.id IS 'Unique identifier for the skill, uuid.';
-COMMENT ON COLUMN available_skills.title IS 'title/name for the skill';
-COMMENT ON COLUMN available_skills.description IS 'Description for the skill';
+COMMENT ON TABLE academic_categories IS 'List of standard academic categories.';
+COMMENT ON COLUMN academic_categories.id IS 'Unique identifier for the academic category.';
+COMMENT ON COLUMN academic_categories.name IS 'Name of the academic category.';
+-- Insert predefined academic categories
+INSERT INTO academic_categories (id, name) VALUES
+  (gen_random_uuid(), 'Mathematics'),
+  (gen_random_uuid(), 'Science'),
+  (gen_random_uuid(), 'Physics'),
+  (gen_random_uuid(), 'Chemistry'),
+  (gen_random_uuid(), 'Biology'),
+  (gen_random_uuid(), 'Computer Science'),
+  (gen_random_uuid(), 'Engineering'),
+  (gen_random_uuid(), 'Medicine'),
+  (gen_random_uuid(), 'Humanities'),
+  (gen_random_uuid(), 'History'),
+  (gen_random_uuid(), 'Literature'),
+  (gen_random_uuid(), 'Philosophy'),
+  (gen_random_uuid(), 'Linguistics'),
+  (gen_random_uuid(), 'Arts'),
+  (gen_random_uuid(), 'Music'),
+  (gen_random_uuid(), 'Visual Arts'),
+  (gen_random_uuid(), 'Performing Arts'),
+  (gen_random_uuid(), 'Economics'),
+  (gen_random_uuid(), 'Business'),
+  (gen_random_uuid(), 'Psychology'),
+  (gen_random_uuid(), 'Sociology'),
+  (gen_random_uuid(), 'Political Science'),
+  (gen_random_uuid(), 'Law'),
+  (gen_random_uuid(), 'Education'),
+  (gen_random_uuid(), 'Environmental Science'),
+  (gen_random_uuid(), 'Geography'),
+  (gen_random_uuid(), 'Anthropology'),
+  (gen_random_uuid(), 'Astronomy');
+
+-- Drop existing tables if they exist
+DROP TABLE IF EXISTS available_skills CASCADE;
+-- Create the available_skills table with a foreign key to academic_categories
+CREATE TABLE available_skills (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  category_id UUID NOT NULL,
+  FOREIGN KEY (category_id) REFERENCES academic_categories(id) ON DELETE CASCADE
+);
+
+COMMENT ON TABLE available_skills IS 'Table defining available skills, each associated with a category.';
+COMMENT ON COLUMN available_skills.id IS 'Unique identifier for the skill.';
+COMMENT ON COLUMN available_skills.title IS 'Title or name of the skill.';
+COMMENT ON COLUMN available_skills.description IS 'Description of the skill.';
+COMMENT ON COLUMN available_skills.category_id IS 'Reference to the academic category that this skill belongs to.';
 
 DROP TABLE IF EXISTS tutor_skills;
 
 CREATE TABLE tutor_skills (
   skill_id UUID NOT NULL,
   tutor_id UUID NOT NULL,
-  validated BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (skill_id, tutor_id),
   FOREIGN KEY (skill_id) REFERENCES available_skills(id) ON DELETE CASCADE,
   FOREIGN KEY (tutor_id) REFERENCES tutors(user_id) ON DELETE CASCADE
@@ -42,6 +89,33 @@ CREATE TABLE tutor_skills (
 COMMENT ON COLUMN tutor_skills.skill_id IS 'Unique identifier for the skill.';
 COMMENT ON COLUMN tutor_skills.tutor_id IS 'Tutor UUID.';
 COMMENT ON COLUMN tutor_skills.validated IS 'If tutor skill is validated.';
+
+CREATE TABLE questions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  skill_id UUID NOT NULL,
+  question TEXT NOT NULL,
+  correct_answers TEXT[] NOT NULL,
+  FOREIGN KEY (skill_id) REFERENCES available_skills(id) ON DELETE CASCADE
+);
+
+CREATE TABLE quiz_attempts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tutor_id UUID NOT NULL,
+  skill_id UUID NOT NULL,
+  passed BOOLEAN DEFAULT FALSE,
+  attempted_at TIMESTAMP DEFAULT NOW(),
+  completed_at TIMESTAMP DEFAULT NULL,
+  FOREIGN KEY (tutor_id) REFERENCES tutors(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (skill_id) REFERENCES available_skills(id) ON DELETE CASCADE
+);
+
+CREATE TABLE quiz_attempt_questions (
+  quiz_attempt_id UUID NOT NULL,
+  question_id UUID NOT NULL,
+  PRIMARY KEY (quiz_attempt_id, question_id),
+  FOREIGN KEY (quiz_attempt_id) REFERENCES quiz_attempts(id) ON DELETE CASCADE,
+  FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+);
 
 DROP TABLE IF EXISTS meetings;
 CREATE TABLE meetings (
