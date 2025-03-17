@@ -43,7 +43,7 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if user exists
+	// Check if tutor exists
 	err = db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM tutors WHERE user_id = $1)", authInfo.UserID).Scan(&exists)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -190,7 +190,7 @@ func (t *OpenTutor) GetTutorById(w http.ResponseWriter, r *http.Request, tutorId
 	)
 
 	if selectErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, "%s\n", selectErr)
 		return
 	}
@@ -204,7 +204,7 @@ func (t *OpenTutor) GetTutorById(w http.ResponseWriter, r *http.Request, tutorId
 	).Scan(&skills)
 
 	if selectErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, "%s\n", selectErr)
 		return
 	}
