@@ -7,12 +7,16 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"open-tutor/internal/services/db"
 	"open-tutor/middleware"
+	"open-tutor/stripe_client"
 
 	"github.com/lib/pq"
 	openapi_types "github.com/oapi-codegen/runtime/types"
+
+	"github.com/stripe/stripe-go/v81"
 )
 
 type TutorResponse struct {
@@ -22,6 +26,12 @@ type TutorResponse struct {
 }
 
 func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("error parsing form data: %v", err))
+		return
+	}
+
 	authInfo := middleware.GetAuthenticationInfo(r)
 	if authInfo.UserID == "" {
 		w.WriteHeader(http.StatusForbidden)
@@ -29,28 +39,28 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if user exists
-	var exists bool
-	err := db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE user_id = $1)", authInfo.UserID).Scan(&exists)
+	var email, userFirstName, userLastName string
+	err = db.GetDB().QueryRow("SELECT email, first_name, last_name FROM users WHERE user_id = $1", authInfo.UserID).Scan(&email, &userFirstName, &userLastName)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Database error: %s\n", err)
 		return
 	}
-
-	if !exists {
+	if email == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "User with ID:{} does not exist\n")
 		return
 	}
 
 	// Check if user exists
-	err = db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM tutors WHERE user_id = $1)", authInfo.UserID).Scan(&exists)
+	var tutorExists bool
+	err = db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM tutors WHERE user_id = $1)", authInfo.UserID).Scan(&tutorExists)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Database error: %s\n", err)
 		return
 	}
-	if exists {
+	if tutorExists {
 		w.WriteHeader(http.StatusConflict)
 		fmt.Fprintf(w, "User with ID:{} is already registered as a tutor.\n")
 		return
@@ -61,6 +71,73 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "%s\n", insertErr)
 		return
+	}
+
+	requestIp := strings.Split(r.RemoteAddr, ":")[0]
+
+	// Create Stripe account for tutor //
+	params := &stripe.AccountParams{
+		Type:    stripe.String("custom"),
+		Country: stripe.String("US"),
+		Email:   stripe.String(email),
+		Capabilities: &stripe.AccountCapabilitiesParams{
+			CardPayments: &stripe.AccountCapabilitiesCardPaymentsParams{
+				Requested: stripe.Bool(true),
+			},
+			Transfers: &stripe.AccountCapabilitiesTransfersParams{
+				Requested: stripe.Bool(true),
+			},
+		},
+		ExternalAccount: &stripe.AccountExternalAccountParams{
+			Country:       stripe.String("US"),
+			Currency:      stripe.String("usd"),
+			AccountNumber: stripe.String(r.FormValue("bank_account_number")),
+			RoutingNumber: stripe.String(r.FormValue("bank_routing_number")),
+		},
+		TOSAcceptance: &stripe.AccountTOSAcceptanceParams{
+			Date: stripe.Int64(time.Now().Unix()), // Unix timestamp
+			IP:   stripe.String(requestIp),
+		},
+		Settings: &stripe.AccountSettingsParams{
+			Payments: &stripe.AccountSettingsPaymentsParams{
+				StatementDescriptor: stripe.String("OPENTUTOR"),
+			},
+		},
+		BusinessType: stripe.String("individual"),
+		BusinessProfile: &stripe.AccountBusinessProfileParams{
+			Name: stripe.String("OpenTutor"),
+			URL:  stripe.String("https://opentutor.com"),
+			MCC:  stripe.String("8299"), // mcc for education services
+		},
+		Individual: &stripe.PersonParams{
+			FirstName: stripe.String(userFirstName),
+			LastName:  stripe.String(userLastName),
+			Email:     stripe.String(email),
+			Phone:     stripe.String(r.FormValue("phone")),
+			Address: &stripe.AddressParams{
+				Line1:      stripe.String(r.FormValue("address_line1")),
+				City:       stripe.String(r.FormValue("address_city")),
+				State:      stripe.String(r.FormValue("address_state")),
+				PostalCode: stripe.String(r.FormValue("address_postalcode")),
+				Country:    stripe.String("US"),
+			},
+			DOB: &stripe.PersonDOBParams{
+				Day:   stripe.Int64(2),
+				Month: stripe.Int64(5),
+				Year:  stripe.Int64(2002),
+			},
+			IDNumber: stripe.String(r.FormValue("ssn")),
+		},
+	}
+	result, err := stripe_client.GetClient().Accounts.New(params)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to create Stripe account for tutor: %v", err))
+	}
+	fmt.Printf("stripe account id: %s\n", result.ID)
+
+	_, err = db.GetDB().Exec("UPDATE tutors SET stripe_account_id = $1 WHERE user_id = $2", result.ID, authInfo.UserID)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to save Stripe account id to tutor: %v", err))
 	}
 
 	w.WriteHeader(http.StatusCreated)

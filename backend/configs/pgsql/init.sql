@@ -14,6 +14,8 @@ DROP TABLE IF EXISTS tutors;
 CREATE TABLE tutors (
   "user_id" TEXT NOT NULL PRIMARY KEY,
   "total_hours" INT DEFAULT 0,
+  "hourly_rate" INT DEFAULT 10,
+  "stripe_account_id" TEXT UNIQUE,
   FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 COMMENT ON TABLE "tutors" IS 'Tutor object that extends user object with tutor specific information.';
