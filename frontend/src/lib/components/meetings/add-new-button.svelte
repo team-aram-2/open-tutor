@@ -1,8 +1,11 @@
-<script>
-</script>
-
 <div class="add-new-button">
-	<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<svg
+		width="auto"
+		height="auto"
+		viewBox="0 0 24 24"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+	>
 		<line
 			x1="12"
 			y1="5"
@@ -30,10 +33,10 @@
 		align-items: center;
 		justify-items: center;
 
-		width: calc(2 * var(--font-size));
-		height: calc(100% - 40px);
+		width: calc(3 * var(--font-size));
+		height: calc(3 * var(--font-size));
 
-		border-radius: var(--font-size);
+		border-radius: calc(3 * var(--font-size));
 
 		background-color: var(--yellow-light);
 	}
