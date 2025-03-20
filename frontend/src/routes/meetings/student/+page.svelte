@@ -3,6 +3,7 @@
 	import AddNewButton from '$lib/components/meetings/add-new-button.svelte';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
+	import { sidebar_width } from '$lib/stores';
 
 	import type { MeetingItem } from '$lib/types/types';
 	import { PUBLIC_API_HOST } from '$env/static/public';
@@ -14,7 +15,7 @@
 	let isInitialized = false;
 	$: if ($user_id && !isInitialized) {
 		isInitialized = true;
-		loadData($user_id);
+		// loadData($user_id);
 	}
 	async function loadData(userId: string) {
 		await fetchMeetings(userId);
@@ -52,10 +53,10 @@
 		try {
 			const res = await fetch(PUBLIC_API_HOST + '/meetings/' + userId);
 			meetings = await res.json();
-			console.log(meetings);
+			// console.log(meetings);
 			meetingId = meetings[0];
 		} catch (err) {
-			console.log('Error in the process of fetching meetings:', err);
+			console.error('Error in the process of fetching meetings:', err);
 		}
 	};
 	// const handleKeydown = (event: KeyboardEvent) => {
@@ -67,7 +68,20 @@
 	onMount(async () => {});
 </script>
 
-<div class="w-full h-full">
+<div class="meetings-container flex flex-col">
 	<MeetingCard />
-	<AddNewButton />
+
+	<div class="fit-content fixed right-10 bottom-10">
+		<a href="/make_meeting">
+			<AddNewButton />
+		</a>
+	</div>
 </div>
+
+<style>
+	.meetings-container {
+		height: 100%;
+		overflow-x: scroll;
+		flex-grow: 1;
+	}
+</style>

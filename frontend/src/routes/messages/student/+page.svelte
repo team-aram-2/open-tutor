@@ -41,7 +41,6 @@
 			}
 		}
 		if (typeof document !== undefined) {
-			console.log(Number(get(font_size).slice(0, -2)));
 			(document.getElementsByClassName('textboxcontainer')[0] as HTMLElement).style.height =
 				Number(Number(get(font_size).slice(0, -2)) * 1.5 + 40) + 'px';
 		}
@@ -64,7 +63,6 @@
 	messages.sort((a, b) => {
 		return a.sentOn - b.sentOn;
 	});
-	console.log(messages);
 </script>
 
 <div class="containercontainer">
