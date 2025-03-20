@@ -26,11 +26,13 @@ function createPersistentStore<T>(key: string, initialValue: T): Writable<T> {
 
 // Variable declaration
 const logged_in = writable(false);
-const user_id = writable("");
+const user_id = writable('');
+const sidebar_width = writable(0)	;
 
 // Regular stores
 export const sessionToken = writable<string | null>(null);
-export {logged_in, user_id}
+export { logged_in, user_id };
+export { sidebar_width };
 
 // Persistent stores
-export const fontSize = createPersistentStore<string>('fontSize', '16px');
+export const font_size = createPersistentStore<string>('font_size', '16px');
