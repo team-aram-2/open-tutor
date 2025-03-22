@@ -51,9 +51,12 @@
 	// };
 	const fetchMeetings = async (userId: string) => {
 		try {
-			const res = await fetch(PUBLIC_API_HOST + '/meetings/' + userId);
+			const res = await fetch(PUBLIC_API_HOST + '/meetings', {
+				method: 'GET',
+				credentials: 'include'
+			});
 			meetings = await res.json();
-			// console.log(meetings);
+			console.log(meetings);
 			meetingId = meetings[0];
 		} catch (err) {
 			console.error('Error in the process of fetching meetings:', err);
@@ -65,7 +68,9 @@
 	// 		sendMessage();
 	// 	}
 	// };
-	onMount(async () => {});
+	onMount(async () => {
+		fetchMeetings(current_id);
+	});
 </script>
 
 <div class="meetings-container flex flex-col">
