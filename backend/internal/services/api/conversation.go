@@ -149,19 +149,30 @@ func (t *OpenTutor) GetUsersByConversationId(w http.ResponseWriter, r *http.Requ
 }
 
 func (t *OpenTutor) GetConversationsByUserId(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID) {
-	var exist bool
-	var err error
-	exist, err = checkUser(userId)
-	if err != nil {
-		sendError(w, http.StatusInternalServerError, "Database error")
-		fmt.Printf("Error: %v\n", err)
-		return
-	}
-	if !exist {
-		sendError(w, http.StatusNotFound, "User not found")
+	authInfo := middleware.GetAuthenticationInfo(r)
+	if authInfo.UserID == "" {
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
+	userid := authInfo.UserID
+	var exists bool
+	err := db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE user_id = $1)", userid).Scan(&exists)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Database error: %s\n", err)
+		return
+	}
+
+	if !exists {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "User with ID:{} does not exist\n")
+		return
+	}
+	if userId.String() != userid {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
 	rows, err := db.GetDB().Query(`
 		SELECT id
 		FROM conversations

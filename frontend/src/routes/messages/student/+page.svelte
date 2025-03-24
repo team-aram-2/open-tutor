@@ -26,7 +26,8 @@
 	}
 	const fetchMessages = async () => {
 		try {
-			messages = [];
+			//messages = [];
+			let tempMessages: MessageItem[] = [];
 			const res = await fetch(PUBLIC_API_HOST + '/conversation/messages/' + conversationId, {
 				credentials: 'include'
 			});
@@ -42,12 +43,15 @@
 					userId: item.originId,
 					sentOn: new Date(item.sentOn).getTime()
 				};
-				messages = [...messages, newItem];
+				tempMessages = [...tempMessages, newItem];
 			}
 			// Sort messages by timestamp
-			messages.sort((a, b) => {
+			tempMessages.sort((a, b) => {
 				return a.sentOn - b.sentOn;
 			});
+			if (messages.length != tempMessages.length) {
+				messages = tempMessages;
+			}
 			console.log(messages);
 		} catch (err) {
 			console.log('fetch failed.', err);
@@ -59,14 +63,12 @@
 			try {
 				const res = await fetch(PUBLIC_API_HOST + '/message', {
 					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
 					body: JSON.stringify({
 						originId: current_id,
 						conversationId: conversationId,
 						message: messageContent
-					})
+					}),
+					credentials: 'include'
 				});
 				const response = await res.json();
 				console.log(response);
@@ -84,7 +86,9 @@
 	};
 	const fetchConversations = async (userId: string) => {
 		try {
-			const res = await fetch(PUBLIC_API_HOST + '/conversation/user/' + userId);
+			const res = await fetch(PUBLIC_API_HOST + '/conversation/user/' + userId, {
+				credentials: 'include'
+			});
 			conversations = await res.json();
 			console.log(conversations);
 			conversationId = conversations[0];
@@ -98,7 +102,14 @@
 			sendMessage();
 		}
 	};
-	onMount(async () => {});
+	onMount(() => {
+		const interval = setInterval(() => {
+			fetchMessages();
+		}, 1000);
+		return () => {
+			clearInterval(interval);
+		};
+	});
 </script>
 
 <div class="messagecontainer">
@@ -117,6 +128,7 @@
 
 <div class="textboxcontainer">
 	<textarea class="textbox" bind:value={messageContent} on:keydown={handleKeydown}></textarea>
+	<button class="send-button" on:click={sendMessage} disabled={!messageContent.trim()}>Send</button>
 </div>
 
 <style>
@@ -141,13 +153,15 @@
 		min-width: max-content;
 		z-index: 100;
 		background-color: var(--yellow-neutral);
+		display: flex;
+		align-items: center;
 	}
 	.textbox {
 		position: relative;
-		width: calc(100% - 40px);
+		width: calc(100% - 80px);
 		height: calc(100% - 20px);
 		/* padding: 20px 20px 20px 20px; */
-		margin: 10px 20px 10px 20px;
+		margin: 10px 10px 10px 20px;
 		box-sizing: border-box;
 		resize: none;
 
@@ -158,5 +172,26 @@
 		background-color: var(--yellow-very-light);
 		border-radius: 10px;
 		border-color: transparent;
+	}
+	.send-button {
+		height: calc(100% - 20px);
+		width: 60px;
+		margin: 10px 20px 10px 0;
+		border-radius: 10px;
+		border: none;
+		background-color: var(--yellow-very-light);
+		font-family: 'Inter', sans-serif;
+		font-size: large;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
+
+	.send-button:hover {
+		background-color: #e0e0e0;
+	}
+
+	.send-button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 </style>

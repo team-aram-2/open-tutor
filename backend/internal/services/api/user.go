@@ -6,11 +6,12 @@ import (
 	"net/http"
 
 	"open-tutor/internal/services/db"
+	"open-tutor/middleware"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-func checkUser(userId openapi_types.UUID) (bool, error) {
+func checkUser[T string | openapi_types.UUID](userId T) (bool, error) {
 	var exist bool
 	err := db.GetDB().QueryRow(`
 		SELECT EXISTS (
@@ -99,6 +100,17 @@ func (t *OpenTutor) UpdateUserById(w http.ResponseWriter, r *http.Request, userI
 	}
 	if !exist {
 		sendError(w, http.StatusNotFound, "User not found")
+		return
+	}
+
+	authInfo := middleware.GetAuthenticationInfo(r)
+	if authInfo.UserID == "" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+	authUserId := authInfo.UserID
+	if authUserId != userId.String() {
+		sendError(w, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
 

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"open-tutor/internal/services/db"
+	"open-tutor/middleware"
 
 	"github.com/google/uuid"
 	openapi_types "github.com/oapi-codegen/runtime/types"
@@ -28,10 +29,42 @@ func checkMessage(messageId openapi_types.UUID) (bool, error) {
 }
 
 func (t *OpenTutor) CreateMessage(w http.ResponseWriter, r *http.Request) {
+	authInfo := middleware.GetAuthenticationInfo(r)
+	if authInfo.UserID == "" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	userid := authInfo.UserID
+	var exists bool
+	err := db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE user_id = $1)", userid).Scan(&exists)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Database error: %s\n", err)
+		return
+	}
+
+	if !exists {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "User with ID:{} does not exist\n")
+		return
+	}
 	var proto ProtoMessage
 	var message Message
 	if parseErr := json.NewDecoder(r.Body).Decode(&proto); parseErr != nil {
 		sendError(w, http.StatusBadRequest, "Invalid format for message")
+		return
+	}
+	var access bool
+	err = db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM conversations where id = $1 AND $2 = ANY(user_ids))", proto.ConversationId, authInfo.UserID).Scan(&access)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Database error: %s\n", err)
+		return
+	}
+	if !access {
+		w.WriteHeader(http.StatusUnauthorized)
+		fmt.Fprintf(w, "Unauthorized")
 		return
 	}
 	messageId := uuid.New().String()
@@ -58,8 +91,39 @@ func (t *OpenTutor) CreateMessage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *OpenTutor) DeleteMessageById(w http.ResponseWriter, r *http.Request, messageId openapi_types.UUID) {
+	authInfo := middleware.GetAuthenticationInfo(r)
+	if authInfo.UserID == "" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	userid := authInfo.UserID
+	var exists bool
+	err := db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE user_id = $1)", userid).Scan(&exists)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Database error: %s\n", err)
+		return
+	}
+
+	if !exists {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "User with ID:{} does not exist\n")
+		return
+	}
+	var access bool
+	err = db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM messages where id = $1 AND origin_id = $2)", messageId, authInfo.UserID).Scan(&access)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Database error: %s\n", err)
+		return
+	}
+	if !access {
+		w.WriteHeader(http.StatusUnauthorized)
+		fmt.Fprintf(w, "Unauthorized")
+		return
+	}
 	var exist bool
-	var err error
 	exist, err = checkMessage(messageId)
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, "Database Error")
