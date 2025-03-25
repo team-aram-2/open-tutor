@@ -34,10 +34,7 @@
 		justify-items: center;
 
 		width: calc(2 * var(--font-size));
-		height: auto;
-
-		margin-top: 20px;
-		margin-bottom: 20px;
+		height: calc(100% - 40px);
 
 		border-radius: var(--font-size);
 

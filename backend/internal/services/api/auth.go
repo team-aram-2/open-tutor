@@ -10,12 +10,15 @@ import (
 	"time"
 
 	"open-tutor/internal/services/db"
+	"open-tutor/stripe_client"
 	"open-tutor/util"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/oapi-codegen/runtime/types"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/stripe/stripe-go/v81"
 )
 
 func generateSessionTokenForUser(userId string, rememberLogin bool) (string, error) {
@@ -172,9 +175,17 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 	}
 	passwordHash := string(hashBytes)
 
+	// Create Stripe customer for user //
+	newCustomer, err := stripe_client.GetClient().Customers.New(&stripe.CustomerParams{})
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("error creating Stripe customer: %v", err))
+		return
+	}
+
+	// Insert into DB //
 	_, err = db.GetDB().Exec(`
-		INSERT INTO users (user_id, email, first_name, last_name, password_hash)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO users (user_id, email, first_name, last_name, password_hash, stripe_customer_id)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING user_id, email, first_name, last_name;
 	`,
 		userId,
@@ -182,6 +193,7 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 		signupData.FirstName,
 		signupData.LastName,
 		passwordHash,
+		newCustomer.ID,
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value") {

@@ -9,9 +9,15 @@
 	import { autoLogin } from '$lib/scripts/auth';
 
 	import { onMount } from 'svelte';
+	import { fontSize } from '$lib/stores';
 
+	// Load page settings
 	onMount(() => {
 		autoLogin();
+		fontSize.subscribe((value) => {
+			// Set global font size
+			document.documentElement.style.setProperty('--font-size', String(value));
+		});
 	});
 </script>
 

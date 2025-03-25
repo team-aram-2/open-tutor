@@ -236,6 +236,9 @@ type ServerInterface interface {
 	// Sign up as a new user
 	// (POST /auth/register)
 	UserRegister(w http.ResponseWriter, r *http.Request)
+	// Redirects to your Stripe customer billing portal
+	// (GET /billing_portal)
+	ViewBillingPortal(w http.ResponseWriter, r *http.Request)
 	// Create a new conversation
 	// (POST /conversation)
 	CreateConversation(w http.ResponseWriter, r *http.Request)
@@ -251,6 +254,9 @@ type ServerInterface interface {
 	// Create a new meeting
 	// (POST /meeting)
 	CreateMeeting(w http.ResponseWriter, r *http.Request)
+	// Finalize a meeting
+	// (POST /meeting/{meetingId}/finalize)
+	FinalizeMeeting(w http.ResponseWriter, r *http.Request, meetingId openapi_types.UUID)
 	// Get meetings for user
 	// (GET /meetings)
 	GetMeetings(w http.ResponseWriter, r *http.Request)
@@ -329,6 +335,20 @@ func (siw *ServerInterfaceWrapper) UserRegister(w http.ResponseWriter, r *http.R
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UserRegister(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ViewBillingPortal operation middleware
+func (siw *ServerInterfaceWrapper) ViewBillingPortal(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ViewBillingPortal(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -432,6 +452,31 @@ func (siw *ServerInterfaceWrapper) CreateMeeting(w http.ResponseWriter, r *http.
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateMeeting(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// FinalizeMeeting operation middleware
+func (siw *ServerInterfaceWrapper) FinalizeMeeting(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "meetingId" -------------
+	var meetingId openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "meetingId", r.PathValue("meetingId"), &meetingId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "meetingId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.FinalizeMeeting(w, r, meetingId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -965,11 +1010,13 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 
 	m.HandleFunc("POST "+options.BaseURL+"/auth/login", wrapper.UserLogin)
 	m.HandleFunc("POST "+options.BaseURL+"/auth/register", wrapper.UserRegister)
+	m.HandleFunc("GET "+options.BaseURL+"/billing_portal", wrapper.ViewBillingPortal)
 	m.HandleFunc("POST "+options.BaseURL+"/conversation", wrapper.CreateConversation)
 	m.HandleFunc("GET "+options.BaseURL+"/conversation/messages/{conversationId}", wrapper.GetMessagesByConversationId)
 	m.HandleFunc("GET "+options.BaseURL+"/conversation/user/{userId}", wrapper.GetConversationsByUserId)
 	m.HandleFunc("GET "+options.BaseURL+"/conversation/{conversationId}", wrapper.GetUsersByConversationId)
 	m.HandleFunc("POST "+options.BaseURL+"/meeting", wrapper.CreateMeeting)
+	m.HandleFunc("POST "+options.BaseURL+"/meeting/{meetingId}/finalize", wrapper.FinalizeMeeting)
 	m.HandleFunc("GET "+options.BaseURL+"/meetings", wrapper.GetMeetings)
 	m.HandleFunc("POST "+options.BaseURL+"/message", wrapper.CreateMessage)
 	m.HandleFunc("DELETE "+options.BaseURL+"/message/{messageId}", wrapper.DeleteMessageById)

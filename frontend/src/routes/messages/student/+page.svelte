@@ -3,6 +3,9 @@
 	//import messagesData from '$lib/mock/messages_mock.json';
 	import { onMount } from 'svelte';
 
+	import Sendbutton from '$lib/components/messaging/sendbutton.svelte';
+	import Attachimagebutton from '$lib/components/messaging/attachimagebutton.svelte';
+
 	import type { MessageItem } from '$lib/types/types';
 	import { PUBLIC_API_HOST } from '$env/static/public';
 	import { user_id } from '$lib/stores';
@@ -127,47 +130,58 @@
 </div>
 
 <div class="textboxcontainer">
+	<Attachimagebutton />
 	<textarea class="textbox" bind:value={messageContent} on:keydown={handleKeydown}></textarea>
+	<Sendbutton />
 	<button class="send-button" on:click={sendMessage} disabled={!messageContent.trim()}>Send</button>
 </div>
 
 <style>
 	.messagecontainer {
-		width: auto;
+		width: 100%;
 		display: flex;
 		flex-direction: column;
 		flex-wrap: nowrap;
 		flex: 1 1 auto;
 		overflow-y: scroll;
-		height: calc(100vh - 100px);
+		height: 80%;
 		left: 0;
 		top: 0;
 		z-index: 0;
 	}
+
 	.textboxcontainer {
-		position: fixed;
+		display: flex;
+		flex-wrap: nowrap;
+		flex-direction: row;
+		flex: 1 1 auto;
+		align-items: center;
+		position: relative;
 		bottom: 0;
 		right: 0;
-		width: calc(100% - 375px);
-		height: 100px;
-		min-width: max-content;
+
+		height: 20%;
+
+		width: 100%;
 		z-index: 100;
 		background-color: var(--yellow-neutral);
 		display: flex;
 		align-items: center;
 	}
+
 	.textbox {
+		flex: 1 1 auto;
 		position: relative;
-		width: calc(100% - 80px);
-		height: calc(100% - 20px);
-		/* padding: 20px 20px 20px 20px; */
-		margin: 10px 10px 10px 20px;
+
+		height: calc(100% - 40px);
 		box-sizing: border-box;
 		resize: none;
 
-		z-index: 101;
+		margin: 20px 20px 20px 20px;
 
-		font-size: xx-large;
+		z-index: 10;
+
+		font-size: var(--font-size);
 		font-family: 'Inter', sans-serif;
 		background-color: var(--yellow-very-light);
 		border-radius: 10px;

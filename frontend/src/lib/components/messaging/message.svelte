@@ -21,7 +21,7 @@
 		border-radius: 20px;
 		padding: 20px 30px 20px 30px;
 		margin: 0px 30px 40px 30px;
-		font-size: xx-large;
+		font-size: calc(var(--font-size) * 0.825);
 		max-width: 70%;
 		display: inline-block;
 		word-wrap: break-word;
