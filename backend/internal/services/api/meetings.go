@@ -130,11 +130,9 @@ func (t *OpenTutor) GetMeetings(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to scan user: %v", err))
 			}
-			fmt.Printf("name: %v\n", name)
 			userNames = append(userNames, name)
 		}
 
-		fmt.Printf("%v\n", userNames)
 		fullNames := strings.Join(userNames, " and ")
 		meetingResponses = append(meetingResponses, MeetingResponse{
 			Id:           meeting.Id,
