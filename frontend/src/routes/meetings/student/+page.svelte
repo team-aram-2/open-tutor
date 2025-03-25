@@ -10,8 +10,9 @@
 	import { user_id } from '$lib/stores';
 
 	$: current_id = $user_id;
+	$: meetings = [];
 	let meetingId = '';
-	let meetings: string[] = [];
+
 	let isInitialized = false;
 	$: if ($user_id && !isInitialized) {
 		isInitialized = true;
@@ -57,7 +58,6 @@
 			});
 			meetings = await res.json();
 			console.log(meetings);
-			meetingId = meetings[0];
 		} catch (err) {
 			console.error('Error in the process of fetching meetings:', err);
 		}
@@ -74,7 +74,9 @@
 </script>
 
 <div class="meetings-container flex flex-col">
-	<MeetingCard />
+	{#each meetings as meeting}
+		<MeetingCard {meeting} />
+	{/each}
 
 	<div class="fit-content fixed right-10 bottom-10">
 		<a href="/make_meeting">
