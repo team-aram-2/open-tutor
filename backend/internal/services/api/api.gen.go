@@ -55,6 +55,18 @@ type Meeting struct {
 	ZoomJoinLink *string            `json:"zoomJoinLink,omitempty"`
 }
 
+// MeetingResponse defines model for MeetingResponse.
+type MeetingResponse struct {
+	EndAt        time.Time          `json:"endAt"`
+	Id           openapi_types.UUID `json:"id"`
+	StartAt      time.Time          `json:"startAt"`
+	StudentId    openapi_types.UUID `json:"studentId"`
+	TutorId      openapi_types.UUID `json:"tutorId"`
+	UserName     *string            `json:"userName,omitempty"`
+	ZoomHostLink *string            `json:"zoomHostLink,omitempty"`
+	ZoomJoinLink *string            `json:"zoomJoinLink,omitempty"`
+}
+
 // Message defines model for Message.
 type Message struct {
 	// MessageAttachments Array of message attachments

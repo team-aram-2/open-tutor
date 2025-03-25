@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"open-tutor/internal/services/db"
 	"open-tutor/middleware"
@@ -95,7 +96,7 @@ func (t *OpenTutor) GetMeetings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	meetings := []Meeting{}
+	meetingResponses := []MeetingResponse{}
 	for meetingRows.Next() {
 		var meeting Meeting
 		err := meetingRows.Scan(
@@ -111,12 +112,45 @@ func (t *OpenTutor) GetMeetings(w http.ResponseWriter, r *http.Request) {
 			sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to parse meetings from database: %s", err))
 			return
 		}
-		meetings = append(meetings, meeting)
+
+		userRows, err := db.GetDB().Query(`
+			SELECT
+				first_name
+			FROM users
+			WHERE user_id = $1 OR user_id = $2
+		`, userId, meeting.StudentId)
+		if err != nil {
+			sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to query users: %v", err))
+		}
+
+		var name string
+		userNames := make([]string, 0)
+		for userRows.Next() {
+			err = userRows.Scan(&name)
+			if err != nil {
+				sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to scan user: %v", err))
+			}
+			fmt.Printf("name: %v\n", name)
+			userNames = append(userNames, name)
+		}
+
+		fmt.Printf("%v\n", userNames)
+		fullNames := strings.Join(userNames, " and ")
+		meetingResponses = append(meetingResponses, MeetingResponse{
+			Id:           meeting.Id,
+			TutorId:      meeting.TutorId,
+			StudentId:    meeting.StudentId,
+			StartAt:      meeting.StartAt,
+			EndAt:        meeting.EndAt,
+			ZoomJoinLink: meeting.ZoomJoinLink,
+			ZoomHostLink: meeting.ZoomHostLink,
+			UserName:     &fullNames,
+		})
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(meetings); err != nil {
+	if err := json.NewEncoder(w).Encode(meetingResponses); err != nil {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to encode meetings response: %s", err))
 		return
 	}

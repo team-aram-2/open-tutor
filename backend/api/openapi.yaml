@@ -42,7 +42,7 @@ paths:
             application/json:
               schema:
                 type: array
-                $ref: "#/components/schemas/Meeting"
+                $ref: "#/components/schemas/MeetingResponse"
 
   # User login
   /auth/login:
@@ -744,6 +744,37 @@ components:
         tutorId:
           type: string
           format: uuid
+        studentId:
+          type: string
+          format: uuid
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        zoomJoinLink:
+          type: string
+        zoomHostLink:
+          type: string
+
+    MeetingResponse:
+      type: object
+      required:
+        - id
+        - tutorId
+        - studentId
+        - startAt
+        - endAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        tutorId:
+          type: string
+          format: uuid
+        userName:
+          type: string
         studentId:
           type: string
           format: uuid
