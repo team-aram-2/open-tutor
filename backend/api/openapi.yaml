@@ -225,6 +225,20 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
+  /tutor_id_verification:
+    get:
+      summary: Allows tutors to verify their identity with Stripe
+      operationId: tutorIdVerification
+      responses:
+        "301":
+          description: "Portal redirect success"
+        "400":
+          description: "Error redirecting to id verification"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
   # Sign up as tutor
   /tutor:
     post:
