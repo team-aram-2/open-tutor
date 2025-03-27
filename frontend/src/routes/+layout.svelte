@@ -6,15 +6,23 @@
 	// Shared logic across pages goes here
 	import '../app.css';
 	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
+	import FPSidebar from '$lib/components/dashboard/front-page-sidebar.svelte'
 
 	import { onMount } from 'svelte';
 
 	onMount(() => {});
+
+	let isLoggedIn = false;
+  
+	// Simulate login action
+	function toggleLogin() {
+		isLoggedIn = !isLoggedIn;
+	}
 </script>
 
 <!-- Page Content -->
 <div class="dashboard-layout">
-	<Sidebar></Sidebar>
+	<FPSidebar></FPSidebar>
 
 	<main class="w-full">
 		<slot />
