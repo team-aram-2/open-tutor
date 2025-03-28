@@ -8,6 +8,7 @@
 	import type { MeetingItem } from '$lib/types/types';
 	import { PUBLIC_API_HOST } from '$env/static/public';
 	import { user_id } from '$lib/stores';
+	import RatingSubmission from '$lib/components/cards/rating-submission.svelte';
 
 	$: current_id = $user_id;
 	$: meetings = [];
@@ -57,7 +58,6 @@
 				credentials: 'include'
 			});
 			meetings = await res.json();
-			console.log(meetings);
 		} catch (err) {
 			console.error('Error in the process of fetching meetings:', err);
 		}
@@ -73,7 +73,13 @@
 	});
 </script>
 
-<div class="meetings-container flex flex-col">
+<div class="meetings-container relative flex flex-col">
+	<!-- !!! DO NOT PUT ANYTHING ABOVE THIS INSIDE THIS DIV IF YOU DO YOU WILL DIE !!! -->
+	<!-- rating submission popover has to be the top element for layout to work -->
+	<div class="absolute flex justify-center items-center w-full h-full bg-black/80 z-50">
+		<RatingSubmission />
+	</div>
+
 	{#each meetings as meeting}
 		<MeetingCard {meeting} />
 	{/each}
