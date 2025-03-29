@@ -6,7 +6,8 @@ CREATE TABLE users (
   "first_name" TEXT NOT NULL,
   "last_name" TEXT NOT NULL,
   "account_locked" BOOLEAN DEFAULT 'f',
-  "password_hash" TEXT NOT NULL
+  "password_hash" TEXT NOT NULL,
+  "stripe_customer_id" TEXT UNIQUE
 );
 COMMENT ON TABLE "users" IS 'Base User object containing shared details needed for all users.';
 
@@ -14,6 +15,8 @@ DROP TABLE IF EXISTS tutors;
 CREATE TABLE tutors (
   "user_id" TEXT NOT NULL PRIMARY KEY,
   "total_hours" INT DEFAULT 0,
+  "hourly_rate" INT DEFAULT 10,
+  "stripe_account_id" TEXT UNIQUE,
   FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 COMMENT ON TABLE "tutors" IS 'Tutor object that extends user object with tutor specific information.';
@@ -77,10 +80,10 @@ COMMENT ON COLUMN available_skills.description IS 'Description of the skill.';
 COMMENT ON COLUMN available_skills.category_id IS 'Reference to the academic category that this skill belongs to.';
 
 DROP TABLE IF EXISTS tutor_skills;
-
 CREATE TABLE tutor_skills (
-  skill_id UUID NOT NULL,
-  tutor_id UUID NOT NULL,
+  skill_id TEXT NOT NULL,
+  tutor_id TEXT NOT NULL,
+  validated BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (skill_id, tutor_id),
   FOREIGN KEY (skill_id) REFERENCES available_skills(id) ON DELETE CASCADE,
   FOREIGN KEY (tutor_id) REFERENCES tutors(user_id) ON DELETE CASCADE
@@ -122,7 +125,6 @@ CREATE TABLE meetings (
   "id" TEXT NOT NULL PRIMARY KEY,
   "tutor_id" TEXT NOT NULL,
   "student_id" TEXT NOT NULL,
-  "date_created" TIMESTAMP NOT NULL,
   "start_at" TIMESTAMP NOT NULL,
   "end_at" TIMESTAMP NOT NULL,
   "zoom_join_link" TEXT NOT NULL,

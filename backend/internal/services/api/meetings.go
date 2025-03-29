@@ -7,10 +7,12 @@ import (
 
 	"open-tutor/internal/services/db"
 	"open-tutor/middleware"
+	"open-tutor/stripe_client"
 	"open-tutor/zoom"
 
 	"github.com/google/uuid"
 	openapi_types "github.com/oapi-codegen/runtime/types"
+	"github.com/stripe/stripe-go/v81"
 )
 
 func (t *OpenTutor) CreateMeeting(w http.ResponseWriter, r *http.Request) {
@@ -119,6 +121,49 @@ func (t *OpenTutor) GetMeetings(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(meetings); err != nil {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to encode meetings response: %s", err))
 		return
+	}
+}
+
+func (t *OpenTutor) FinalizeMeeting(w http.ResponseWriter, r *http.Request, meetingId uuid.UUID) {
+	// Auth check //
+	authInfo := middleware.GetAuthenticationInfo(r)
+	if authInfo == nil {
+		sendError(w, http.StatusUnauthorized, "User is not logged in")
+		return
+	}
+
+	// Verify meeting ownership & get hourly rate //
+	var tutorHourlyRate int64
+	var tutorAccountId string
+	var studentUserId string
+	var studentCustomerId string
+	err := db.GetDB().QueryRow("SELECT tutors.hourly_rate, tutors.stripe_account_id, meetings.student_id FROM meetings LEFT JOIN tutors ON tutors.user_id = meetings.tutor_id WHERE meetings.id = $1 AND meetings.tutor_id = $2", meetingId, authInfo.UserID).Scan(&tutorHourlyRate, &tutorAccountId, &studentUserId)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to fetch meeting: %v", err))
+		return
+	}
+	err = db.GetDB().QueryRow("SELECT users.stripe_customer_id FROM users WHERE user_id = $1", studentUserId).Scan(&studentCustomerId)
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to fetch student customer ID: %v", err))
+		return
+	}
+
+	// Submit PaymentIntent from student customer to tutor account via Stripe //
+	_, err = stripe_client.GetClient().PaymentIntents.New(&stripe.PaymentIntentParams{
+		Customer: stripe.String(studentCustomerId),
+		TransferData: &stripe.PaymentIntentTransferDataParams{
+			Destination: stripe.String(tutorAccountId),
+		},
+		Amount:   stripe.Int64(tutorHourlyRate * 100), // multiply by 100 for cents value
+		Currency: stripe.String(string(stripe.CurrencyUSD)),
+		AutomaticPaymentMethods: &stripe.PaymentIntentAutomaticPaymentMethodsParams{
+			Enabled: stripe.Bool(true),
+		},
+		// Confirm:    stripe.Bool(true),
+		// OffSession: stripe.Bool(true),
+	})
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to create PaymentIntent for meeting: %v", err))
 	}
 }
 
