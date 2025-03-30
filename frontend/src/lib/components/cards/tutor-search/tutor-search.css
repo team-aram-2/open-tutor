@@ -1,0 +1,192 @@
+.sort-toggle {
+  display: flex;
+  flex-direction: row;
+  
+  max-height: 50%;
+}
+.search-container {
+  display: flex;
+  flex-direction: row;
+
+  height: calc(6 * var(--font-size));
+  width: calc(100% - 20px);
+
+  margin: 20px 10px 20px 10px;
+
+  background: var(--yellow-light);
+  border: calc(0.1 * var(--font-size)) solid var(--yellow-neutral);
+  border-radius: calc(var(--font-size) * 0.75);
+
+  font-size: var(--font-size);
+  font-weight: 500;
+}
+
+.skills-container {
+  flex: 1 1 60%;
+  max-width: 60%;
+
+  height: auto;
+
+  background: var(--yellow-very-light);
+  border-top-left-radius: calc(var(--font-size) * 0.68);
+  border-bottom-left-radius: calc(var(--font-size) * 0.68);
+
+  overflow-y: scroll;
+}
+.sorting-container {
+  flex: 1 1 40%;
+  display: flex;
+  flex-direction: row;
+
+  height: 100%;
+  max-width: 40%;
+
+  overflow-y: scroll;
+
+  border-left: 3px solid var(--yellow-neutral);
+}
+.tutor-name-lookup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1 1 45%;
+
+  background: var(--yellow-very-light);
+
+}
+.tutor-name-lookup label {
+
+  height: fit-content;
+  padding: 0 auto 0 auto;
+
+  font-size: var(--font-size);
+
+  background: var(--yellow-very-light);
+  /* border-top-right-radius: calc(var(--font-size) * 0.68); */
+}
+.tutor-name-search-box {
+  height: calc(var(--font-size) * 1.5 - 10px);
+  width: calc(100% - 40px);
+
+  margin: 5px auto 5px auto;
+  padding: 0px 20px 0px 20px;
+
+  background: var(--yellow-light);
+  border: 2px solid var(--yellow-neutral);
+
+  border-radius: calc(var(--font-size));
+
+  font-size: calc(var(--font-size) - 10px);
+
+  resize: none;
+}
+.tutor-name-search-box:focus {
+  background: var(--purple-very-light);
+  border: 2px solid var(--purple-light);
+}
+.tutor-name-search-box-label{
+  height: fit-content;
+  text-align: center;
+}
+.tutor-rating-lookup{
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 45%;
+  justify-content: center;
+
+  height: 100%;
+
+  /* width: 50%; */
+  font-size: var(--font-size);
+
+  background: var(--yellow-very-light);
+
+}
+.tutor-name-lookup label {
+  height: fit-content;
+  margin: 0 20px 0 20px;
+
+  font-size: var(--font-size);
+
+  background: var(--yellow-very-light);
+  /* border-top-right-radius: calc(var(--font-size) * 0.68); */
+}
+
+.sort-and-order-container{
+  flex: 1 1 10%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  height: 100%;
+  /* max-width: calc(2.5 * var(--font-size)); */
+
+  background: var(--yellow-very-light);
+
+  border-left: 3px solid var(--yellow-neutral);
+}
+
+.sort-toggle {
+  display: flex;
+
+  height: 50%;
+  width: 100%;
+
+  justify-content: center;
+
+  background: var(--yellow-very-light);
+}
+.filter-by-toggle{
+  display: flex;
+
+  height: 50%;
+  width: 100%;
+
+  justify-content: center;
+
+  border-bottom: 3px solid var(--yellow-neutral);
+}
+.skill {
+  height: calc(1.5 * var(--font-size));
+
+  padding: 0 calc(0.5 * var(--font-size)) 0 calc(0.5 * var(--font-size));
+  margin: calc(var(--font-size) / 10);
+
+  background: var(--yellow-very-light);
+  border: calc(0.1 * var(--font-size)) solid var(--yellow-neutral);
+  border-radius: calc(1.4 * var(--font-size));
+
+  line-height: calc(1.4 * var(--font-size));
+  overflow-y: hidden;
+
+  color: black;
+}
+.skill.selected {
+  background: var(--purple-neutral);
+  color: var(--purple-very-light);
+  border: calc(0.1 * var(--font-size)) solid var(--purple-dark);
+}
+.skill.selected :hover {
+}
+
+.search-button {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+
+  width: calc(2.5 * var(--font-size));
+
+  background: var(--yellow-light);
+  border-left: 3px solid var(--yellow-light);
+  border-top-right-radius: calc(var(--font-size) * 0.68);
+  border-bottom-right-radius: calc(var(--font-size) * 0.68);
+
+  stroke: var(--yellow-dark);
+}
+.search-button:hover {
+  background: var(--purple-light);
+  stroke: var(--purple-very-light);
+  border-left: 3px solid var(--purple-dark);
+  border-top-right-radius: calc(var(--font-size) * 0.68);
+  border-bottom-right-radius: calc(var(--font-size) * 0.68);
+}

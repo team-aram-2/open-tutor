@@ -1,4 +1,5 @@
 <script lang="ts">
+	import TutorSearch from '$lib/components/cards/tutor-search.svelte';
 	import Tutor from '$lib/components/cards/tutor-card.svelte';
 	import tutorsData from '$lib/mock/my_tutors_mock.json';
 	import { onDestroy, onMount } from 'svelte';
@@ -49,6 +50,8 @@
 </script>
 
 <div style="height: 100%; overflow-y: scroll;">
+	<!-- Tutor Search Bar -->
+	<TutorSearch />
 	<div bind:this={container} class="cardcontainer" style="gap: {gap}px; row-gap: {gap * 1.125}px;">
 		{#each tutorsData.tutors as tutor}
 			<Tutor
