@@ -148,7 +148,7 @@ func (t *OpenTutor) CreateSkill(w http.ResponseWriter, r *http.Request) {
 	// Return created skill with ID
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"id":          skillId,
 		"title":       req.Title,
 		"description": req.Description,
@@ -471,7 +471,7 @@ func (t *OpenTutor) SubmitSkillQuiz(w http.ResponseWriter, r *http.Request, atte
 
 	// Send response
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"grade":  grade,
 		"passed": passed,
 	})
