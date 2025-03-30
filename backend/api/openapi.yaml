@@ -646,6 +646,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Message"
+
   /conversation/user/{userId}:
     get:
       summary: Get all conversations the user is a member in
@@ -672,8 +673,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: string
-                  format: uuid
+                  $ref: "#/components/schemas/ConversationName"
 
 components:
   securitySchemes:
@@ -1041,3 +1041,11 @@ components:
           items:
             type: string
             format: uuid
+
+    ConversationName:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -174,7 +175,7 @@ func (t *OpenTutor) GetConversationsByUserId(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	rows, err := db.GetDB().Query(`
-		SELECT id
+		SELECT id, user_ids
 		FROM conversations
 		WHERE $1 = ANY(user_ids)
 	`, userId)
@@ -185,16 +186,68 @@ func (t *OpenTutor) GetConversationsByUserId(w http.ResponseWriter, r *http.Requ
 	}
 	defer rows.Close()
 
-	var conversations []string
+	type convInfo struct {
+		id       string
+		user_ids []string
+	}
+
+	var conversationInfo []convInfo
 
 	for rows.Next() {
-		var temp string
-		if err := rows.Scan(&temp); err != nil {
+		var temp convInfo
+		if err := rows.Scan(&temp.id, pq.Array(&temp.user_ids)); err != nil {
 			sendError(w, http.StatusInternalServerError, "Server error")
 			return
 		}
-		conversations = append(conversations, temp)
+		conversationInfo = append(conversationInfo, temp)
+	}
+
+	if err = rows.Err(); err != nil {
+		sendError(w, http.StatusInternalServerError, "Server error")
+		return
+	}
+
+	userMap := make(map[string]string)
+
+	var toReturn []ConversationName
+
+	for _, conv := range conversationInfo {
+		var result ConversationName
+		result.Id = &conv.id
+		var names []string
+
+		for _, uid := range conv.user_ids {
+			fullname, exists := userMap[uid]
+			if !exists {
+				var first, last string
+
+				err := db.GetDB().QueryRow(`
+				SELECT first_name, last_name
+				FROM users
+				WHERE user_id = $1`, uid).Scan(&first, &last)
+
+				if err == sql.ErrNoRows {
+					fullname = "Unknown"
+				} else if err != nil {
+					sendError(w, http.StatusInternalServerError, "Server Error")
+					return
+				} else {
+					fullname = fmt.Sprintf("%s %s", first, last)
+				}
+				userMap[uid] = fullname
+			}
+			names = append(names, fullname)
+		}
+		var namesList string
+		for i, name := range names {
+			if i > 0 {
+				namesList += ", "
+			}
+			namesList += name
+		}
+		result.Name = &namesList
+		toReturn = append(toReturn, result)
 	}
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(conversations)
+	_ = json.NewEncoder(w).Encode(toReturn)
 }

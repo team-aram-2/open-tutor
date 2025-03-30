@@ -37,6 +37,12 @@ type Conversation struct {
 	Users *[]openapi_types.UUID `json:"users,omitempty"`
 }
 
+// ConversationName defines model for ConversationName.
+type ConversationName struct {
+	Id   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
 // CreateMeetingBody defines model for CreateMeetingBody.
 type CreateMeetingBody struct {
 	EndAt     *time.Time          `json:"endAt,omitempty"`
