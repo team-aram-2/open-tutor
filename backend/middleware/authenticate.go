@@ -3,9 +3,11 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
+	"open-tutor/internal/services/db"
 	"open-tutor/util"
 
 	"github.com/golang-jwt/jwt"
@@ -35,6 +37,18 @@ func GetAuthenticationInfo(r *http.Request) *AuthenticationInfo {
 	return &authInfo
 }
 
+func InvalidateAuthRedirect(r *http.Request, w http.ResponseWriter) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: false,
+		MaxAge:   -1, // Expire immediately
+	})
+	// Redirect the user to the login page
+	http.Redirect(w, r, "/login", http.StatusForbidden)
+}
+
 func Authenticate(next http.Handler) http.HandlerFunc {
 	jwtKeyPair, err := util.GetKeyPair("user-auth-jwt")
 	if err != nil {
@@ -59,15 +73,15 @@ func Authenticate(next http.Handler) http.HandlerFunc {
 			return jwtKeyPair.PublicKey, nil
 		})
 		if err != nil {
-			fmt.Printf("[Authenticate] invalid token: %v\n", err)
-			next.ServeHTTP(w, r)
+			log.Printf("[Authenticate] invalid token: %v\n", err)
+			InvalidateAuthRedirect(r, w)
 			return
 		}
 
 		claims, ok := token.Claims.(*Claims)
 		if !ok || !token.Valid {
-			fmt.Printf("[Authenticate] invalid token claims: %v\n", err)
-			next.ServeHTTP(w, r)
+			log.Printf("[Authenticate] invalid token claims: %v\n", err)
+			InvalidateAuthRedirect(r, w)
 			return
 		}
 
@@ -78,10 +92,26 @@ func Authenticate(next http.Handler) http.HandlerFunc {
 			if err == nil {
 				userId = parsedId.String()
 			} else {
-				fmt.Printf("[Authenticate] failed to parse uuid from user id: %v\n", err)
-				next.ServeHTTP(w, r)
+				log.Printf("[Authenticate] failed to parse uuid from user id: %v\n", err)
+				InvalidateAuthRedirect(r, w)
 				return
 			}
+		}
+
+		// Get the current role from the database
+		var currentRoleMask util.RoleMask
+		err = db.GetDB().QueryRow("SELECT role_mask FROM users WHERE user_id = $1", userId).Scan(&currentRoleMask)
+		if err != nil {
+			// Handle error if the user is not found or DB issue
+			log.Printf("[Authenticate] failed to find user in database: %v\n", err)
+			InvalidateAuthRedirect(r, w)
+			return
+		}
+
+		// Compare the stored role with the current role
+		if claims.RoleMask != currentRoleMask {
+			InvalidateAuthRedirect(r, w)
+			return
 		}
 
 		// Add the userId to authentication context //
