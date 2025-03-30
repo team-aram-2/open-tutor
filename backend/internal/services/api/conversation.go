@@ -30,10 +30,49 @@ func checkConversation(conversationId openapi_types.UUID) (bool, error) {
 }
 
 func (t *OpenTutor) CreateConversation(w http.ResponseWriter, r *http.Request) {
+	authInfo := middleware.GetAuthenticationInfo(r)
+	if authInfo.UserID == "" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	userid := authInfo.UserID
+	var exists bool
+	err := db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE user_id = $1)", userid).Scan(&exists)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Database error: %s\n", err)
+		return
+	}
+
+	if !exists {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "User with ID:{} does not exist\n")
+		return
+	}
 	var users []openapi_types.UUID
 	var convo Conversation
 	if parseErr := json.NewDecoder(r.Body).Decode(&users); parseErr != nil {
 		sendError(w, http.StatusBadRequest, "Invalid format for conversation")
+		return
+	}
+	isOne := false
+	for _, user := range users {
+		exists, err := checkUser(user)
+		if err != nil {
+			sendError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		if !exists {
+			sendError(w, http.StatusBadRequest, fmt.Sprintf("User with ID:%s does not exist\n", user))
+			return
+		}
+		if user.String() == userid {
+			isOne = true
+		}
+	}
+	if !isOne {
+		sendError(w, http.StatusForbidden, "Unauthorized")
 		return
 	}
 	conversationId := uuid.New().String()
