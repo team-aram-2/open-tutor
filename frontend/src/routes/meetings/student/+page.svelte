@@ -2,24 +2,24 @@
 	import MeetingCard from '$lib/components/meetings/meeting-card.svelte';
 	import AddNewButton from '$lib/components/meetings/add-new-button.svelte';
 	import { onMount } from 'svelte';
-	import { get } from 'svelte/store';
-	import { sidebar_width } from '$lib/stores';
+	//import { get } from 'svelte/store';
+	//import { sidebar_width } from '$lib/stores';
 
-	import type { MeetingItem } from '$lib/types/types';
-	import { PUBLIC_API_HOST } from '$env/static/public';
+	//import type { MeetingItem } from '$lib/types/types';
+	//import { PUBLIC_API_HOST } from '$env/static/public';
 	import { user_id } from '$lib/stores';
 
-	$: current_id = $user_id;
-	let meetingId = '';
-	let meetings: string[] = [];
+	//$: current_id = $user_id;
+	//let meetingId = '';
+	//let meetings: string[] = [];
 	let isInitialized = false;
 	$: if ($user_id && !isInitialized) {
 		isInitialized = true;
 		// loadData($user_id);
 	}
-	async function loadData(userId: string) {
+	/*async function loadData(userId: string) {
 		await fetchMeetings(userId);
-	}
+	}*/
 
 	// const sendMessage = async () => {
 	// 	if (messageContent.trim()) {
@@ -49,7 +49,7 @@
 	// 		}
 	// 	}
 	// };
-	const fetchMeetings = async (userId: string) => {
+	/*const fetchMeetings = async (userId: string) => {
 		try {
 			const res = await fetch(PUBLIC_API_HOST + '/meetings/' + userId);
 			meetings = await res.json();
@@ -58,7 +58,7 @@
 		} catch (err) {
 			console.error('Error in the process of fetching meetings:', err);
 		}
-	};
+	};*/
 	// const handleKeydown = (event: KeyboardEvent) => {
 	// 	if (event.key === 'Enter' && messageContent.trim()) {
 	// 		event.preventDefault();
