@@ -21,15 +21,15 @@ import (
 	"github.com/stripe/stripe-go/v81"
 )
 
-func generateSessionTokenForUser(userId string, rememberLogin bool, roleMask util.Role) (string, error) {
+func generateSessionTokenForUser(userId string, rememberLogin bool, roleMask util.RoleMask) (string, error) {
 	jwtKeyPair, err := util.GetKeyPair("user-auth-jwt")
 	if err != nil {
 		return "", err
 	}
 
 	type sessionClaims struct {
-		UserID   string    `json:"user_id"`
-		RoleMask util.Role `json:"role_bitmask"`
+		UserID   string        `json:"user_id"`
+		RoleMask util.RoleMask `json:"role_mask"`
 		jwt.StandardClaims
 	}
 
@@ -60,7 +60,7 @@ func generateSessionTokenForUser(userId string, rememberLogin bool, roleMask uti
 	return tokenString, nil
 }
 
-func applySessionTokenForUserId(userId string, rememberLogin bool, roleMask util.Role, w http.ResponseWriter) error {
+func applySessionTokenForUserId(userId string, rememberLogin bool, roleMask util.RoleMask, w http.ResponseWriter) error {
 	sessionToken, err := generateSessionTokenForUser(userId, rememberLogin, roleMask)
 	if err != nil {
 		return err
@@ -112,7 +112,7 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 	var (
 		userId            string
 		savedPasswordHash string
-		roleMask          util.Role
+		roleMask          util.RoleMask
 	)
 	err = db.GetDB().QueryRow(`
 		SELECT user_id, password_hash, role_mask
@@ -158,7 +158,7 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 	var (
 		signupData UserSignup
-		roleMask   util.Role
+		roleMask   util.RoleMask
 	)
 	err := r.ParseForm()
 	if err != nil {

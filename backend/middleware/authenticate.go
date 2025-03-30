@@ -17,12 +17,14 @@ const (
 )
 
 type Claims struct {
-	UserID *string `json:"user_id"`
+	UserID   *string `json:"user_id"`
+	RoleMask util.RoleMask
 	jwt.StandardClaims
 }
 
 type AuthenticationInfo struct {
-	UserID string
+	UserID   string
+	RoleMask util.RoleMask
 }
 
 func GetAuthenticationInfo(r *http.Request) *AuthenticationInfo {
@@ -68,19 +70,24 @@ func Authenticate(next http.Handler) http.HandlerFunc {
 			next.ServeHTTP(w, r)
 			return
 		}
-		var userId uuid.UUID
+
+		// Parse user ID safely
+		var userId string
 		if claims.UserID != nil {
-			userId, err = uuid.Parse(*claims.UserID)
-		}
-		if err != nil {
-			fmt.Printf("[Authenticate] failed to parse uuid from user id: %v\n", err)
-			next.ServeHTTP(w, r)
-			return
+			parsedId, err := uuid.Parse(*claims.UserID)
+			if err == nil {
+				userId = parsedId.String()
+			} else {
+				fmt.Printf("[Authenticate] failed to parse uuid from user id: %v\n", err)
+				next.ServeHTTP(w, r)
+				return
+			}
 		}
 
 		// Add the userId to authentication context //
 		authInfo := AuthenticationInfo{
-			UserID: userId.String(),
+			UserID:   userId,
+			RoleMask: claims.RoleMask,
 		}
 		ctx := context.WithValue(r.Context(), AuthenticationContextKey, authInfo)
 		next.ServeHTTP(w, r.WithContext(ctx))

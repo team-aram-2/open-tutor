@@ -246,6 +246,12 @@ type GetTutorsParams struct {
 // SignUpAsTutorJSONBody defines parameters for SignUpAsTutor.
 type SignUpAsTutorJSONBody interface{}
 
+// UpdateUserRoleJSONBody defines parameters for UpdateUserRole.
+type UpdateUserRoleJSONBody struct {
+	// RoleMask Uint16 Bitmask representing the user's new roles
+	RoleMask int `json:"role_mask"`
+}
+
 // UserLoginJSONRequestBody defines body for UserLogin for application/json ContentType.
 type UserLoginJSONRequestBody = UserLogin
 
@@ -287,6 +293,9 @@ type SignUpAsTutorJSONRequestBody SignUpAsTutorJSONBody
 
 // UpdateUserByIdJSONRequestBody defines body for UpdateUserById for application/json ContentType.
 type UpdateUserByIdJSONRequestBody = User
+
+// UpdateUserRoleJSONRequestBody defines body for UpdateUserRole for application/json ContentType.
+type UpdateUserRoleJSONRequestBody UpdateUserRoleJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -389,6 +398,9 @@ type ServerInterface interface {
 	// Update user information
 	// (PUT /user/{userId})
 	UpdateUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID)
+	// Update user information
+	// (PUT /user/{userId}/role)
+	UpdateUserRole(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -1199,6 +1211,37 @@ func (siw *ServerInterfaceWrapper) UpdateUserById(w http.ResponseWriter, r *http
 	handler.ServeHTTP(w, r)
 }
 
+// UpdateUserRole operation middleware
+func (siw *ServerInterfaceWrapper) UpdateUserRole(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", r.PathValue("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "userId", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{"admin"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateUserRole(w, r, userId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 type UnescapedCookieParamError struct {
 	ParamName string
 	Err       error
@@ -1352,6 +1395,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("DELETE "+options.BaseURL+"/user/{userId}", wrapper.DeleteUserById)
 	m.HandleFunc("GET "+options.BaseURL+"/user/{userId}", wrapper.GetUserById)
 	m.HandleFunc("PUT "+options.BaseURL+"/user/{userId}", wrapper.UpdateUserById)
+	m.HandleFunc("PUT "+options.BaseURL+"/user/{userId}/role", wrapper.UpdateUserRole)
 
 	return m
 }

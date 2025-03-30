@@ -12,6 +12,7 @@ import (
 	"open-tutor/internal/services/db"
 	"open-tutor/middleware"
 	"open-tutor/stripe_client"
+	"open-tutor/util"
 
 	"github.com/lib/pq"
 	openapi_types "github.com/oapi-codegen/runtime/types"
@@ -40,7 +41,8 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 
 	// Check if user exists
 	var email, userFirstName, userLastName string
-	err = db.GetDB().QueryRow("SELECT email, first_name, last_name FROM users WHERE user_id = $1", authInfo.UserID).Scan(&email, &userFirstName, &userLastName)
+	var currentRoleMask util.RoleMask
+	err = db.GetDB().QueryRow("SELECT email, first_name, last_name, role_mask FROM users WHERE user_id = $1", authInfo.UserID).Scan(&email, &userFirstName, &userLastName, &currentRoleMask)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Database error: %s\n", err)
@@ -52,7 +54,7 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if user exists
+	// Check if user exists as tutor already
 	var tutorExists bool
 	err = db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM tutors WHERE user_id = $1)", authInfo.UserID).Scan(&tutorExists)
 	if err != nil {
@@ -65,6 +67,33 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "User with ID:{} is already registered as a tutor.\n")
 		return
 	}
+
+	// Update user role to include Tutor role
+	err = db.GetDB().QueryRow("SELECT role_mask FROM users WHERE user_id = $1", authInfo.UserID).Scan(&currentRoleMask)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Database error: %s\n", err)
+		return
+	}
+
+	// Update the user's role in the database
+	_, err = db.GetDB().Exec("UPDATE users SET role_mask = $1 WHERE user_id = $2", currentRoleMask, authInfo.UserID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Failed to update user's role: %v\n", err)
+		return
+	}
+
+	// Update the session token to reflect the new role
+	err = applySessionTokenForUserId(authInfo.UserID, false, currentRoleMask, w)
+	if err != nil {
+		fmt.Printf("failed to apply session token: %v\n", err)
+		sendError(w, http.StatusInternalServerError, "failed to apply session token")
+		return
+	}
+
+	// Add the Tutor role to the current role mask
+	currentRoleMask.Add(util.Tutor)
 
 	_, insertErr := db.GetDB().Exec("INSERT INTO tutors (user_id) VALUES ($1)", authInfo.UserID)
 	if insertErr != nil {

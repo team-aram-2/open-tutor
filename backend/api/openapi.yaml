@@ -211,6 +211,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
+  # change a user role, admin only
+  /user/{userId}/role:
+    put:
+      summary: Update user information
+      operationId: updateUserRole
+      security:
+        - BearerAuth: [admin]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to update
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role_mask:
+                  type: integer
+                  description: "Uint16 Bitmask representing the user's new roles"
+              required:
+                - role_mask
+
   /billing_portal:
     get:
       summary: Redirects to your Stripe customer billing portal
@@ -386,7 +414,7 @@ paths:
       summary: Create new tutor skill.
       operationId: createSkill
       security:
-        - BearerAuth: ["admin"]
+        - BearerAuth: [admin]
       requestBody:
         required: true
         content:
@@ -456,7 +484,7 @@ paths:
       summary: Update tutor skill.
       operationId: UpdateSkill
       security:
-        - BearerAuth: ["admin"]
+        - BearerAuth: [admin]
       parameters:
         - name: id
           in: path
@@ -502,7 +530,7 @@ paths:
       summary: Delete a specific skill by ID.
       operationId: deleteSkill
       security:
-        - BearerAuth: ["admin"]
+        - BearerAuth: [admin]
       parameters:
         - name: id
           in: path
@@ -532,7 +560,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
-
 
   /skills/{id}/quiz:
     get:
@@ -661,7 +688,7 @@ paths:
       tags:
         - Academic Categories
       security:
-        - BearerAuth: [admin]  # Requires admin permission
+        - BearerAuth: [admin] # Requires admin permission
       requestBody:
         required: true
         content:
@@ -715,7 +742,7 @@ paths:
       tags:
         - Academic Categories
       security:
-        - BearerAuth: [admin]  # Requires admin permission
+        - BearerAuth: [admin] # Requires admin permission
       parameters:
         - name: id
           in: path
@@ -751,7 +778,7 @@ paths:
       tags:
         - Academic Categories
       security:
-        - BearerAuth: [admin]  # Requires admin permission
+        - BearerAuth: [admin] # Requires admin permission
       parameters:
         - name: id
           in: path
@@ -1373,10 +1400,10 @@ components:
           type: string
           format: date-time
       required:
-      - attemptId
-      - tutorId
-      - skillId
-      - quiz
+        - attemptId
+        - tutorId
+        - skillId
+        - quiz
 
     AcademicCategory:
       type: object
