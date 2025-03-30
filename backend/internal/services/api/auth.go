@@ -82,9 +82,10 @@ func applySessionTokenForUserId(userId string, rememberLogin bool, roleMask util
 
 func sendBack(w http.ResponseWriter, r *http.Request, errMsg *string) {
 	redirectUrl, err := url.Parse(r.Header.Get("Origin"))
-	redirectUrl.Path = "/login"
-	if err != nil {
-		redirectUrl = &url.URL{}
+	if err != nil || redirectUrl == nil {
+		redirectUrl = &url.URL{Path: "/login"}
+	} else {
+		redirectUrl.Path = "/login"
 	}
 	queries := redirectUrl.Query()
 	if errMsg != nil {
@@ -182,7 +183,7 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	passwordHash := string(hashBytes)
-	roleMask = roleMask.Add(util.User)
+	roleMask.Add(util.User)
 
 	// Create Stripe customer for user //
 	newCustomer, err := stripe_client.GetClient().Customers.New(&stripe.CustomerParams{})

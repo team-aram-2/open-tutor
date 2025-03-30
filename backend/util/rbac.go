@@ -9,12 +9,12 @@ const (
 	Admin                      // 8
 )
 
-func (mask *Role) Add(toAdd Role) Role {
-	return *mask | toAdd
+func (mask *Role) Add(toAdd Role) {
+	*mask |= toAdd
 }
 
-func (mask *Role) Remove(toRemove Role) Role {
-	return *mask & ^toRemove
+func (mask *Role) Remove(toRemove Role) {
+	*mask &= ^toRemove
 }
 
 func (mask *Role) Has(wanted Role) bool {
@@ -30,11 +30,18 @@ func Roles() []Role {
 	}
 }
 
-func (mask Role) Label() string {
-	return map[Role]string{
+func (mask Role) Labels() []string {
+	labels := []string{}
+	roleMap := map[Role]string{
 		User:      "User",
 		Tutor:     "Tutor",
 		Moderator: "Moderator",
 		Admin:     "Admin",
-	}[mask]
+	}
+	for role, label := range roleMap {
+		if mask.Has(role) {
+			labels = append(labels, label)
+		}
+	}
+	return labels
 }
