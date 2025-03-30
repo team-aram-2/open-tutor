@@ -52,7 +52,9 @@ func EnsureDefaultAdmin() {
 	passwordHash := string(hashBytes)
 
 	// Set role to Admin + User
-	roleMask := util.RoleMask(util.User & util.Admin)
+	roleMask := util.RoleMask(util.User)
+	roleMask.Add(util.Admin)
+	fmt.Println("Default admin roleMask:", roleMask)
 
 	// Insert into DB
 	_, err = db.GetDB().Exec(`

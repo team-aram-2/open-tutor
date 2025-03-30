@@ -8,14 +8,18 @@ import (
 
 	api "open-tutor/internal/services/api"
 	middleware "open-tutor/middleware"
-	"open-tutor/setup"
 	zoom "open-tutor/zoom"
+
+	"github.com/joho/godotenv"
 )
 
 type Middleware func(http.Handler) http.HandlerFunc
 
 func main() {
-	setup.EnsureDefaultAdmin()
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	zoom.LoadAccessToken()
 

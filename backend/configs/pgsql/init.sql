@@ -7,7 +7,7 @@ CREATE TABLE users (
   "last_name" TEXT NOT NULL,
   "account_locked" BOOLEAN DEFAULT 'f',
   "password_hash" TEXT NOT NULL,
-  "role_mask" SMALLSERIAL NOT NULL DEFAULT 1,
+  "role_mask" SMALLINT NOT NULL DEFAULT 1,
   "stripe_customer_id" TEXT UNIQUE
 );
 COMMENT ON TABLE "users" IS 'Base User object containing shared details needed for all users.';
@@ -26,7 +26,7 @@ COMMENT ON TABLE "tutors" IS 'Tutor object that extends user object with tutor s
 DROP TABLE IF EXISTS academic_categories CASCADE;
 -- Create the academic_categories table
 CREATE TABLE academic_categories (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE
 );
 COMMENT ON TABLE academic_categories IS 'List of standard academic categories.';
@@ -67,10 +67,10 @@ INSERT INTO academic_categories (id, name) VALUES
 DROP TABLE IF EXISTS available_skills CASCADE;
 -- Create the available_skills table with a foreign key to academic_categories
 CREATE TABLE available_skills (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   description TEXT NOT NULL,
-  category_id UUID NOT NULL,
+  category_id TEXT NOT NULL,
   FOREIGN KEY (category_id) REFERENCES academic_categories(id) ON DELETE CASCADE
 );
 
@@ -95,17 +95,17 @@ COMMENT ON COLUMN tutor_skills.tutor_id IS 'Tutor UUID.';
 COMMENT ON COLUMN tutor_skills.validated IS 'If tutor skill is validated.';
 
 CREATE TABLE questions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  skill_id UUID NOT NULL,
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  skill_id TEXT NOT NULL,
   question TEXT NOT NULL,
   correct_answers TEXT[] NOT NULL,
   FOREIGN KEY (skill_id) REFERENCES available_skills(id) ON DELETE CASCADE
 );
 
 CREATE TABLE quiz_attempts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tutor_id UUID NOT NULL,
-  skill_id UUID NOT NULL,
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  tutor_id TEXT NOT NULL,
+  skill_id TEXT NOT NULL,
   passed BOOLEAN DEFAULT FALSE,
   attempted_at TIMESTAMP DEFAULT NOW(),
   completed_at TIMESTAMP DEFAULT NULL,
@@ -114,8 +114,8 @@ CREATE TABLE quiz_attempts (
 );
 
 CREATE TABLE quiz_attempt_questions (
-  quiz_attempt_id UUID NOT NULL,
-  question_id UUID NOT NULL,
+  quiz_attempt_id TEXT NOT NULL,
+  question_id TEXT NOT NULL,
   PRIMARY KEY (quiz_attempt_id, question_id),
   FOREIGN KEY (quiz_attempt_id) REFERENCES quiz_attempts(id) ON DELETE CASCADE,
   FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
