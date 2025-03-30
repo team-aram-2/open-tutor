@@ -17,3 +17,12 @@ export interface MeetingItem {
 	zoomJoinLink: string;
 	zoomHostLink: string;
 }
+
+export interface SkillsItem{
+	id: string;
+	category: string;
+	title: string;
+	description: string;
+	questions: string[];
+	tutorHasSkill: boolean;
+}
