@@ -19,7 +19,8 @@ services:
     networks:
       - opentutor
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
       - "8080:8080"
 
@@ -31,6 +32,11 @@ services:
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: password
       POSTGRES_DB: opentutor
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d opentutor"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
     ports:
       - "5432:5432"
     volumes:
