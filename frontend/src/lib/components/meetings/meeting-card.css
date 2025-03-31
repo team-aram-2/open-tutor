@@ -1,0 +1,119 @@
+.meeting-card {
+	display: flex;
+	flex-direction: row;
+	gap: 0;
+	width: calc(100% - 40px);
+	height: calc(var(--font-size) * 5);
+
+	margin: 10px 20px 0px 20px;
+
+	background-color: var(--yellow-very-light);
+
+	border: 5px solid var(--yellow-neutral);
+	border-radius: 25px;
+}
+.time-date-info {
+	display: flex;
+	flex-direction: column;
+
+	align-content: center;
+	justify-content: center;
+
+	max-width: calc(6.5 * var(--font-size));
+	overflow-x: scroll;
+	overflow-y: hidden;
+	white-space: nowrap;
+}
+.tutor-info-block {
+	display: flex;
+	flex-direction: column;
+	width: calc(100% - (13.5 * var(--font-size)));
+	container-type: inline-size;
+}
+.link-info {
+	display: flex;
+	align-content: center;
+	min-width: calc(6 * var(--font-size));
+}
+.day {
+	display: flex;
+
+	height: 57.14%;
+
+	justify-content: center;
+	align-content: center;
+}
+.day p {
+	font-weight: bolder;
+	line-height: calc(var(--font-size) * 3);
+	font-size: calc(3 * var(--font-size));
+}
+:is(.month, .time) p {
+	height: 20%;
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	font-weight: bolder;
+	line-height: calc(var(--font-size));
+	font-size: calc(var(--font-size));
+}
+
+.tutor-name {
+	margin-top: auto;
+	margin-bottom: auto;
+	margin-left: calc(0.1 * var(--font-size));
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
+	height: fit-content;
+	width: 100%;
+
+	font-weight: bolder;
+	line-height: calc(2 * var(--font-size));
+	font-size: calc(2 * var(--font-size));
+
+}
+@container (min-width: 50px){
+	.tutor-name{
+		border: 2px solid chartreuse;
+	}
+}
+
+
+.zoom-link {
+	height: calc(var(--font-size) * 1.5);
+	width: 100%;
+
+	margin: auto 5px auto 5px;
+	padding-right: calc(0.25 * var(--font-size));
+	padding-left: calc(0.25 * var(--font-size));
+
+	color: var(--yellow-very-dark);
+
+	background-color: var(--yellow-neutral);
+	border: 5px solid var(--yellow-dark);
+	border-radius: calc(var(--font-size));
+
+	line-height: calc(1.25 * var(--font-size));
+	font-size: calc(1 * var(--font-size));
+	font-weight: bolder;
+	text-align: center;
+  vertical-align: center;
+  white-space: nowrap;
+}
+:hover.zoom-link {
+	transition:
+		background-color 100ms ease-in,
+		border 120ms ease-in,
+		color 120ms ease-in;
+	color: var(--purple-very-light);
+
+	background-color: var(--purple-neutral);
+	border: 5px solid var(--purple-dark);
+	border-radius: calc(var(--font-size));
+}
+
+/* .meeting-card > :is(div, a) {
+	border: 2px solid blue;
+} */

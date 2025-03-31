@@ -46,7 +46,7 @@ func main() {
 
 	s := &http.Server{
 		Handler: h,
-		Addr:    net.JoinHostPort("127.0.0.1", *port),
+		Addr:    net.JoinHostPort("localhost", *port),
 	}
 
 	log.Fatal(s.ListenAndServe())

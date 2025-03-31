@@ -73,10 +73,12 @@
 		flex-direction: row;
 		align-content: flex-start;
 
-		width: calc(100% - 40px);
+		flex: 1;
 		height: auto;
 
-		margin: 10px 20px 0px 20px;
+		margin-top: 10px;
+		margin-left: 10px;
+		margin-right: 10px;
 	}
 
 	.bottomText {

@@ -7,3 +7,13 @@ export interface MessageItem {
 	sentOn: number;
 	messageAttachments: string[];
 }
+
+export interface MeetingItem {
+	id: string;
+	tutorId: string;
+	studentId: string;
+	startAt: string;
+	endAt: string;
+	zoomJoinLink: string;
+	zoomHostLink: string;
+}
