@@ -1,6 +1,8 @@
 <script lang="ts">
 	import FontSize from '$lib/components/settings_page/font-size.svelte';
 	import { PUBLIC_API_HOST } from '$env/static/public';
+
+	$: isTutor = true;
 </script>
 
 <div class="setting-container">
@@ -18,9 +20,18 @@
 				class="mr-4 px-4 py-1 bg-sky-400 rounded-md shadow-md cursor-pointer">Open billing portal</a
 			>
 		</div>
-		<div class="setting-entry">
-			<div class="setting-label">another setting</div>
-		</div>
+
+		<!-- Tutor settings -->
+		{#if isTutor}
+			<span class="mt-4 ml-4 text-lg text-white">Tutor Settings</span>
+			<div class="setting-entry">
+				<div class="setting-label">Verify identity</div>
+				<a
+					href="{PUBLIC_API_HOST}/tutor_id_verification"
+					class="mr-4 px-4 py-1 bg-sky-400 rounded-md shadow-md cursor-pointer">Start</a
+				>
+			</div>
+		{/if}
 	</div>
 </div>
 

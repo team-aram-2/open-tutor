@@ -389,6 +389,9 @@ type ServerInterface interface {
 	// Get a tutor by ID
 	// (GET /tutor/{tutorId})
 	GetTutorById(w http.ResponseWriter, r *http.Request, tutorId openapi_types.UUID)
+	// Allows tutors to verify their identity with Stripe
+	// (GET /tutor_id_verification)
+	TutorIdVerification(w http.ResponseWriter, r *http.Request)
 	// Delete user account, maybe via settings or moderation panel
 	// (DELETE /user/{userId})
 	DeleteUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID)
@@ -1136,6 +1139,20 @@ func (siw *ServerInterfaceWrapper) GetTutorById(w http.ResponseWriter, r *http.R
 	handler.ServeHTTP(w, r)
 }
 
+// TutorIdVerification operation middleware
+func (siw *ServerInterfaceWrapper) TutorIdVerification(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.TutorIdVerification(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // DeleteUserById operation middleware
 func (siw *ServerInterfaceWrapper) DeleteUserById(w http.ResponseWriter, r *http.Request) {
 
@@ -1392,6 +1409,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("GET "+options.BaseURL+"/tutor", wrapper.GetTutors)
 	m.HandleFunc("POST "+options.BaseURL+"/tutor", wrapper.SignUpAsTutor)
 	m.HandleFunc("GET "+options.BaseURL+"/tutor/{tutorId}", wrapper.GetTutorById)
+	m.HandleFunc("GET "+options.BaseURL+"/tutor_id_verification", wrapper.TutorIdVerification)
 	m.HandleFunc("DELETE "+options.BaseURL+"/user/{userId}", wrapper.DeleteUserById)
 	m.HandleFunc("GET "+options.BaseURL+"/user/{userId}", wrapper.GetUserById)
 	m.HandleFunc("PUT "+options.BaseURL+"/user/{userId}", wrapper.UpdateUserById)
