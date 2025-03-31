@@ -31,6 +31,21 @@ const (
 	GetRatingByIdParamsUserTypeTutor   GetRatingByIdParamsUserType = "tutor"
 )
 
+// AcademicCategory defines model for AcademicCategory.
+type AcademicCategory struct {
+	// Id Unique identifier for the academic category.
+	Id openapi_types.UUID `json:"id"`
+
+	// Name Name of the academic category.
+	Name string `json:"name"`
+}
+
+// AcademicCategoryCreate defines model for AcademicCategoryCreate.
+type AcademicCategoryCreate struct {
+	// Name Name of the academic category.
+	Name string `json:"name"`
+}
+
 // CreateMeetingBody defines model for CreateMeetingBody.
 type CreateMeetingBody struct {
 	EndAt     *time.Time          `json:"endAt,omitempty"`
@@ -89,15 +104,45 @@ type MessageAttachment struct {
 	Url string `json:"url"`
 }
 
+// Question defines model for Question.
+type Question struct {
+	// Answers The list of all possible answers.
+	Answers []string `json:"answers"`
+
+	// CorrectAnswers The list of all correct answers.
+	CorrectAnswers *[]string          `json:"correctAnswers,omitempty"`
+	Id             openapi_types.UUID `json:"id"`
+
+	// Question The question being asked.
+	Question       string  `json:"question"`
+	SelectedAnswer *string `json:"selectedAnswer,omitempty"`
+}
+
+// Quiz defines model for Quiz.
+type Quiz struct {
+	Questions *[]Question `json:"questions,omitempty"`
+}
+
+// QuizAttempt defines model for QuizAttempt.
+type QuizAttempt struct {
+	AttemptId   openapi_types.UUID `json:"attemptId"`
+	AttemptedAt *time.Time         `json:"attemptedAt,omitempty"`
+	CompletedAt *time.Time         `json:"completedAt,omitempty"`
+	Passed      *bool              `json:"passed,omitempty"`
+	Quiz        Quiz               `json:"quiz"`
+	SkillId     openapi_types.UUID `json:"skillId"`
+	TutorId     openapi_types.UUID `json:"tutorId"`
+}
+
 // Rating defines model for Rating.
 type Rating struct {
-	Comment        *string                 `json:"comment,omitempty"`
-	Id             *openapi_types.UUID     `json:"id,omitempty"`
-	MeetingId      *openapi_types.UUID     `json:"meetingId,omitempty"`
-	RatingType     *RatingRatingType       `json:"ratingType,omitempty"`
-	ReviewerUserId *openapi_types.UUID     `json:"reviewerUserId,omitempty"`
-	Scores         *map[string]interface{} `json:"scores,omitempty"`
-	UserId         *openapi_types.UUID     `json:"userId,omitempty"`
+	Comment        *string             `json:"comment,omitempty"`
+	Id             *openapi_types.UUID `json:"id,omitempty"`
+	MeetingId      *openapi_types.UUID `json:"meetingId,omitempty"`
+	RatingType     *RatingRatingType   `json:"ratingType,omitempty"`
+	ReviewerUserId *openapi_types.UUID `json:"reviewerUserId,omitempty"`
+	Scores         *RatingScores       `json:"scores,omitempty"`
+	UserId         *openapi_types.UUID `json:"userId,omitempty"`
 }
 
 // RatingRatingType defines model for Rating.RatingType.
@@ -123,6 +168,27 @@ type Tutor struct {
 	Skills        *[]string            `json:"skills,omitempty"`
 	TotalHours    *int                 `json:"totalHours,omitempty"`
 	UserId        openapi_types.UUID   `json:"userId"`
+}
+
+// TutorSkill defines model for TutorSkill.
+type TutorSkill struct {
+	// Category The UUID of the academic category of the skill.
+	Category *string `json:"category,omitempty"`
+
+	// Description Description for the skill.
+	Description string `json:"description"`
+
+	// Id Unique identifier for the skill.
+	Id openapi_types.UUID `json:"id"`
+
+	// Questions All possible quiz questions for a skill.
+	Questions *[]Question `json:"questions,omitempty"`
+
+	// Title The name of the skill.
+	Title string `json:"title"`
+
+	// TutorHasSkill If the skill is validated for a specific tutor.
+	TutorHasSkill *bool `json:"tutorHasSkill,omitempty"`
 }
 
 // User Base User object containing shared details needed for all users.
@@ -159,6 +225,9 @@ type GetRatingByIdParams struct {
 // GetRatingByIdParamsUserType defines parameters for GetRatingById.
 type GetRatingByIdParamsUserType string
 
+// UpdateSkillJSONBody defines parameters for UpdateSkill.
+type UpdateSkillJSONBody = []TutorSkill
+
 // GetTutorsParams defines parameters for GetTutors.
 type GetTutorsParams struct {
 	// PageSize The ID of the tutor to get
@@ -177,11 +246,23 @@ type GetTutorsParams struct {
 // SignUpAsTutorJSONBody defines parameters for SignUpAsTutor.
 type SignUpAsTutorJSONBody interface{}
 
+// UpdateUserRoleJSONBody defines parameters for UpdateUserRole.
+type UpdateUserRoleJSONBody struct {
+	// RoleMask Uint16 Bitmask representing the user's new roles
+	RoleMask int `json:"role_mask"`
+}
+
 // UserLoginJSONRequestBody defines body for UserLogin for application/json ContentType.
 type UserLoginJSONRequestBody = UserLogin
 
 // UserRegisterFormdataRequestBody defines body for UserRegister for application/x-www-form-urlencoded ContentType.
 type UserRegisterFormdataRequestBody = UserSignup
+
+// CreateCategoryJSONRequestBody defines body for CreateCategory for application/json ContentType.
+type CreateCategoryJSONRequestBody = AcademicCategoryCreate
+
+// UpdateCategoryJSONRequestBody defines body for UpdateCategory for application/json ContentType.
+type UpdateCategoryJSONRequestBody = AcademicCategoryCreate
 
 // CreateMeetingJSONRequestBody defines body for CreateMeeting for application/json ContentType.
 type CreateMeetingJSONRequestBody = CreateMeetingBody
@@ -198,11 +279,23 @@ type CreateMessageAttachmentJSONRequestBody = MessageAttachment
 // PostRatingJSONRequestBody defines body for PostRating for application/json ContentType.
 type PostRatingJSONRequestBody = Rating
 
+// CreateSkillJSONRequestBody defines body for CreateSkill for application/json ContentType.
+type CreateSkillJSONRequestBody = TutorSkill
+
+// UpdateSkillJSONRequestBody defines body for UpdateSkill for application/json ContentType.
+type UpdateSkillJSONRequestBody = UpdateSkillJSONBody
+
+// SubmitSkillQuizJSONRequestBody defines body for SubmitSkillQuiz for application/json ContentType.
+type SubmitSkillQuizJSONRequestBody = QuizAttempt
+
 // SignUpAsTutorJSONRequestBody defines body for SignUpAsTutor for application/json ContentType.
 type SignUpAsTutorJSONRequestBody SignUpAsTutorJSONBody
 
 // UpdateUserByIdJSONRequestBody defines body for UpdateUserById for application/json ContentType.
 type UpdateUserByIdJSONRequestBody = User
+
+// UpdateUserRoleJSONRequestBody defines body for UpdateUserRole for application/json ContentType.
+type UpdateUserRoleJSONRequestBody UpdateUserRoleJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -215,6 +308,21 @@ type ServerInterface interface {
 	// Redirects to your Stripe customer billing portal
 	// (GET /billing_portal)
 	ViewBillingPortal(w http.ResponseWriter, r *http.Request)
+	// Get all academic categories
+	// (GET /categories/academic)
+	GetCategories(w http.ResponseWriter, r *http.Request)
+	// Create a new academic category
+	// (POST /categories/academic)
+	CreateCategory(w http.ResponseWriter, r *http.Request)
+	// Delete an academic category
+	// (DELETE /categories/academic/{id})
+	DeleteCategory(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Get details of a specific academic category
+	// (GET /categories/academic/{id})
+	GetCategory(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Update an academic category
+	// (PUT /categories/academic/{id})
+	UpdateCategory(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Create a new meeting
 	// (POST /meeting)
 	CreateMeeting(w http.ResponseWriter, r *http.Request)
@@ -251,6 +359,27 @@ type ServerInterface interface {
 	// Get a user's rating by user ID, optionally filtering by usertype.
 	// (GET /rating/{userId})
 	GetRatingById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID, params GetRatingByIdParams)
+	// Retrieve a list of skills.
+	// (GET /skills)
+	GetAllSkills(w http.ResponseWriter, r *http.Request)
+	// Create new tutor skill.
+	// (POST /skills)
+	CreateSkill(w http.ResponseWriter, r *http.Request)
+	// Delete a specific skill by ID.
+	// (DELETE /skills/{id})
+	DeleteSkill(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Retrieve skill info for a specific skill by ID.
+	// (GET /skills/{id})
+	GetSkill(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Update tutor skill.
+	// (PUT /skills/{id})
+	UpdateSkill(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Retrieve a bank of questions for a given skill. The number of questions is dependent on the backend configuration.
+	// (GET /skills/{id}/quiz)
+	GetSkillQuiz(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Submit answers for a quiz attempt.
+	// (POST /skills/{id}/quiz/submit)
+	SubmitSkillQuiz(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
 	// Search All Tutors
 	// (GET /tutor)
 	GetTutors(w http.ResponseWriter, r *http.Request, params GetTutorsParams)
@@ -269,6 +398,9 @@ type ServerInterface interface {
 	// Update user information
 	// (PUT /user/{userId})
 	UpdateUserById(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID)
+	// Update user information
+	// (PUT /user/{userId}/role)
+	UpdateUserRole(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -313,6 +445,127 @@ func (siw *ServerInterfaceWrapper) ViewBillingPortal(w http.ResponseWriter, r *h
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ViewBillingPortal(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetCategories operation middleware
+func (siw *ServerInterfaceWrapper) GetCategories(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCategories(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateCategory operation middleware
+func (siw *ServerInterfaceWrapper) CreateCategory(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{"admin"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateCategory(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteCategory operation middleware
+func (siw *ServerInterfaceWrapper) DeleteCategory(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{"admin"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteCategory(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetCategory operation middleware
+func (siw *ServerInterfaceWrapper) GetCategory(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCategory(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateCategory operation middleware
+func (siw *ServerInterfaceWrapper) UpdateCategory(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{"admin"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateCategory(w, r, id)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -578,6 +831,201 @@ func (siw *ServerInterfaceWrapper) GetRatingById(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r)
 }
 
+// GetAllSkills operation middleware
+func (siw *ServerInterfaceWrapper) GetAllSkills(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetAllSkills(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateSkill operation middleware
+func (siw *ServerInterfaceWrapper) CreateSkill(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{"admin"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateSkill(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteSkill operation middleware
+func (siw *ServerInterfaceWrapper) DeleteSkill(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{"admin"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteSkill(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetSkill operation middleware
+func (siw *ServerInterfaceWrapper) GetSkill(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetSkill(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateSkill operation middleware
+func (siw *ServerInterfaceWrapper) UpdateSkill(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{"admin"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateSkill(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetSkillQuiz operation middleware
+func (siw *ServerInterfaceWrapper) GetSkillQuiz(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetSkillQuiz(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SubmitSkillQuiz operation middleware
+func (siw *ServerInterfaceWrapper) SubmitSkillQuiz(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "id" -------------
+	var id openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SubmitSkillQuiz(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // GetTutors operation middleware
 func (siw *ServerInterfaceWrapper) GetTutors(w http.ResponseWriter, r *http.Request) {
 
@@ -763,6 +1211,37 @@ func (siw *ServerInterfaceWrapper) UpdateUserById(w http.ResponseWriter, r *http
 	handler.ServeHTTP(w, r)
 }
 
+// UpdateUserRole operation middleware
+func (siw *ServerInterfaceWrapper) UpdateUserRole(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", r.PathValue("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "userId", Err: err})
+		return
+	}
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{"admin"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateUserRole(w, r, userId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 type UnescapedCookieParamError struct {
 	ParamName string
 	Err       error
@@ -886,6 +1365,11 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("POST "+options.BaseURL+"/auth/login", wrapper.UserLogin)
 	m.HandleFunc("POST "+options.BaseURL+"/auth/register", wrapper.UserRegister)
 	m.HandleFunc("GET "+options.BaseURL+"/billing_portal", wrapper.ViewBillingPortal)
+	m.HandleFunc("GET "+options.BaseURL+"/categories/academic", wrapper.GetCategories)
+	m.HandleFunc("POST "+options.BaseURL+"/categories/academic", wrapper.CreateCategory)
+	m.HandleFunc("DELETE "+options.BaseURL+"/categories/academic/{id}", wrapper.DeleteCategory)
+	m.HandleFunc("GET "+options.BaseURL+"/categories/academic/{id}", wrapper.GetCategory)
+	m.HandleFunc("PUT "+options.BaseURL+"/categories/academic/{id}", wrapper.UpdateCategory)
 	m.HandleFunc("POST "+options.BaseURL+"/meeting", wrapper.CreateMeeting)
 	m.HandleFunc("POST "+options.BaseURL+"/meeting/{meetingId}/finalize", wrapper.FinalizeMeeting)
 	m.HandleFunc("GET "+options.BaseURL+"/meetings", wrapper.GetMeetings)
@@ -898,12 +1382,20 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("GET "+options.BaseURL+"/messageAttachment/{messageAttachmentId}", wrapper.GetMessageAttachmentById)
 	m.HandleFunc("POST "+options.BaseURL+"/rating", wrapper.PostRating)
 	m.HandleFunc("GET "+options.BaseURL+"/rating/{userId}", wrapper.GetRatingById)
+	m.HandleFunc("GET "+options.BaseURL+"/skills", wrapper.GetAllSkills)
+	m.HandleFunc("POST "+options.BaseURL+"/skills", wrapper.CreateSkill)
+	m.HandleFunc("DELETE "+options.BaseURL+"/skills/{id}", wrapper.DeleteSkill)
+	m.HandleFunc("GET "+options.BaseURL+"/skills/{id}", wrapper.GetSkill)
+	m.HandleFunc("PUT "+options.BaseURL+"/skills/{id}", wrapper.UpdateSkill)
+	m.HandleFunc("GET "+options.BaseURL+"/skills/{id}/quiz", wrapper.GetSkillQuiz)
+	m.HandleFunc("POST "+options.BaseURL+"/skills/{id}/quiz/submit", wrapper.SubmitSkillQuiz)
 	m.HandleFunc("GET "+options.BaseURL+"/tutor", wrapper.GetTutors)
 	m.HandleFunc("POST "+options.BaseURL+"/tutor", wrapper.SignUpAsTutor)
 	m.HandleFunc("GET "+options.BaseURL+"/tutor/{tutorId}", wrapper.GetTutorById)
 	m.HandleFunc("DELETE "+options.BaseURL+"/user/{userId}", wrapper.DeleteUserById)
 	m.HandleFunc("GET "+options.BaseURL+"/user/{userId}", wrapper.GetUserById)
 	m.HandleFunc("PUT "+options.BaseURL+"/user/{userId}", wrapper.UpdateUserById)
+	m.HandleFunc("PUT "+options.BaseURL+"/user/{userId}/role", wrapper.UpdateUserRole)
 
 	return m
 }
