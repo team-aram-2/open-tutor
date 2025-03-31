@@ -12,7 +12,8 @@ This guide assumes you are deploying this project on a system that can run Docke
 
 You must install the latest version of the following base dependencies to run this project:
 
-[Docker](https://docs.docker.com/engine/install/) (containerization)
+- VSCode
+- [Docker](https://docs.docker.com/engine/install/) (containerization)
 
 ## Constraints
 
@@ -105,6 +106,22 @@ For tutors to receive payouts and for students to submit payments, Open Tutor ut
 The credentials for the pgadmin dashboard are located under the `pgadmin` service in `docker-compose.yml` by default. You may reconfigure these.
 
 ## Deployment Process
+
+1. Open the project in VSCode
+2. Build the project's devcontainer
+3. Open a new terminal in the devcontainer, run the following commands:
+
+- `cd frontend`
+- `npm ci`
+- `npm run dev`
+
+4. Open a new terminal in the devcontainer, run the following commands:
+
+- `cd backend`
+- `go install`
+- `go run .`
+
+Disregard the following steps:
 
 Complete the following procedure to start the software stack:
 
