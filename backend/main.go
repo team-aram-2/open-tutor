@@ -9,11 +9,18 @@ import (
 	api "open-tutor/internal/services/api"
 	middleware "open-tutor/middleware"
 	zoom "open-tutor/zoom"
+
+	"github.com/joho/godotenv"
 )
 
 type Middleware func(http.Handler) http.HandlerFunc
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	zoom.LoadAccessToken()
 
 	port := flag.String("port", "8080", "OpenTutor API port")
