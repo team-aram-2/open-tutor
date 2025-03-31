@@ -4,7 +4,7 @@ services:
       context: ./frontend
     volumes:
       - web:/app
-      - ./web.env:/app/.env
+      - ./frontend/.env:/app/.env
     networks:
       - opentutor
     ports:
@@ -15,7 +15,7 @@ services:
       context: ./backend
     volumes:
       - api:/app
-      - ./api.env:/app/.env
+      - ./backend/.env:/app/.env
     networks:
       - opentutor
     ports:
@@ -36,6 +36,21 @@ services:
       - "postgres-data:/var/lib/postgresql/data"
     networks:
       - opentutor
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=dev@opentutor.io
+      - PGADMIN_DEFAULT_PASSWORD=password
+      - PGADMIN_SERVER_JSON_FILE=/pgadmin/servers.json
+    networks:
+      - opentutor
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    volumes:
+      - "./.devcontainer/configs/pgadmin:/pgadmin"
 
 volumes:
   web:
