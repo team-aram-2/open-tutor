@@ -879,7 +879,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Message"
+              $ref: "#/components/schemas/ProtoMessage"
+
       responses:
         "201":
           description: Message created
@@ -1029,6 +1030,108 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
+
+  /conversation:
+    post:
+      summary: Create a new conversation
+      operationId: createConversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+      responses:
+        "201":
+          description: Attachment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+
+  /conversation/{conversationId}:
+    get:
+      summary: Get all userIds in the conversation via conversationId
+      operationId: getUsersByConversationId
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          description: The ID of the conversation to fetch
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "404":
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "200":
+          description: Conversation found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+  /conversation/messages/{conversationId}:
+    get:
+      summary: Get all messages in the conversation via conversationId
+      operationId: getMessagesByConversationId
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          description: The ID of the conversation to fetch
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "404":
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "200":
+          description: Messages found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+
+  /conversation/user/{userId}:
+    get:
+      summary: Get all conversations the user is a member in
+      operationId: getConversationsByUserId
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "404":
+          description: Conversation/User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "200":
+          description: Conversations found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConversationName"
 
 components:
   securitySchemes:
@@ -1281,10 +1384,10 @@ components:
           type: string
           format: uuid
           description: Unique identifier for the originID for the message.
-        recipientId:
+        conversationId:
           type: string
           format: uuid
-          description: Unique identifier for the recipient of the message.
+          description: Unique identifier for the conversation for the message.
         message:
           type: string
           description: Message content.
@@ -1297,7 +1400,26 @@ components:
         - id
         - sentOn
         - originId
-        - recipientId
+        - conversationId
+        - message
+
+    ProtoMessage:
+      type: object
+      properties:
+        originId:
+          type: string
+          format: uuid
+          description: Unique identifier for the ID of the sender.
+        conversationId:
+          type: string
+          format: uuid
+          description: Unique identifier for the conversation.
+        message:
+          type: string
+          description: Message content.
+      required:
+        - originId
+        - conversationId
         - message
 
     MessageAttachment:
@@ -1381,6 +1503,26 @@ components:
         - id
         - question
         - answers
+
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        users:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    ConversationName:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
 
     Quiz:
       type: object

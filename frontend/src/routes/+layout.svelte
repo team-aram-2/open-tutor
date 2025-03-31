@@ -6,12 +6,14 @@
 	// Shared logic across pages goes here
 	import '../app.css';
 	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
+	import { autoLogin } from '$lib/scripts/auth';
 
 	import { onMount } from 'svelte';
 	import { fontSize } from '$lib/stores';
 
 	// Load page settings
 	onMount(() => {
+		autoLogin();
 		fontSize.subscribe((value) => {
 			// Set global font size
 			document.documentElement.style.setProperty('--font-size', String(value));

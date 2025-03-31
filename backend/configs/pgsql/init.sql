@@ -136,20 +136,26 @@ CREATE TABLE meetings (
 );
 COMMENT ON COLUMN meetings.id IS 'Meeting unique id, uuid';
 
+DROP TABLE IF EXISTS conversations;
+CREATE TABLE conversations (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "user_ids" TEXT[] NOT NULL
+);
+CREATE INDEX idx_user_ids ON conversations USING GIN (user_ids);
+
 DROP TABLE IF EXISTS messages;
 CREATE TABLE messages (
   "id" TEXT NOT NULL PRIMARY KEY,
   "sent_at" TIMESTAMP NOT NULL,
   "origin_id" TEXT NOT NULL,
-  "recipient_id" TEXT NOT NULL,
+  "conversation_id" TEXT NOT NULL,
   "message" TEXT NOT NULL,
   FOREIGN KEY (origin_id) REFERENCES users(user_id),
-  FOREIGN KEY (recipient_id) REFERENCES users(user_id)
+  FOREIGN KEY (conversation_id) REFERENCES conversations(id)
 );
 COMMENT ON COLUMN messages.id IS 'Unique identifier for the message.';
 COMMENT ON COLUMN messages.sent_at IS 'Date time the message was sent.';
 COMMENT ON COLUMN messages.origin_id IS 'Unique identifier for the originID for the message.';
-COMMENT ON COLUMN messages.recipient_id IS 'UserId of the recipient.';
 COMMENT ON COLUMN messages.message IS 'Message text content.';
 
 DROP TABLE IF EXISTS message_attachments;
@@ -162,9 +168,9 @@ CREATE TABLE message_attachments (
   FOREIGN KEY (message_id) REFERENCES messages(id)
 );
 COMMENT ON COLUMN message_attachments.message_id IS 'Unique identifier for the message the attachement belongs to.';
-COMMENT ON COLUMN message_attachments.message_id IS 'Friendly name of the attachment.';
-COMMENT ON COLUMN message_attachments.message_id IS 'Mimetype of the attachment.';
-COMMENT ON COLUMN message_attachments.message_id IS 'URI for of the attachment data.';
+COMMENT ON COLUMN message_attachments.file_name IS 'Friendly name of the attachment.';
+COMMENT ON COLUMN message_attachments.mime_type IS 'Mimetype of the attachment.';
+COMMENT ON COLUMN message_attachments.url IS 'URI for of the attachment data.';
 
 DROP TYPE IF EXISTS user_type;
 CREATE TYPE user_type AS ENUM ('tutor', 'student');
@@ -194,3 +200,10 @@ CREATE TABLE key_pairs (
   "private_key" TEXT NOT NULL,
   "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE OR REPLACE FUNCTION array_sort (arr TEXT[]) RETURNS TEXT[] IMMUTABLE AS
+$$
+  SELECT array_agg(x ORDER BY x) FROM UNNEST(arr) x;
+$$ LANGUAGE SQL;
+
+CREATE UNIQUE INDEX unique_ids ON conversations (array_sort(user_ids));

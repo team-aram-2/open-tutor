@@ -8,6 +8,7 @@
 
 	let selectedItem = 'view';
 	let collapsed = false;
+	import { logged_in } from '$lib/stores';
 
 	const setSelectedItem = (item: string) => {
 		selectedItem = item;
@@ -32,77 +33,88 @@
 
 	<!-- Sidebar Items -->
 	<nav class="sidebar-items">
-		<a
-			href="/my_people/student"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'view'}
-			on:click={() => setSelectedItem('view')}
-		>
-			<p class="sidebar-item-text">View Tutors</p>
+		{#if $logged_in}
+			<a
+				href="/my_people/student"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'view'}
+				on:click={() => setSelectedItem('view')}
+			>
+				<p class="sidebar-item-text">View Tutors</p>
 
-			<!-- Icon that appears when sidebar is collapsed -->
-			<div class="collapsed-sidebar-item-icon">
-				<!-- Person Head -->
-				<PersonHeadIcon />
-			</div>
-		</a>
-		<!-- TODO: MOVE THIS HREF BACK TO THE APPOINTMENTS <a> tag -->
-		<a
-			href="#/"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'apt'}
-			on:click={() => setSelectedItem('apt')}
-		>
-			<p class="sidebar-item-text">Appointments</p>
+				<!-- Icon that appears when sidebar is collapsed -->
+				<div class="collapsed-sidebar-item-icon">
+					<!-- Person Head -->
+					<PersonHeadIcon />
+				</div>
+			</a>
+			<!-- TODO: MOVE THIS HREF BACK TO THE APPOINTMENTS <a> tag -->
+			<a
+				href="#/"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'apt'}
+				on:click={() => setSelectedItem('apt')}
+			>
+				<p class="sidebar-item-text">Appointments</p>
 
-			<!-- Icon that appears when sidebar is collapsed -->
-			<div class="collapsed-sidebar-item-icon">
-				<!-- Calendar -->
-				<CalendarIcon />
-			</div>
-		</a>
-		<a
-			href="/messages/student"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'msg'}
-			on:click={() => setSelectedItem('msg')}
-		>
-			<p class="sidebar-item-text">Messages</p>
+				<!-- Icon that appears when sidebar is collapsed -->
+				<div class="collapsed-sidebar-item-icon">
+					<!-- Calendar -->
+					<CalendarIcon />
+				</div>
+			</a>
+			<a
+				href="/messages/student"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'msg'}
+				on:click={() => setSelectedItem('msg')}
+			>
+				<p class="sidebar-item-text">Messages</p>
 
-			<!-- Icon that appears when sidebar is collapsed -->
-			<div class="collapsed-sidebar-item-icon">
-				<!-- Speech Bubble -->
-				<SpeechBubbleIcon />
-			</div>
-		</a>
-		<a
-			href="#/"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'pym'}
-			on:click={() => setSelectedItem('pym')}
-		>
-			<p class="sidebar-item-text">Payments</p>
+				<!-- Icon that appears when sidebar is collapsed -->
+				<div class="collapsed-sidebar-item-icon">
+					<!-- Speech Bubble -->
+					<SpeechBubbleIcon />
+				</div>
+			</a>
+			<a
+				href="#/"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'pym'}
+				on:click={() => setSelectedItem('pym')}
+			>
+				<p class="sidebar-item-text">Payments</p>
 
-			<!-- Icon that appears when sidebar is collapsed -->
-			<div class="collapsed-sidebar-item-icon">
-				<!-- Credit Card -->
-				<CreditCardIcon />
-			</div>
-		</a>
-		<a
-			href="/settings_page"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'set'}
-			on:click={() => setSelectedItem('set')}
-		>
-			<p class="sidebar-item-text">Settings</p>
+				<!-- Icon that appears when sidebar is collapsed -->
+				<div class="collapsed-sidebar-item-icon">
+					<!-- Credit Card -->
+					<CreditCardIcon />
+				</div>
+			</a>
+			<a
+				href="/settings_page"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'set'}
+				on:click={() => setSelectedItem('set')}
+			>
+				<p class="sidebar-item-text">Settings</p>
 
-			<!-- Icon that appears when sidebar is collapsed -->
-			<div class="collapsed-sidebar-item-icon">
-				<!-- Gear -->
-				<GearIcon />
-			</div>
-		</a>
+				<!-- Icon that appears when sidebar is collapsed -->
+				<div class="collapsed-sidebar-item-icon">
+					<!-- Gear -->
+					<GearIcon />
+				</div>
+			</a>
+		{:else}
+			<a
+				href="/login"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'log'}
+				on:click={() => setSelectedItem('log')}
+			>
+				<p>Login</p>
+			</a>
+		{/if}
 	</nav>
 </div>
 

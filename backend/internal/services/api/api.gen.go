@@ -46,6 +46,18 @@ type AcademicCategoryCreate struct {
 	Name string `json:"name"`
 }
 
+// Conversation defines model for Conversation.
+type Conversation struct {
+	Id    *openapi_types.UUID   `json:"id,omitempty"`
+	Users *[]openapi_types.UUID `json:"users,omitempty"`
+}
+
+// ConversationName defines model for ConversationName.
+type ConversationName struct {
+	Id   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
 // CreateMeetingBody defines model for CreateMeetingBody.
 type CreateMeetingBody struct {
 	EndAt     *time.Time          `json:"endAt,omitempty"`
@@ -75,6 +87,9 @@ type Message struct {
 	// MessageAttachments Array of message attachments
 	MessageAttachments *[]MessageAttachment `json:"MessageAttachments,omitempty"`
 
+	// ConversationId Unique identifier for the conversation for the message.
+	ConversationId openapi_types.UUID `json:"conversationId"`
+
 	// Id Unique identifier for the message.
 	Id openapi_types.UUID `json:"id"`
 
@@ -83,10 +98,7 @@ type Message struct {
 
 	// OriginId Unique identifier for the originID for the message.
 	OriginId openapi_types.UUID `json:"originId"`
-
-	// RecipientId Unique identifier for the recipient of the message.
-	RecipientId openapi_types.UUID `json:"recipientId"`
-	SentOn      time.Time          `json:"sentOn"`
+	SentOn   time.Time          `json:"sentOn"`
 }
 
 // MessageAttachment defines model for MessageAttachment.
@@ -102,6 +114,18 @@ type MessageAttachment struct {
 
 	// Url Source of the attachment.
 	Url string `json:"url"`
+}
+
+// ProtoMessage defines model for ProtoMessage.
+type ProtoMessage struct {
+	// ConversationId Unique identifier for the conversation.
+	ConversationId openapi_types.UUID `json:"conversationId"`
+
+	// Message Message content.
+	Message string `json:"message"`
+
+	// OriginId Unique identifier for the ID of the sender.
+	OriginId openapi_types.UUID `json:"originId"`
 }
 
 // Question defines model for Question.
@@ -217,6 +241,9 @@ type UserSignup struct {
 	Password  string              `json:"password"`
 }
 
+// CreateConversationJSONBody defines parameters for CreateConversation.
+type CreateConversationJSONBody = []openapi_types.UUID
+
 // GetRatingByIdParams defines parameters for GetRatingById.
 type GetRatingByIdParams struct {
 	UserType *GetRatingByIdParamsUserType `form:"userType,omitempty" json:"userType,omitempty"`
@@ -264,11 +291,14 @@ type CreateCategoryJSONRequestBody = AcademicCategoryCreate
 // UpdateCategoryJSONRequestBody defines body for UpdateCategory for application/json ContentType.
 type UpdateCategoryJSONRequestBody = AcademicCategoryCreate
 
+// CreateConversationJSONRequestBody defines body for CreateConversation for application/json ContentType.
+type CreateConversationJSONRequestBody = CreateConversationJSONBody
+
 // CreateMeetingJSONRequestBody defines body for CreateMeeting for application/json ContentType.
 type CreateMeetingJSONRequestBody = CreateMeetingBody
 
 // CreateMessageJSONRequestBody defines body for CreateMessage for application/json ContentType.
-type CreateMessageJSONRequestBody = Message
+type CreateMessageJSONRequestBody = ProtoMessage
 
 // UpdateMessageByIdJSONRequestBody defines body for UpdateMessageById for application/json ContentType.
 type UpdateMessageByIdJSONRequestBody = Message
@@ -323,6 +353,18 @@ type ServerInterface interface {
 	// Update an academic category
 	// (PUT /categories/academic/{id})
 	UpdateCategory(w http.ResponseWriter, r *http.Request, id openapi_types.UUID)
+	// Create a new conversation
+	// (POST /conversation)
+	CreateConversation(w http.ResponseWriter, r *http.Request)
+	// Get all messages in the conversation via conversationId
+	// (GET /conversation/messages/{conversationId})
+	GetMessagesByConversationId(w http.ResponseWriter, r *http.Request, conversationId openapi_types.UUID)
+	// Get all conversations the user is a member in
+	// (GET /conversation/user/{userId})
+	GetConversationsByUserId(w http.ResponseWriter, r *http.Request, userId openapi_types.UUID)
+	// Get all userIds in the conversation via conversationId
+	// (GET /conversation/{conversationId})
+	GetUsersByConversationId(w http.ResponseWriter, r *http.Request, conversationId openapi_types.UUID)
 	// Create a new meeting
 	// (POST /meeting)
 	CreateMeeting(w http.ResponseWriter, r *http.Request)
@@ -569,6 +611,95 @@ func (siw *ServerInterfaceWrapper) UpdateCategory(w http.ResponseWriter, r *http
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateCategory(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateConversation operation middleware
+func (siw *ServerInterfaceWrapper) CreateConversation(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateConversation(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetMessagesByConversationId operation middleware
+func (siw *ServerInterfaceWrapper) GetMessagesByConversationId(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "conversationId" -------------
+	var conversationId openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "conversationId", r.PathValue("conversationId"), &conversationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "conversationId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetMessagesByConversationId(w, r, conversationId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetConversationsByUserId operation middleware
+func (siw *ServerInterfaceWrapper) GetConversationsByUserId(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", r.PathValue("userId"), &userId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "userId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetConversationsByUserId(w, r, userId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetUsersByConversationId operation middleware
+func (siw *ServerInterfaceWrapper) GetUsersByConversationId(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "conversationId" -------------
+	var conversationId openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "conversationId", r.PathValue("conversationId"), &conversationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "conversationId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetUsersByConversationId(w, r, conversationId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1387,6 +1518,10 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("DELETE "+options.BaseURL+"/categories/academic/{id}", wrapper.DeleteCategory)
 	m.HandleFunc("GET "+options.BaseURL+"/categories/academic/{id}", wrapper.GetCategory)
 	m.HandleFunc("PUT "+options.BaseURL+"/categories/academic/{id}", wrapper.UpdateCategory)
+	m.HandleFunc("POST "+options.BaseURL+"/conversation", wrapper.CreateConversation)
+	m.HandleFunc("GET "+options.BaseURL+"/conversation/messages/{conversationId}", wrapper.GetMessagesByConversationId)
+	m.HandleFunc("GET "+options.BaseURL+"/conversation/user/{userId}", wrapper.GetConversationsByUserId)
+	m.HandleFunc("GET "+options.BaseURL+"/conversation/{conversationId}", wrapper.GetUsersByConversationId)
 	m.HandleFunc("POST "+options.BaseURL+"/meeting", wrapper.CreateMeeting)
 	m.HandleFunc("POST "+options.BaseURL+"/meeting/{meetingId}/finalize", wrapper.FinalizeMeeting)
 	m.HandleFunc("GET "+options.BaseURL+"/meetings", wrapper.GetMeetings)

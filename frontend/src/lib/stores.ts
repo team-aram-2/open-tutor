@@ -23,9 +23,10 @@ function createPersistentStore<T>(key: string, initialValue: T): Writable<T> {
 
 	return store;
 }
+const logged_in = writable(false);
+const user_id = writable('');
 
-// Regular stores
-export const sessionToken = writable<string | null>(null);
+export { logged_in, user_id };
 
 // Persistent stores
 export const fontSize = createPersistentStore<string>('fontSize', '16px');
