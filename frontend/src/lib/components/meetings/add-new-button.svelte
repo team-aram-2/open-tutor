@@ -1,56 +1,51 @@
-<div class="messagesbutton mt-[20px] mr-[10px] ml-0px mb-[20px]">
+<div class="add-new-button">
 	<svg
-		width="100%"
-		height="100%"
+		width="auto"
+		height="auto"
 		viewBox="0 0 24 24"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
 	>
-		<!-- Vertical line -->
 		<line
 			x1="12"
-			y1="19"
+			y1="5"
 			x2="12"
-			y2="5"
+			y2="19"
 			stroke="var(--yellow-dark)"
 			stroke-width="2"
 			stroke-linecap="round"
-			stroke-linejoin="round"
 		/>
-		<!-- Head of arrow -->
-		<polyline
-			points="5 12 12 5 19 12"
-			fill="none"
+		<line
+			x1="5"
+			y1="12"
+			x2="19"
+			y2="12"
 			stroke="var(--yellow-dark)"
 			stroke-width="2"
 			stroke-linecap="round"
-			stroke-linejoin="round"
 		/>
 	</svg>
 </div>
 
 <style>
-	.messagesbutton {
+	.add-new-button {
 		display: flex;
 		align-items: center;
 		justify-items: center;
 
-		width: calc(2 * var(--font-size));
-		height: auto;
+		width: calc(3 * var(--font-size));
+		height: calc(3 * var(--font-size));
 
-		margin-top: 20px;
-		margin-bottom: 20px;
-
-		border-radius: var(--font-size);
+		border-radius: calc(3 * var(--font-size));
 
 		background-color: var(--yellow-light);
 	}
-	:hover.messagesbutton {
+	:hover.add-new-button {
 		transition: background-color 210ms ease-in-out;
 
 		background-color: var(--purple-neutral);
 	}
-	.messagesbutton:hover svg :is(path, line, polyline) {
+	.add-new-button:hover svg :is(path, line, polyline) {
 		transition: stroke var(--purple-light) 200ms ease-in-out;
 
 		stroke: var(--purple-very-light);
