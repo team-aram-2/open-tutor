@@ -28,8 +28,5 @@ const user_id = writable('');
 
 export { logged_in, user_id };
 
-// Regular stores
-export const sessionToken = writable<string | null>(null);
-
 // Persistent stores
 export const fontSize = createPersistentStore<string>('fontSize', '16px');
