@@ -5,6 +5,7 @@
 	import CreditCardIcon from './sidebar-icons/creditCard_icon.svelte';
 	import GearIcon from './sidebar-icons/gear_icon.svelte';
 	import PersonHeadIcon from './sidebar-icons/personHead_icon.svelte';
+	import HomeIcon from './sidebar-icons/home_icon.svelte';
 
 	let selectedItem = 'view';
 	let collapsed = false;
@@ -33,6 +34,20 @@
 
 	<!-- Sidebar Items -->
 	<nav class="sidebar-items">
+		<a
+			href="/"
+			class="no-decoration"
+			class:selected-sidebar-item={selectedItem === 'home'}
+			on:click={() => setSelectedItem('home')}
+		>
+			<p class="sidebar-item-text">Home</p>
+
+			<!-- Icon that appears when sidebar is collapsed -->
+			<div class="collapsed-sidebar-item-icon">
+				<!-- HomeIcon -->
+				<HomeIcon />
+			</div>
+		</a>
 		{#if $logged_in}
 			<a
 				href="/my_people/student"
