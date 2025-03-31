@@ -31,8 +31,8 @@ COMMENT ON COLUMN available_skills.description IS 'Description for the skill';
 DROP TABLE IF EXISTS tutor_skills;
 
 CREATE TABLE tutor_skills (
-  skill_id UUID NOT NULL,
-  tutor_id UUID NOT NULL,
+  skill_id TEXT NOT NULL,
+  tutor_id TEXT NOT NULL,
   validated BOOLEAN DEFAULT FALSE,
   PRIMARY KEY (skill_id, tutor_id),
   FOREIGN KEY (skill_id) REFERENCES available_skills(id) ON DELETE CASCADE,

@@ -4,6 +4,7 @@ services:
       context: ./frontend
     volumes:
       - web:/app
+      - ./web.env:/app/.env
     networks:
       - opentutor
     ports:
@@ -14,6 +15,7 @@ services:
       context: ./backend
     volumes:
       - api:/app
+      - ./api.env:/app/.env
     networks:
       - opentutor
     ports:
