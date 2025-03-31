@@ -68,7 +68,37 @@ For tutors to receive payouts and for students to submit payments, Open Tutor ut
 
 1. Navigate to [Stripe](https://stripe.com/)
 2. Sign up for a new account
-3.
+3. Fill out business information as requested
+4. Select "Build a platform or marketplace"
+5. Click "Go To Dashboard"
+6. Click "Get your live account" at the top of the screen
+7. Verify email as requested
+8. Click "Connect" on the left sidebar
+9. Click "Connect overview"
+10. Click the ... in the top right, select "Settings"
+11. Click "Customize" under Branding
+12. Fill out information under "Onboarding experience" as requested
+13. Navigate back to [Stripe dashboard](https://dashboard.stripe.com/)
+14. Click "Complete your profile" in the bottom right corner
+15. Fill out business information as requested (if testing out, do Individual)
+16. Enter personal information as requested, continue when done
+17. For "Industry" select "Education" -> "Other educational services". Fill out other information on page as requested. Continue when done.
+18. Fill out information on Public details tab, continue when done.
+19. Link an empty bank account to attach to payout system. This will be the account that receives payments and pays out after a buffer period.
+20. Set up authenticator appropriately, continue when done
+21. Enter "Educational Services" into "Select your product category", continue
+22. Select "Agree and submit"
+23. In the bottom right corner, select "Complete Connect setup"
+24. Select "Sellers will collect payments directly"
+25. Select "On-Demand services"
+26. Select "Onboarding hosted by Stripe"
+27. Select "Stripe Dashboard" for "Where will sellers manage their account"
+28. Review information and click Continue
+29. Go to the "Home" tab on the left panel
+30. Copy the API keys into the `backend/.env` file accordingly:
+
+- Publishable key -> `STRIPE_PK`
+- Secret key -> `STRIPE_SK`
 
 ## Admin Credentials
 

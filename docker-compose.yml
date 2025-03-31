@@ -18,6 +18,8 @@ services:
       - ./backend/.env:/app/.env
     networks:
       - opentutor
+    depends_on:
+      - postgres
     ports:
       - "8080:8080"
 
