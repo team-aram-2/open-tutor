@@ -149,7 +149,6 @@
 <div class="textboxcontainer">
 	<Attachimagebutton />
 	<textarea class="textbox" bind:value={messageContent} on:keydown={handleKeydown}></textarea>
-	<Sendbutton />
 	<button class="send-button" on:click={sendMessage} disabled={!messageContent.trim()}>
 		Send
 	</button>
