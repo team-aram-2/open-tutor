@@ -10,7 +10,7 @@ This guide assumes you are deploying this project on a system that can run Docke
 
 ## Dependencies
 
-You must install the latest versio of the following base dependencies to run this project:
+You must install the latest version of the following base dependencies to run this project:
 
 [Docker](https://docs.docker.com/engine/install/) (containerization)
 
