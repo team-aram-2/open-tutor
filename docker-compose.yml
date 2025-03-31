@@ -1,0 +1,44 @@
+services:
+  web:
+    build:
+      context: ./frontend
+    volumes:
+      - web:/app
+    networks:
+      - opentutor
+    ports:
+      - "5173:4173"
+
+  api:
+    build:
+      context: ./backend
+    volumes:
+      - api:/app
+    networks:
+      - opentutor
+    ports:
+      - "8080:8080"
+
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: opentutor
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./backend/configs/pgsql:/docker-entrypoint-initdb.d/"
+      - "postgres-data:/var/lib/postgresql/data"
+    networks:
+      - opentutor
+
+volumes:
+  web:
+  api:
+  postgres-data:
+
+networks:
+  opentutor:

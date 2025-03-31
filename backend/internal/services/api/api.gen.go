@@ -151,6 +151,9 @@ type UserSignup struct {
 	Password  string              `json:"password"`
 }
 
+// PostRatingJSONBody defines parameters for PostRating.
+type PostRatingJSONBody interface{}
+
 // GetRatingByIdParams defines parameters for GetRatingById.
 type GetRatingByIdParams struct {
 	UserType *GetRatingByIdParamsUserType `form:"userType,omitempty" json:"userType,omitempty"`
@@ -196,7 +199,7 @@ type UpdateMessageByIdJSONRequestBody = Message
 type CreateMessageAttachmentJSONRequestBody = MessageAttachment
 
 // PostRatingJSONRequestBody defines body for PostRating for application/json ContentType.
-type PostRatingJSONRequestBody = Rating
+type PostRatingJSONRequestBody PostRatingJSONBody
 
 // SignUpAsTutorJSONRequestBody defines body for SignUpAsTutor for application/json ContentType.
 type SignUpAsTutorJSONRequestBody SignUpAsTutorJSONBody
