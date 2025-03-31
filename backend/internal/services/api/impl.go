@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"open-tutor/internal/services/db"
+	"open-tutor/setup"
 
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
@@ -21,6 +22,7 @@ func Init() *OpenTutor {
 	if err != nil {
 		log.Fatal(err)
 	}
+	setup.EnsureDefaultAdmin()
 
 	fmt.Println("Database initialized successfully")
 	return &OpenTutor{}
