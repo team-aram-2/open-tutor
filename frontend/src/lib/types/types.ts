@@ -18,7 +18,7 @@ export interface MeetingItem {
 	zoomHostLink: string;
 }
 
-export interface SkillsItem{
+export interface SkillsItem {
 	id: string;
 	category: string;
 	title: string;

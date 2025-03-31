@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let strokeColor: string = 'black';
+	// export let strokeColor: string = 'black';
 </script>
 
 <svg width="auto" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -1,7 +1,7 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	export let skill: string;
 	export let selectedSkills: string[];
-	export let availableSkills: string[];
+	// export let availableSkills: string[];
 	import { toggleSkill } from './tutor-search';
 </script>
 
@@ -12,4 +12,4 @@
 	on:click={() => {
 		toggleSkill(skill);
 	}}>{skill}</button
->
+> -->

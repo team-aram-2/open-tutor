@@ -1,6 +1,6 @@
 <script lang="ts">
-	export let startAt = 0;
-	export let endAt = 0;
+	// export let startAt = 0;
+	// export let endAt = 0;
 	export let tutorName = 'Jon Bovi';
 	export let zoomLink = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 

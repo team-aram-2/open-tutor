@@ -40,7 +40,7 @@
 					'px';
 			}
 		}
-		if (typeof document !== undefined) {
+		if (!(typeof document === 'undefined')) {
 			(document.getElementsByClassName('textboxcontainer')[0] as HTMLElement).style.height =
 				Number(Number(get(font_size).slice(0, -2)) * 1.5 + 40) + 'px';
 		}

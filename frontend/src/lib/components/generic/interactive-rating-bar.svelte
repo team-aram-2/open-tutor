@@ -1,16 +1,19 @@
 <script lang="ts">
 	const starLabels = [1, 2, 3, 4, 5];
 
-	function setRating(newRating: number) {}
+	// function setRating(newRating: number) {} TODO: IMPLEMENT SENDING SEARCH INFO TO BACKEND
+	function setRating() {}
 </script>
 
 <div class="star-container">
 	{#each starLabels as star}
 		<button
 			on:click={() => {
-				setRating(star);
+				// setRating(star); TODO: IMPLEMENT SENDING SEARCH INFO TO BACKEND
+				setRating();
 			}}
 			class="star-button"
+			id={String(star)}
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="auto" height="100%">
 				<g transform="translate(2,2) scale(0.2)">

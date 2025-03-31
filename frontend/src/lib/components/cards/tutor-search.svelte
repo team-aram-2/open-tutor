@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { fetchSkillsJSON, loadSkills, handleSubmit } from './tutor-search/tutor-search';
-	import { PUBLIC_API_HOST } from '$env/static/public';
+	// import { fetchSkillsJSON, loadSkills, handleSubmit } from './tutor-search/tutor-search';
+	// import { PUBLIC_API_HOST } from '$env/static/public';
 	import { onMount } from 'svelte';
 
-	import type { SkillsItem } from '$lib/types/types';
-	import SearchIcon from './tutor-search/search-icon.svelte';
+	// import type { SkillsItem } from '$lib/types/types';
+	// import SearchIcon from './tutor-search/search-icon.svelte';
 	import AscIcon from './tutor-search/order-icons/asc-icon.svelte';
+	import SearchIcon from './tutor-search/search-icon.svelte';
 	import DescIcon from './tutor-search/order-icons/desc-icon.svelte';
 	import UnsortedIcon from './tutor-search/unsorted-icon.svelte';
 	import RatingIcon from './tutor-search/sort-icons/rating-icon.svelte';
@@ -49,7 +50,7 @@
 		'Inside'
 	];
 
-	availableSkills;
+	// availableSkills; TODO: LOAD AVAILABLESKILLS FROM BACKEND
 
 	// On update of one of the selected skills, update the list
 	function toggleSkill(skillName: string) {

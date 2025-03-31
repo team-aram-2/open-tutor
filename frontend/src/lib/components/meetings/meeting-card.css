@@ -72,14 +72,12 @@
 	font-weight: bolder;
 	line-height: calc(2 * var(--font-size));
 	font-size: calc(2 * var(--font-size));
-
 }
-@container (min-width: 50px){
-	.tutor-name{
+@container (min-width: 50px) {
+	.tutor-name {
 		border: 2px solid chartreuse;
 	}
 }
-
 
 .zoom-link {
 	height: calc(var(--font-size) * 1.5);
@@ -99,8 +97,8 @@
 	font-size: calc(1 * var(--font-size));
 	font-weight: bolder;
 	text-align: center;
-  vertical-align: center;
-  white-space: nowrap;
+	vertical-align: center;
+	white-space: nowrap;
 }
 :hover.zoom-link {
 	transition:
