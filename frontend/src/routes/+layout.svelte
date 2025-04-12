@@ -3,7 +3,6 @@
 	import { autoLogin } from '$lib/scripts/auth';
 	import '../app.css';
 	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
-	import { autoLogin } from '$lib/scripts/auth';
 
 	import { font_size, sidebar_width } from '$lib/stores';
 
@@ -11,7 +10,6 @@
 
 	onMount(() => {
 		font_size.subscribe((value) => {
-		fontSize.subscribe((value) => {
 			// Set global font size
 			document.documentElement.style.setProperty('--font-size', String(value));
 		});
