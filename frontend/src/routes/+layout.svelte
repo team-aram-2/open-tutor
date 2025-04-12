@@ -9,7 +9,7 @@
 	import { autoLogin } from '$lib/scripts/auth';
 
 	import { onMount } from 'svelte';
-	import { fontSize } from '$lib/stores';
+	import { fontSize, sidebar_width } from '$lib/stores';
 
 	// Load page settings
 	onMount(() => {
@@ -19,13 +19,14 @@
 			document.documentElement.style.setProperty('--font-size', String(value));
 		});
 	});
+	console.log('Sidebar width: ' + $sidebar_width);
 </script>
 
 <!-- Page Content -->
 <div class="dashboard-layout">
 	<Sidebar></Sidebar>
 
-	<main class="w-full">
+	<main style="width: calc(100% - {$sidebar_width});">
 		<slot />
 		<!-- Where page content will be rendered -->
 	</main>
@@ -51,18 +52,5 @@
 		min-height: 100;
 
 		background: #231d34;
-
-		/* font:  */
 	}
-
-	/* * .content {
-		padding-left: 0px;
-		padding-top: 0px;
-		width: auto;
-		flex-grow: 1;
-	} */
-
-	/* .page-title {
-        padding-left: 30px;
-    } */
 </style>

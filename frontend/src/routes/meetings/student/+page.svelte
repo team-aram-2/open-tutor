@@ -3,7 +3,7 @@
 	import AddNewButton from '$lib/components/meetings/add-new-button.svelte';
 	import { onMount } from 'svelte';
 	//import { get } from 'svelte/store';
-	//import { sidebar_width } from '$lib/stores';
+	import { sidebar_width } from '$lib/stores';
 
 	//import type { MeetingItem } from '$lib/types/types';
 	//import { PUBLIC_API_HOST } from '$env/static/public';
@@ -81,7 +81,8 @@
 <style>
 	.meetings-container {
 		height: 100%;
+		max-width: 100%;
 		overflow-x: scroll;
-		flex-grow: 1;
+		border: 2px solid chartreuse;
 	}
 </style>
