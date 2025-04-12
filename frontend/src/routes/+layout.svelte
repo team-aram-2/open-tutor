@@ -1,37 +1,32 @@
-<!-- src/routes/+layout.svelte -->
-
-<!-- This will contain all shared layouts across the site -->
-
 <script>
 	// Shared logic across pages goes here
+	import { autoLogin } from '$lib/scripts/auth';
 	import '../app.css';
 	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
-	import { autoLogin } from '$lib/scripts/auth';
+
+	import { font_size, sidebar_width } from '$lib/stores';
 
 	import { onMount } from 'svelte';
-	import { fontSize } from '$lib/stores';
 
-	// Load page settings
 	onMount(() => {
-		autoLogin();
-		fontSize.subscribe((value) => {
+		font_size.subscribe((value) => {
 			// Set global font size
 			document.documentElement.style.setProperty('--font-size', String(value));
 		});
+		autoLogin();
 	});
 </script>
 
 <!-- Page Content -->
 <div class="dashboard-layout">
-	<Sidebar></Sidebar>
+	<div class="sidebar-container" style="width: min-content;">
+		<Sidebar></Sidebar>
+	</div>
 
-	<main class="w-full">
-		<slot />
-		<!-- Where page content will be rendered -->
-	</main>
+	<!-- Where page content will be rendered -->
+	<slot />
 </div>
 
-<!-- Style for the page goes here -->
 <style>
 	/* Apply these globally */
 	* {
@@ -42,27 +37,17 @@
 		display: flex;
 		flex-direction: row;
 		position: fixed;
+		flex-wrap: nowrap;
+
+		overflow: hidden;
 
 		top: 0;
-		bottom: 0;
 		left: 0;
-		right: 0;
 
 		min-height: 100;
+		height: 100vh;
+		width: 100vw;
 
 		background: #231d34;
-
-		/* font:  */
 	}
-
-	/* * .content {
-		padding-left: 0px;
-		padding-top: 0px;
-		width: auto;
-		flex-grow: 1;
-	} */
-
-	/* .page-title {
-        padding-left: 30px;
-    } */
 </style>

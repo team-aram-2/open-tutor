@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fontSize } from '$lib/stores';
+	import { font_size } from '$lib/stores';
 
 	// Dictionary with labels and sizes
 	let sizeLabels = new Map<string, string>([
@@ -12,7 +12,7 @@
 
 	function setFontSize(value: string) {
 		console.log('Setting font size to ' + value);
-		fontSize.set(value);
+		font_size.set(value);
 		console.log();
 	}
 </script>

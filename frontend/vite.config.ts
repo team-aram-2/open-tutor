@@ -6,5 +6,8 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}']
+	},
+	preview: {
+		port: 5173
 	}
 });
