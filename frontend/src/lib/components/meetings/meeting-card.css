@@ -98,8 +98,8 @@
 	font-size: calc(1 * var(--font-size));
 	font-weight: bolder;
 	text-align: center;
-  vertical-align: center;
-  white-space: nowrap;
+	vertical-align: center;
+	white-space: nowrap;
 }
 :hover.zoom-link {
 	transition:

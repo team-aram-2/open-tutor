@@ -25,7 +25,7 @@ function createPersistentStore<T>(key: string, initialValue: T): Writable<T> {
 }
 const logged_in = writable(false);
 const user_id = writable('');
-const sidebar_width = writable(0)	;
+const sidebar_width = writable(0);
 
 // Regular stores
 export const sessionToken = writable<string | null>(null);

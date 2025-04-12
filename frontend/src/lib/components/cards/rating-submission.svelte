@@ -16,8 +16,6 @@
 			body: JSON.stringify(ratingSubmissions),
 			credentials: 'include'
 		});
-
-		
 	};
 </script>
 

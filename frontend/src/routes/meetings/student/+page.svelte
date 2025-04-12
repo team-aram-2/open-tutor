@@ -18,7 +18,7 @@
 		isInitialized = true;
 		// loadData($user_id);
 	}
-  
+
 	async function loadData(userId: string) {
 		await fetchMeetings(userId);
 	}
@@ -51,7 +51,7 @@
 	// 		}
 	// 	}
 	// };
-  
+
 	const fetchMeetings = async (userId: string) => {
 		try {
 			const res = await fetch(PUBLIC_API_HOST + '/meetings', {
@@ -63,7 +63,7 @@
 			console.error('Error in the process of fetching meetings:', err);
 		}
 	};
-  
+
 	// const handleKeydown = (event: KeyboardEvent) => {
 	// 	if (event.key === 'Enter' && messageContent.trim()) {
 	// 		event.preventDefault();
