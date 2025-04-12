@@ -52,16 +52,18 @@
 	height: 22.5%;
 	width: 100%;
 	display: flex;
-	align-content: left;
+	justify-content: center;
+	align-items: left;
 	font-weight: bolder;
 	line-height: calc(var(--font-size));
 	font-size: calc(var(--font-size));
-	overflow-x: scroll;
 	overflow-y: clip;
 }
 :is(.month, .time) p{
 	width: fit-content;
-	text-align: left;
+	text-align: center;
+	overflow-x: scroll;
+	overflow-y: clip;
 }
 
 .tutor-name {
