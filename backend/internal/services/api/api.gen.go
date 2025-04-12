@@ -245,7 +245,7 @@ type UserSignup struct {
 type PostRatingJSONBody interface{}
 
 // CreateConversationJSONBody defines parameters for CreateConversation.
-type CreateConversationJSONBody = []openapi_types.UUIDc
+type CreateConversationJSONBody = []openapi_types.UUID
 
 // GetRatingByIdParams defines parameters for GetRatingById.
 type GetRatingByIdParams struct {
