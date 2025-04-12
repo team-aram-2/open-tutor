@@ -23,8 +23,6 @@ function createPersistentStore<T>(key: string, initialValue: T): Writable<T> {
 
 	return store;
 }
-
-// Variable declaration
 const logged_in = writable(false);
 const user_id = writable('');
 const sidebar_width = writable(0)	;

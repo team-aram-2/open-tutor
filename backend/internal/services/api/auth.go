@@ -10,22 +10,26 @@ import (
 	"time"
 
 	"open-tutor/internal/services/db"
+	"open-tutor/stripe_client"
 	"open-tutor/util"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/oapi-codegen/runtime/types"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/stripe/stripe-go/v81"
 )
 
-func generateSessionTokenForUser(userId string, rememberLogin bool) (string, error) {
+func generateSessionTokenForUser(userId string, rememberLogin bool, roleMask util.RoleMask) (string, error) {
 	jwtKeyPair, err := util.GetKeyPair("user-auth-jwt")
 	if err != nil {
 		return "", err
 	}
 
 	type sessionClaims struct {
-		UserID string `json:"user_id"`
+		UserID   string        `json:"user_id"`
+		RoleMask util.RoleMask `json:"role_mask"`
 		jwt.StandardClaims
 	}
 
@@ -38,6 +42,7 @@ func generateSessionTokenForUser(userId string, rememberLogin bool) (string, err
 
 	claims := sessionClaims{
 		userId,
+		roleMask,
 		jwt.StandardClaims{
 			IssuedAt:  time.Now().Unix(),
 			ExpiresAt: time.Now().Unix() + int64(time.Hour.Seconds())*24*daysUntilExpiry,
@@ -55,8 +60,8 @@ func generateSessionTokenForUser(userId string, rememberLogin bool) (string, err
 	return tokenString, nil
 }
 
-func applySessionTokenForUserId(userId string, rememberLogin bool, w http.ResponseWriter) error {
-	sessionToken, err := generateSessionTokenForUser(userId, rememberLogin)
+func applySessionTokenForUserId(userId string, rememberLogin bool, roleMask util.RoleMask, w http.ResponseWriter) error {
+	sessionToken, err := generateSessionTokenForUser(userId, rememberLogin, roleMask)
 	if err != nil {
 		return err
 	}
@@ -77,9 +82,10 @@ func applySessionTokenForUserId(userId string, rememberLogin bool, w http.Respon
 
 func sendBack(w http.ResponseWriter, r *http.Request, errMsg *string) {
 	redirectUrl, err := url.Parse(r.Header.Get("Origin"))
-	redirectUrl.Path = "/login"
-	if err != nil {
-		redirectUrl = &url.URL{}
+	if err != nil || redirectUrl == nil {
+		redirectUrl = &url.URL{Path: "/login"}
+	} else {
+		redirectUrl.Path = "/login"
 	}
 	queries := redirectUrl.Query()
 	if errMsg != nil {
@@ -106,14 +112,15 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 	var (
 		userId            string
 		savedPasswordHash string
+		roleMask          util.RoleMask
 	)
 	err = db.GetDB().QueryRow(`
-		SELECT user_id, password_hash
+		SELECT user_id, password_hash, role_mask
 		FROM users
 		WHERE email = $1;
 	`,
 		loginData.Email,
-	).Scan(&userId, &savedPasswordHash)
+	).Scan(&userId, &savedPasswordHash, &roleMask)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err := "Invalid login"
@@ -137,7 +144,8 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = applySessionTokenForUserId(userId, *loginData.RememberLogin, w)
+	// pass in userId and userRole bitmask
+	err = applySessionTokenForUserId(userId, *loginData.RememberLogin, roleMask, w)
 	if err != nil {
 		fmt.Printf("failed to apply session token: %v\n", err)
 		sendError(w, http.StatusInternalServerError, "failed to apply session token")
@@ -148,7 +156,10 @@ func (t *OpenTutor) UserLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
-	var signupData UserSignup
+	var (
+		signupData UserSignup
+		roleMask   util.RoleMask
+	)
 	err := r.ParseForm()
 	if err != nil {
 		sendError(w, http.StatusInternalServerError, fmt.Sprintf("error parsing form data: %v", err))
@@ -160,6 +171,7 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 	signupData.Password = r.FormValue("password")
 	signupData.FirstName = &firstName
 	signupData.LastName = &lastName
+	roleMask = 0
 
 	// Generate user id //
 	userId := uuid.New().String()
@@ -171,10 +183,19 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	passwordHash := string(hashBytes)
+	roleMask.Add(util.User)
 
+	// Create Stripe customer for user //
+	newCustomer, err := stripe_client.GetClient().Customers.New(&stripe.CustomerParams{})
+	if err != nil {
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("error creating Stripe customer: %v", err))
+		return
+	}
+
+	// Insert into DB //
 	_, err = db.GetDB().Exec(`
-		INSERT INTO users (user_id, email, first_name, last_name, password_hash)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO users (user_id, email, first_name, last_name, password_hash, role_mask, stripe_customer_id)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING user_id, email, first_name, last_name;
 	`,
 		userId,
@@ -182,6 +203,8 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 		signupData.FirstName,
 		signupData.LastName,
 		passwordHash,
+		roleMask,
+		newCustomer.ID,
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value") {
@@ -194,7 +217,7 @@ func (t *OpenTutor) UserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = applySessionTokenForUserId(userId, false, w)
+	err = applySessionTokenForUserId(userId, false, roleMask, w)
 	if err != nil {
 		fmt.Printf("failed to apply session token: %v\n", err)
 		sendError(w, http.StatusInternalServerError, "failed to apply session token")

@@ -34,7 +34,6 @@ paths:
     get:
       summary: Get meetings for user
       operationId: getMeetings
-      requestBody:
       responses:
         "200":
           description: Meetings returned
@@ -42,7 +41,24 @@ paths:
             application/json:
               schema:
                 type: array
-                $ref: "#/components/schemas/Meeting"
+                items:
+                  $ref: "#/components/schemas/Meeting"
+
+  /meeting/{meetingId}/finalize:
+    post:
+      summary: Finalize a meeting
+      operationId: finalizeMeeting
+      parameters:
+        - name: meetingId
+          in: path
+          required: true
+          description: The ID of the meeting
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Meeting finalized
 
   # User login
   /auth/login:
@@ -195,6 +211,62 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
+  # change a user role, admin only
+  /user/{userId}/role:
+    put:
+      summary: Update user information
+      operationId: updateUserRole
+      security:
+        - BearerAuth: [admin]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user to update
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role_mask:
+                  type: integer
+                  description: "Uint16 Bitmask representing the user's new roles"
+              required:
+                - role_mask
+
+  /billing_portal:
+    get:
+      summary: Redirects to your Stripe customer billing portal
+      operationId: viewBillingPortal
+      responses:
+        "301":
+          description: "Portal redirect success"
+        "400":
+          description: "Error redirecting to billing portal"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  /tutor_id_verification:
+    get:
+      summary: Allows tutors to verify their identity with Stripe
+      operationId: tutorIdVerification
+      responses:
+        "301":
+          description: "Portal redirect success"
+        "400":
+          description: "Error redirecting to id verification"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
   # Sign up as tutor
   /tutor:
     post:
@@ -246,7 +318,6 @@ paths:
             items:
               type: string
               format: uuid
-
       responses:
         "200":
           description: Found tutors.
@@ -271,7 +342,7 @@ paths:
                 $ref: "#/components/schemas/ErrorModel"
         "403":
           description: Not authorized.
-          constent:
+          content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
@@ -321,6 +392,423 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
+
+  /skills:
+    get:
+      summary: Retrieve a list of skills.
+      operationId: getAllSkills
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Successful skill GET.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TutorSkill"
+        "400":
+          description: GET skill info request malformed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "401":
+          description: GET skill info request denied, bearer auth required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: NO skills found matching query.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    post:
+      summary: Create new tutor skill.
+      operationId: createSkill
+      security:
+        - BearerAuth: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TutorSkill"
+      responses:
+        "201":
+          description: Successful skill created/updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TutorSkill"
+        "400":
+          description: POST skill info request malformed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "401":
+          description: PUT skill info request denied, bearer auth required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  /skills/{id}:
+    get:
+      summary: Retrieve skill info for a specific skill by ID.
+      operationId: getSkill
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The skill ID to get information about.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful info GET.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TutorSkill"
+        "400":
+          description: Get skill info request malformed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "401":
+          description: Get skill info request denied, bearer auth required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: Skill not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    put:
+      summary: Update tutor skill.
+      operationId: UpdateSkill
+      security:
+        - BearerAuth: [admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The skill ID to get information about.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/TutorSkill"
+      responses:
+        "201":
+          description: Successful skill created/updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TutorSkill"
+        "400":
+          description: POST skill info request malformed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "401":
+          description: GET skill info request denied, bearer auth required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: Skill with ID not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+    delete:
+      summary: Delete a specific skill by ID.
+      operationId: deleteSkill
+      security:
+        - BearerAuth: [admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The skill ID to delete.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Skill deleted successfully.
+        "400":
+          description: Bad request, skill ID is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "401":
+          description: Unauthorized, admin access required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: Skill not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  /skills/{id}/quiz:
+    get:
+      summary: Retrieve a bank of questions for a given skill. The number of questions is dependent on the backend configuration.
+      operationId: getSkillQuiz
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The skill ID for which to get a quiz bank.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful quiz get.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizAttempt"
+        "400":
+          description: Get skill info request malformed or denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: Skill not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "409":
+          description: Quiz GET denied because Tutor has skill already.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  /skills/{id}/quiz/submit:
+    post:
+      summary: Submit answers for a quiz attempt.
+      operationId: submitSkillQuiz
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizAttempt"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the skill.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: Successful quiz submission.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  grade:
+                    type: integer
+                    minimum: 0
+                    maximum: 100
+                    description: The percetage grade of the quiz attempt.
+                  passed:
+                    type: boolean
+                    description: True if the skill quiz passed.
+        "400":
+          description: Get skill info request malformed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "401":
+          description: Get skill info request denied.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "404":
+          description: Skill not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "409":
+          description: Skill quiz POST denied because tutor already has skill.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+
+  /categories/academic:
+    get:
+      summary: Get all academic categories
+      description: Returns a list of all available academic categories.
+      operationId: getCategories
+      tags:
+        - Academic Categories
+      responses:
+        "200":
+          description: A list of academic categories.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AcademicCategory"
+        "500":
+          description: Internal server error.
+
+    post:
+      summary: Create a new academic category
+      description: Adds a new academic category to the system.
+      operationId: createCategory
+      tags:
+        - Academic Categories
+      security:
+        - BearerAuth: [admin] # Requires admin permission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcademicCategoryCreate"
+      responses:
+        "201":
+          description: Academic category successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademicCategory"
+        "400":
+          description: Invalid request payload.
+        "401":
+          description: Unauthorized.
+        "500":
+          description: Internal server error.
+
+  /categories/academic/{id}:
+    get:
+      summary: Get details of a specific academic category
+      description: Fetches the details of a specific academic category by ID.
+      operationId: getCategory
+      tags:
+        - Academic Categories
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Details of the academic category.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademicCategory"
+        "404":
+          description: Category not found.
+        "500":
+          description: Internal server error.
+
+    put:
+      summary: Update an academic category
+      description: Updates an existing academic category by ID.
+      operationId: updateCategory
+      tags:
+        - Academic Categories
+      security:
+        - BearerAuth: [admin] # Requires admin permission
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcademicCategoryCreate"
+      responses:
+        "200":
+          description: Academic category successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcademicCategory"
+        "400":
+          description: Invalid request payload.
+        "401":
+          description: Unauthorized.
+        "404":
+          description: Category not found.
+        "500":
+          description: Internal server error.
+    delete:
+      summary: Delete an academic category
+      description: Deletes an academic category by ID.
+      operationId: deleteCategory
+      tags:
+        - Academic Categories
+      security:
+        - BearerAuth: [admin] # Requires admin permission
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Academic category successfully deleted.
+        "401":
+          description: Unauthorized.
+        "404":
+          description: Category not found.
+        "500":
+          description: Internal server error.
 
   /rating/{userId}:
     get:
@@ -403,7 +891,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Message"
+              $ref: "#/components/schemas/ProtoMessage"
+
       responses:
         "201":
           description: Message created
@@ -554,11 +1043,113 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorModel"
 
+  /conversation:
+    post:
+      summary: Create a new conversation
+      operationId: createConversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+      responses:
+        "201":
+          description: Attachment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+
+  /conversation/{conversationId}:
+    get:
+      summary: Get all userIds in the conversation via conversationId
+      operationId: getUsersByConversationId
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          description: The ID of the conversation to fetch
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "404":
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "200":
+          description: Conversation found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+  /conversation/messages/{conversationId}:
+    get:
+      summary: Get all messages in the conversation via conversationId
+      operationId: getMessagesByConversationId
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          description: The ID of the conversation to fetch
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "404":
+          description: Conversation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "200":
+          description: Messages found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+
+  /conversation/user/{userId}:
+    get:
+      summary: Get all conversations the user is a member in
+      operationId: getConversationsByUserId
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "404":
+          description: Conversation/User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorModel"
+        "200":
+          description: Conversations found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConversationName"
+
 components:
   securitySchemes:
     BearerAuth:
       type: http
-      schema: bearer
+      scheme: bearer
 
     GitHubOAuth:
       type: oauth2
@@ -737,7 +1328,7 @@ components:
           format: uuid
         scores:
           type: object
-          ref: "#/components/schemas/RatingScores"
+          $ref: "#/components/schemas/RatingScores"
         comment:
           type: string
 
@@ -805,10 +1396,10 @@ components:
           type: string
           format: uuid
           description: Unique identifier for the originID for the message.
-        recipientId:
+        conversationId:
           type: string
           format: uuid
-          description: Unique identifier for the recipient of the message.
+          description: Unique identifier for the conversation for the message.
         message:
           type: string
           description: Message content.
@@ -821,7 +1412,26 @@ components:
         - id
         - sentOn
         - originId
-        - recipientId
+        - conversationId
+        - message
+
+    ProtoMessage:
+      type: object
+      properties:
+        originId:
+          type: string
+          format: uuid
+          description: Unique identifier for the ID of the sender.
+        conversationId:
+          type: string
+          format: uuid
+          description: Unique identifier for the conversation.
+        message:
+          type: string
+          description: Message content.
+      required:
+        - originId
+        - conversationId
         - message
 
     MessageAttachment:
@@ -847,45 +1457,141 @@ components:
         - mimetype
         - url
 
-    AvailableSkill:
+    SkillCategory:
+      type: string
+      description: Academic Categories for Skills."
+
+    TutorSkill:
       type: object
       properties:
         id:
           type: string
           format: uuid
           description: Unique identifier for the skill.
+        category:
+          type: string
+          description: The UUID of the academic category of the skill.
         title:
           type: string
-          description: title/name for the skill
+          description: The name of the skill.
         description:
           type: string
-          description: Description for the skill
+          description: Description for the skill.
+        questions:
+          type: array
+          description: All possible quiz questions for a skill.
+          items:
+            $ref: "#/components/schemas/Question"
+        tutorHasSkill:
+          type: boolean
+          description: If the skill is validated for a specific tutor.
       required:
         - id
         - title
         - description
 
-    TutorSkill:
-      allOf:
-        - $ref: "#/components/schemas/AvailableSkill"
-        - type: object
-          properties:
-            validated:
-              type: boolean
-              description: If the skill is validated
-          required:
-            - validated
-
     Question:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         question:
           type: string
-          description: The literal question being asked.
-        valid:
-          type: string
-          description: The valid answer to the question
-        invalid:
+          description: The question being asked.
+        answers:
+          type: array
+          description: The list of all possible answers.
+          items:
+            type: string
+        correctAnswers:
+          description: The list of all correct answers.
           type: array
           items:
             type: string
+        selectedAnswer:
+          type: string
+      required:
+        - id
+        - question
+        - answers
+
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        users:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    ConversationName:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+
+    Quiz:
+      type: object
+      properties:
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Question"
+
+    QuizAttempt:
+      type: object
+      properties:
+        attemptId:
+          type: string
+          format: uuid
+        tutorId:
+          type: string
+          format: uuid
+        skillId:
+          type: string
+          format: uuid
+        quiz:
+          type: object
+          $ref: "#/components/schemas/Quiz"
+        passed:
+          type: boolean
+        attemptedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+      required:
+        - attemptId
+        - tutorId
+        - skillId
+        - quiz
+
+    AcademicCategory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the academic category.
+        name:
+          type: string
+          description: Name of the academic category.
+      required:
+        - id
+        - name
+
+    AcademicCategoryCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the academic category.
+      required:
+        - name

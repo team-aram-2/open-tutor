@@ -12,6 +12,7 @@
 
 	let selectedItem = 'view';
 	let collapsed = false;
+	import { logged_in } from '$lib/stores';
 
 	let targetSidebar: HTMLDivElement | null = null;
 
