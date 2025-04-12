@@ -5,10 +5,13 @@
 	import CreditCardIcon from './sidebar-icons/creditCard_icon.svelte';
 	import GearIcon from './sidebar-icons/gear_icon.svelte';
 	import PersonHeadIcon from './sidebar-icons/personHead_icon.svelte';
+	import { logged_in, sidebar_width } from '$lib/stores';
+	import { onMount } from 'svelte';
 
 	let selectedItem = 'view';
 	let collapsed = false;
-	import { logged_in } from '$lib/stores';
+	let resizeObserver: ResizeObserver;
+	let sidebarRef: HTMLElement | null = null;
 
 	const setSelectedItem = (item: string) => {
 		selectedItem = item;
@@ -19,9 +22,40 @@
 		collapsed = event.detail.open; // Syncs with hamburger toggle's output
 		console.log(collapsed);
 	};
+
+	onMount(() => {
+		// Initialize ResizeObserver to observe changes in size
+		// For all entries, update sidebar_width with entry.contentRect.width
+		resizeObserver = new ResizeObserver((entries) => {
+			for (let entry of entries) {
+				sidebar_width.set(String(entry.contentRect.width) + 'px');
+			}
+		});
+
+		// Begin observing the element referenced by elementref
+		if (sidebarRef) {
+			resizeObserver.observe(sidebarRef);
+		}
+
+		return () => {
+			// Clean up observer when sidebar is destroyed
+			if (resizeObserver && sidebarRef) {
+				resizeObserver.unobserve(sidebarRef);
+			}
+			if (resizeObserver) {
+				resizeObserver.disconnect();
+			}
+		};
+	});
 </script>
 
-<div class="sidebar flex h-screen" style="border-top-right-radius: 25px;" class:collapsed>
+<aside
+	class="sidebar flex h-screen"
+	style="border-top-right-radius: 25px;"
+	class:collapsed
+	aria-label="Sidebar"
+	bind:this={sidebarRef}
+>
 	<!-- Sidebar Title -->
 	<div class="title-container">
 		<h2 class="sidebar-title">Student</h2>
@@ -32,17 +66,17 @@
 	</div>
 
 	<!-- Sidebar Items -->
-	<nav class="sidebar-items">
+	<nav class="sidebar-items" aria-label="Sidebar Navigation">
 		{#if $logged_in}
 			<a
 				href="/my_people/student"
 				class="no-decoration"
 				class:selected-sidebar-item={selectedItem === 'view'}
 				on:click={() => setSelectedItem('view')}
+				aria-label="View Tutors"
+				aria-current={selectedItem === 'view' ? 'page' : undefined}
 			>
 				<p class="sidebar-item-text">View Tutors</p>
-
-				<!-- Icon that appears when sidebar is collapsed -->
 				<div class="collapsed-sidebar-item-icon">
 					<!-- Person Head -->
 					<PersonHeadIcon />
@@ -50,16 +84,15 @@
 			</a>
 			<!-- TODO: MOVE THIS HREF BACK TO THE APPOINTMENTS <a> tag -->
 			<a
-				href="#/"
+				href="/meetings/student"
 				class="no-decoration"
-				class:selected-sidebar-item={selectedItem === 'apt'}
-				on:click={() => setSelectedItem('apt')}
+				class:selected-sidebar-item={selectedItem === 'mtng'}
+				on:click={() => setSelectedItem('mtng')}
+				aria-label="Meetings"
+				aria-current={selectedItem === 'mtng' ? 'page' : undefined}
 			>
-				<p class="sidebar-item-text">Appointments</p>
-
-				<!-- Icon that appears when sidebar is collapsed -->
+				<p class="sidebar-item-text">Meetings</p>
 				<div class="collapsed-sidebar-item-icon">
-					<!-- Calendar -->
 					<CalendarIcon />
 				</div>
 			</a>
@@ -68,12 +101,11 @@
 				class="no-decoration"
 				class:selected-sidebar-item={selectedItem === 'msg'}
 				on:click={() => setSelectedItem('msg')}
+				aria-label="Messages"
+				aria-current={selectedItem === 'msg' ? 'page' : undefined}
 			>
 				<p class="sidebar-item-text">Messages</p>
-
-				<!-- Icon that appears when sidebar is collapsed -->
 				<div class="collapsed-sidebar-item-icon">
-					<!-- Speech Bubble -->
 					<SpeechBubbleIcon />
 				</div>
 			</a>
@@ -82,12 +114,11 @@
 				class="no-decoration"
 				class:selected-sidebar-item={selectedItem === 'pym'}
 				on:click={() => setSelectedItem('pym')}
+				aria-label="Payments"
+				aria-current={selectedItem === 'pym' ? 'page' : undefined}
 			>
 				<p class="sidebar-item-text">Payments</p>
-
-				<!-- Icon that appears when sidebar is collapsed -->
 				<div class="collapsed-sidebar-item-icon">
-					<!-- Credit Card -->
 					<CreditCardIcon />
 				</div>
 			</a>
@@ -96,12 +127,11 @@
 				class="no-decoration"
 				class:selected-sidebar-item={selectedItem === 'set'}
 				on:click={() => setSelectedItem('set')}
+				aria-label="Settings"
+				aria-current={selectedItem === 'set' ? 'page' : undefined}
 			>
 				<p class="sidebar-item-text">Settings</p>
-
-				<!-- Icon that appears when sidebar is collapsed -->
 				<div class="collapsed-sidebar-item-icon">
-					<!-- Gear -->
 					<GearIcon />
 				</div>
 			</a>
@@ -111,12 +141,14 @@
 				class="no-decoration"
 				class:selected-sidebar-item={selectedItem === 'log'}
 				on:click={() => setSelectedItem('log')}
+				aria-label="Login"
+				aria-current={selectedItem === 'log' ? 'page' : undefined}
 			>
 				<p>Login</p>
 			</a>
 		{/if}
 	</nav>
-</div>
+</aside>
 
 <style>
 	.sidebar {
