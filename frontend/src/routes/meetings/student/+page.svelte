@@ -83,6 +83,5 @@
 		height: 100%;
 		max-width: 100%;
 		overflow-x: scroll;
-		border: 2px solid chartreuse;
 	}
 </style>

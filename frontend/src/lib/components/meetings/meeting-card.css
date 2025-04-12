@@ -25,13 +25,11 @@
 	overflow-x: hidden;
 	overflow-y: hidden;
 	white-space: nowrap;
-	border: 2px solid salmon;
 }
 .tutor-info-block {
 	display: flex;
 	flex-direction: column;
 	width: calc(100% - (19 * var(--font-size)));
-	border: 2px solid blue;
 }
 .link-info {
 	display: flex;
@@ -114,7 +112,3 @@
 	border: 5px solid var(--purple-dark);
 	border-radius: calc(var(--font-size));
 }
-
-/* .meeting-card > :is(div, a) {
-	border: 2px solid blue;
-} */
