@@ -5,6 +5,27 @@
 	export let skills = [''];
 	export let userId = '';
 	export let width = '';
+	import { PUBLIC_API_HOST } from '$env/static/public';
+	import { user_id } from '$lib/stores';
+	import { goto } from '$app/navigation';
+
+	const createConversation = async () => {
+		try {
+			const sendArray = [$user_id, userId];
+			const res = await fetch(`${PUBLIC_API_HOST}/conversation`, {
+				method: 'POST',
+				credentials: 'include',
+				body: JSON.stringify(sendArray)
+			});
+			if (!res.ok) {
+				throw new Error(`API Error: ${res.status} ${res.statusText}`);
+			}
+			await res.json();
+			goto('/messages/student');
+		} catch (err) {
+			console.log('Creating convo err' + err);
+		}
+	};
 </script>
 
 <div class="tutor-card flex h-screen" style="width: {width}px;">
@@ -22,6 +43,19 @@
 				{/each}
 			</div>
 		</a>
+		<button class="message-btn" on:click={createConversation}>
+			<svg
+				class="message-icon"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+			</svg>
+		</button>
 	</h1>
 	<div class="specialties">
 		{#each skills as skill}
@@ -109,7 +143,7 @@
 	.tutor-info {
 		text-decoration: none;
 		color: inherit;
-		width: 70%;
+		width: 74%;
 		height: 100%;
 		display: flex;
 		flex-direction: column;
@@ -144,5 +178,28 @@
 		background: var(--yellow-light);
 		border: 3px solid var(--yellow-neutral);
 		white-space: nowrap;
+	}
+	.message-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: calc(var(--font-size) * 1.8);
+		padding: 0 calc(var(--font-size) * 0.5);
+		margin-right: 0px;
+		border-radius: calc(var(--font-size) * 0.5);
+		background: var(--yellow-neutral);
+		color: var(--yellow-very-dark);
+		font-weight: bold;
+		font-size: calc(var(--font-size) * 0.8);
+		border: none;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
+	.message-btn:hover {
+		background: var(--yellow-dark);
+	}
+	.message-icon {
+		width: calc(var(--font-size) * 1);
+		height: calc(var(--font-size) * 1);
 	}
 </style>

@@ -1,8 +1,24 @@
 <script lang="ts">
 	import FontSize from '$lib/components/settings_page/font-size.svelte';
 	import { PUBLIC_API_HOST } from '$env/static/public';
+	import { logged_in } from '$lib/stores';
+	import { goto } from '$app/navigation';
 
 	$: isTutor = true;
+
+	// Function to clear the cookie and update the store
+	function logout(): void {
+		// Remove the cookie by setting an expiration date in the past.
+		// Adjust the cookie name and path as needed.
+		document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
+
+		// Update the Svelte store to indicate the user is logged out.
+		logged_in.set(false);
+
+		// Optionally, you might also refresh the page or navigate to a login route.
+		// For example:
+		goto('/login');
+	}
 </script>
 
 <div class="setting-container">
@@ -30,6 +46,11 @@
 					href="{PUBLIC_API_HOST}/tutor_id_verification"
 					class="mr-4 px-4 py-1 bg-sky-400 rounded-md shadow-md cursor-pointer">Start</a
 				>
+			</div>
+		{/if}
+		{#if $logged_in}
+			<div class="setting-entry">
+				<button class="log-out" on:click={logout}>Log out</button>
 			</div>
 		{/if}
 	</div>
@@ -90,5 +111,13 @@
 		font-size: var(--font-size);
 		font-weight: bolder;
 		color: var(--yellow-very-light);
+	}
+	.log-out {
+		width: fit-content;
+		height: fit-content;
+		font-size: calc(0.8 * var(--font-size));
+		padding: 5px 15px 5px 15px;
+		background-color: var(--yellow-light);
+		border-radius: 15px;
 	}
 </style>
