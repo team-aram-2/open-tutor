@@ -54,63 +54,79 @@
 
 	<!-- Sidebar Items -->
 	<nav class="sidebar-items">
-		<a
-			href="/my_people/student"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'view'}
-			on:click={() => setSelectedItem('view')}
-		>
-			<p class="sidebar-item-text">View Tutors</p>
+		{#if $logged_in}
+			<a
+				href="/my_people/student"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'view'}
+				on:click={() => setSelectedItem('view')}
+			>
+				<p class="sidebar-item-text">View Tutors</p>
 
-			<!-- Icon that appears when sidebar is collapsed -->
-			<div class="collapsed-sidebar-item-icon">
-				<!-- Person Head -->
-				<PersonHeadIcon />
-			</div>
-		</a>
-		<!-- TODO: MOVE THIS HREF BACK TO THE APPOINTMENTS <a> tag -->
-		<a
-			href="/meetings/student"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'mtgs'}
-			on:click={() => setSelectedItem('mtgs')}
-		>
-			<p class="sidebar-item-text">Meetings</p>
+				<!-- Icon that appears when sidebar is collapsed -->
+				<div class="collapsed-sidebar-item-icon">
+					<!-- Person Head -->
+					<PersonHeadIcon />
+				</div>
+			</a>
+			<!-- TODO: MOVE THIS HREF BACK TO THE APPOINTMENTS <a> tag -->
+			<a
+				href="/meetings/student"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'mtgs'}
+				on:click={() => setSelectedItem('mtgs')}
+			>
+				<p class="sidebar-item-text">Meetings</p>
 
-			<!-- Icon that appears when sidebar is collapsed -->
-			<div class="collapsed-sidebar-item-icon">
-				<!-- Calendar -->
-				<CalendarIcon />
-			</div>
-		</a>
-		<a
-			href="/messages/student"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'msg'}
-			on:click={() => setSelectedItem('msg')}
-		>
-			<p class="sidebar-item-text">Messages</p>
+				<!-- Icon that appears when sidebar is collapsed -->
+				<div class="collapsed-sidebar-item-icon">
+					<!-- Calendar -->
+					<CalendarIcon />
+				</div>
+			</a>
+			<a
+				href="/messages/student"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'msg'}
+				on:click={() => setSelectedItem('msg')}
+			>
+				<p class="sidebar-item-text">Messages</p>
 
-			<!-- Icon that appears when sidebar is collapsed -->
-			<div class="collapsed-sidebar-item-icon">
-				<!-- Speech Bubble -->
-				<SpeechBubbleIcon />
-			</div>
-		</a>
-		<a
-			href="#/"
-			class="no-decoration"
-			class:selected-sidebar-item={selectedItem === 'pym'}
-			on:click={() => setSelectedItem('pym')}
-		>
-			<p class="sidebar-item-text">Payments</p>
+				<!-- Icon that appears when sidebar is collapsed -->
+				<div class="collapsed-sidebar-item-icon">
+					<!-- Speech Bubble -->
+					<SpeechBubbleIcon />
+				</div>
+			</a>
+			<a
+				href="#/"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'pym'}
+				on:click={() => setSelectedItem('pym')}
+			>
+				<p class="sidebar-item-text">Payments</p>
 
-			<!-- Icon that appears when sidebar is collapsed -->
-			<div class="collapsed-sidebar-item-icon">
-				<!-- Credit Card -->
-				<CreditCardIcon />
-			</div>
-		</a>
+				<!-- Icon that appears when sidebar is collapsed -->
+				<div class="collapsed-sidebar-item-icon">
+					<!-- Credit Card -->
+					<CreditCardIcon />
+				</div>
+			</a>
+		{:else}
+			<a
+				href="/login"
+				class="no-decoration"
+				class:selected-sidebar-item={selectedItem === 'login'}
+				on:click={() => setSelectedItem('login')}
+			>
+				<p class="sidebar-item-text">Login</p>
+
+				<!-- Icon that appears when sidebar is collapsed -->
+				<div class="collapsed-sidebar-item-icon">
+					<!--TODO ADD LOGIN SIDEBAR ITEM-->
+				</div>
+			</a>
+		{/if}
 		<a
 			href="/settings_page"
 			class="no-decoration"
