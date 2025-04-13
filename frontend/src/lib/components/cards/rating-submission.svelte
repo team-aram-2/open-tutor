@@ -3,8 +3,8 @@
 
 	const categories = ['Professionalism', 'Knowledge', 'Communication', 'Punctuality', 'Overall'];
 	let comment = '';
-	export let submitRatings = (_ratings: Record<string, number>, _comment?: string) => {};
-	export let onRatingSubmit = () => {};
+	export let submitRatings;
+	export let onRatingSubmit;
 
 	$: ratingSubmissions = {} as Record<string, number>;
 
