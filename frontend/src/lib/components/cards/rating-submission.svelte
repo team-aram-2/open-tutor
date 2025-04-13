@@ -3,9 +3,8 @@
 
 	const categories = ['Professionalism', 'Knowledge', 'Communication', 'Punctuality', 'Overall'];
 	let comment = '';
-	export let submitRatings = (ratings: Record<string, number>, comment?: string) => {};
+	export let submitRatings = (_ratings: Record<string, number>, _comment?: string) => {};
 	export let onRatingSubmit = () => {};
-	console.log(comment);
 
 	$: ratingSubmissions = {} as Record<string, number>;
 
@@ -16,7 +15,7 @@
 	};
 
 	const submit = () => {
-		if (!canSubmit) {
+		if (!canSubmit || submitting) {
 			return;
 		}
 

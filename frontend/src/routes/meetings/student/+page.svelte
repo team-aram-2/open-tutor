@@ -68,7 +68,7 @@
 			netRatings[category.toLowerCase()] = score;
 		}
 
-		const reqPromise = fetch(`${PUBLIC_API_HOST}/rating`, {
+		fetch(`${PUBLIC_API_HOST}/rating`, {
 			method: 'POST',
 			body: JSON.stringify({
 				meetingId: submitRatingsMeetingId,
