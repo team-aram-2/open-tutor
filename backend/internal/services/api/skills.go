@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"open-tutor/internal/services/db"
@@ -29,7 +30,8 @@ type QuizAttemptResponse struct {
 func (t *OpenTutor) GetAllSkills(w http.ResponseWriter, r *http.Request) {
 	authInfo := middleware.GetAuthenticationInfo(r)
 	if authInfo.UserID == "" {
-		http.Error(w, `{"error": "Unauthorized"}`, http.StatusUnauthorized)
+		sendError(w, http.StatusUnauthorized, "You must log in to access this resource.")
+		log.Printf("[GET skills/] Unauthorized attempt to access endpoint: %v", r.Header)
 		return
 	}
 
@@ -40,15 +42,16 @@ func (t *OpenTutor) GetAllSkills(w http.ResponseWriter, r *http.Request) {
 
 	if categoryID != "" {
 		rows, err = db.GetDB().Query(
-			"SELECT id, name, category FROM skills WHERE category = $1",
+			"SELECT id, title, category_id, description FROM available_skills WHERE category_id = $1",
 			categoryID,
 		)
 	} else {
-		rows, err = db.GetDB().Query("SELECT id, name, category FROM skills")
+		rows, err = db.GetDB().Query("SELECT id, title, category_id, description FROM available_skills")
 	}
 
 	if err != nil {
-		http.Error(w, `{"error": "Database error"}`, http.StatusInternalServerError)
+		sendError(w, http.StatusInternalServerError, "Database error")
+		log.Printf("[GET skills/] Database error: %v", err)
 		return
 	}
 	defer rows.Close()
@@ -58,7 +61,8 @@ func (t *OpenTutor) GetAllSkills(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var skill TutorSkill
 		if err := rows.Scan(&skill.Id, &skill.Title, &skill.Category); err != nil {
-			http.Error(w, `{"error": "Failed to scan skill data"}`, http.StatusInternalServerError)
+			sendError(w, http.StatusInternalServerError, "Database error.")
+			log.Printf("Failed to scan skill data: %v", err)
 			return
 		}
 		skills = append(skills, skill)
@@ -66,7 +70,7 @@ func (t *OpenTutor) GetAllSkills(w http.ResponseWriter, r *http.Request) {
 
 	// Check if no skills were found
 	if len(skills) == 0 {
-		http.Error(w, `{"error": "No skills found matching query"}`, http.StatusNotFound)
+		sendError(w, http.StatusNotFound, "No skills found.")
 		return
 	}
 
@@ -74,7 +78,8 @@ func (t *OpenTutor) GetAllSkills(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(skills)
 	if err != nil {
-		http.Error(w, "Error scanning category", http.StatusInternalServerError)
+		sendError(w, http.StatusInternalServerError, "JSON Encoding Error")
+		log.Printf("[GET skills/] Error in JSON Encoding: %v", err)
 		return
 	}
 }
@@ -88,10 +93,11 @@ func (t *OpenTutor) GetSkill(w http.ResponseWriter, r *http.Request, id openapi_
 	).Scan(&skill.Id, &skill.Title, &skill.Description, &skill.Category)
 
 	if err == sql.ErrNoRows {
-		http.Error(w, "Skill not found", http.StatusNotFound)
+		sendError(w, http.StatusNotFound, "Skill not found")
 		return
 	} else if err != nil {
-		http.Error(w, fmt.Sprintf("Database error: %v", err), http.StatusInternalServerError)
+		sendError(w, http.StatusInternalServerError, "Database Error.")
+		log.Printf("Database error: %v", err)
 		return
 	}
 

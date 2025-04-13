@@ -24,6 +24,7 @@
 	let conversationId = '';
 	let conversations: Conversation[] = [];
 	let isInitialized = false;
+	let toLoad = false;
 
 	$: if ($user_id && !isInitialized) {
 		isInitialized = true;
@@ -33,6 +34,7 @@
 	async function loadData(userId: string) {
 		await fetchConversations(userId);
 		if (conversationId) {
+			toLoad = true;
 			fetchMessages();
 		}
 	}
@@ -104,7 +106,11 @@
 			});
 			conversations = await res.json();
 			console.log(conversations);
-			conversationId = conversations[0].id;
+			if (conversations) {
+				conversationId = conversations[0].id;
+			} else {
+				return;
+			}
 		} catch (err) {
 			console.log('Error in the process of fetching messages:', err);
 		}
@@ -124,29 +130,38 @@
 	};
 
 	onMount(() => {
-		const interval = setInterval(() => {
-			fetchMessages();
-		}, 1000);
-		return () => {
-			clearInterval(interval);
-		};
+		if (toLoad) {
+			const interval = setInterval(() => {
+				fetchMessages();
+			}, 1000);
+			return () => {
+				clearInterval(interval);
+			};
+		}
 	});
 </script>
 
 <div class="conversation-selector">
 	<select on:change={handleConversationChange} value={conversationId} class="conversation-dropdown">
-		{#each conversations as conversation}
-			<option value={conversation.id}>{conversation.name}</option>
-		{/each}
+		{#if toLoad}
+			{#each conversations as conversation}
+				<option value={conversation.id}>{conversation.name}</option>
+			{/each}
+		{/if}
 	</select>
 </div>
 
 <div class="messagecontainer">
 	<div style="padding-bottom: 30px"></div>
-	{#each messages as message}
-		<Message originId={message.originId} messageContent={message.messageContent} userId={current_id}
-		></Message>
-	{/each}
+	{#if toLoad}
+		{#each messages as message}
+			<Message
+				originId={message.originId}
+				messageContent={message.messageContent}
+				userId={current_id}
+			></Message>
+		{/each}
+	{/if}
 </div>
 
 <div class="textboxcontainer">
