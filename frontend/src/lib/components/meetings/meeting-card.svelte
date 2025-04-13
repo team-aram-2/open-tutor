@@ -33,9 +33,11 @@
 		<div class="link-info" style="width: {sidebar_width}px;">
 			<a class="zoom-link" href={meeting.zoomHostLink ?? meeting.zoomJoinLink}>Zoom Link</a>
 		</div>
-		<div class="link-info" style="width: {sidebar_width}px;">
-			<button class="zoom-link" on:click={onSubmitRating}>Submit Rating</button>
-		</div>
+		{#if !meeting.zoomHostLink}
+			<div class="link-info" style="width: {sidebar_width}px;">
+				<button class="zoom-link" on:click={onSubmitRating}>Submit Rating</button>
+			</div>
+		{/if}
 	</div>
 </div>
 

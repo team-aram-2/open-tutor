@@ -82,7 +82,6 @@ func (t *OpenTutor) PostRating(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value") {
-			msg := "rating already submitted for this meeting"
 			sendError(w, http.StatusBadRequest, "rating already submitted for this meeting")
 		} else {
 			fmt.Printf("error submitting rating: %v\n", err)
