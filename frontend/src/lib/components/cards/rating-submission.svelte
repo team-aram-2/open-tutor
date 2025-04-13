@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PUBLIC_API_HOST } from '$env/static/public';
+	// import { PUBLIC_API_HOST } from '$env/static/public';
 	import Star from '../star.svelte';
 
 	const categories = ['Professionalism', 'Knowledge', 'Communication', 'Punctuality', 'Overall'];
@@ -10,13 +10,13 @@
 		ratingSubmissions[cat] = starCount;
 	};
 
-	const submitRatings = () => {
-		const reqPromise = fetch(`${PUBLIC_API_HOST}/meeting`, {
-			method: 'POST',
-			body: JSON.stringify(ratingSubmissions),
-			credentials: 'include'
-		});
-	};
+	// const submitRatings = () => {
+	// 	const reqPromise = fetch(`${PUBLIC_API_HOST}/meeting`, {
+	// 		method: 'POST',
+	// 		body: JSON.stringify(ratingSubmissions),
+	// 		credentials: 'include'
+	// 	});
+	// };
 </script>
 
 <div class="bg-[#fdf8ed] w-1/4 rounded-lg select-none">
@@ -49,8 +49,8 @@
 		<!-- Submit -->
 		<button
 			class="mb-4 mx-auto rounded-md text-white bg-sky-500 px-3 py-2 enabled:cursor-pointer disabled:opacity-50"
-			on:click={submitRatings}
 		>
+			<!-- on:click={submitRatings} -->
 			Submit Ratings</button
 		>
 	</div>

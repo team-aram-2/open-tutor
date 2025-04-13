@@ -4,7 +4,7 @@
 	import '../app.css';
 	import Sidebar from '$lib/components/dashboard/sidebar.svelte';
 
-	import { font_size, sidebar_width } from '$lib/stores';
+	import { font_size } from '$lib/stores';
 
 	import { onMount } from 'svelte';
 
