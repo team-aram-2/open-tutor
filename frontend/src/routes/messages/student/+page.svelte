@@ -6,10 +6,9 @@
 	import Attachimagebutton from '$lib/components/messaging/attachimagebutton.svelte';
 
 	import type { MessageItem } from '$lib/types/types';
-	import { onMount } from 'svelte';
-	import autosize from 'autosize';
-	import { font_size } from '$lib/stores';
-	import { get } from 'svelte/store';
+	// import autosize from 'autosize';
+	// import { font_size } from '$lib/stores';
+	// import { get } from 'svelte/store';
 	import { PUBLIC_API_HOST } from '$env/static/public';
 	import { user_id } from '$lib/stores';
 

@@ -2,26 +2,23 @@
 	import MeetingCard from '$lib/components/meetings/meeting-card.svelte';
 	import AddNewButton from '$lib/components/meetings/add-new-button.svelte';
 	import { onMount } from 'svelte';
-	import { get } from 'svelte/store';
-	import { sidebar_width } from '$lib/stores';
 
-	import type { MeetingItem } from '$lib/types/types';
 	import { PUBLIC_API_HOST } from '$env/static/public';
 	import { user_id } from '$lib/stores';
 	import RatingSubmission from '$lib/components/cards/rating-submission.svelte';
 
-	$: current_id = $user_id;
+	// $: current_id = $user_id;
 	$: meetings = [];
-	let meetingId = '';
+	// let meetingId = '';
 	let isInitialized = false;
 	$: if ($user_id && !isInitialized) {
 		isInitialized = true;
 		// loadData($user_id);
 	}
 
-	async function loadData(userId: string) {
-		await fetchMeetings(userId);
-	}
+	// async function loadData(userId: string) {
+	// 	await fetchMeetings(userId);
+	// }
 
 	// const sendMessage = async () => {
 	// 	if (messageContent.trim()) {
@@ -52,7 +49,7 @@
 	// 	}
 	// };
 
-	const fetchMeetings = async (userId: string) => {
+	const fetchMeetings = async () => {
 		try {
 			const res = await fetch(PUBLIC_API_HOST + '/meetings', {
 				method: 'GET',
@@ -71,7 +68,7 @@
 	// 	}
 	// };
 	onMount(async () => {
-		fetchMeetings(current_id);
+		fetchMeetings();
 	});
 </script>
 
