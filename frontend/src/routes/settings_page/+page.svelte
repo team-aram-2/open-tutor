@@ -10,7 +10,7 @@
 	function logout(): void {
 		// Remove the cookie by setting an expiration date in the past.
 		// Adjust the cookie name and path as needed.
-		document.cookie = 'session_token=; expires=${new Date(Date.now() - 1 )}; path=/;';
+		document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
 
 		// Update the Svelte store to indicate the user is logged out.
 		logged_in.set(false);
