@@ -6,6 +6,9 @@
 	import Attachimagebutton from '$lib/components/messaging/attachimagebutton.svelte';
 
 	import type { MessageItem } from '$lib/types/types';
+	// import autosize from 'autosize';
+	// import { font_size } from '$lib/stores';
+	// import { get } from 'svelte/store';
 	import { PUBLIC_API_HOST } from '$env/static/public';
 	import { user_id } from '$lib/stores';
 
@@ -172,11 +175,13 @@
 	}
 
 	.messagecontainer {
-		width: 100%;
+		flex: 1;
 		display: flex;
 		flex-direction: column;
 		flex-wrap: nowrap;
-		flex: 1 1 auto;
+
+		min-width: 0;
+
 		overflow-y: scroll;
 		height: 70%; /* Reduced to make room for dropdown */
 		left: 0;
@@ -188,8 +193,11 @@
 		display: flex;
 		flex-wrap: nowrap;
 		flex-direction: row;
-		flex: 1 1 auto;
-		align-items: center;
+		align-items: stretch;
+
+		min-width: 0;
+		min-height: 0;
+
 		position: relative;
 		bottom: 0;
 		right: 0;
@@ -204,6 +212,11 @@
 	.textbox {
 		flex: 1 1 auto;
 		position: relative;
+		max-height: calc(11.5 * var(--font-size));
+		height: min-content;
+		min-height: calc(1.5 * var(--font-size));
+		width: auto;
+		min-width: 0;
 		height: calc(100% - 40px);
 		box-sizing: border-box;
 		resize: none;

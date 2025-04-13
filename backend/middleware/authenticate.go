@@ -46,7 +46,7 @@ func InvalidateAuthRedirect(r *http.Request, w http.ResponseWriter) {
 		MaxAge:   -1, // Expire immediately
 	})
 	// Redirect the user to the login page
-	http.Redirect(w, r, "/login", http.StatusForbidden)
+	http.Redirect(w, r, "/login?reason=session_expired", http.StatusFound)
 }
 
 func Authenticate(next http.Handler) http.HandlerFunc {

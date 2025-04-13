@@ -867,8 +867,20 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/Rating"
+            type: object
+            required:
+              - meetingId
+              - scores
+            properties:
+              meetingId:
+                type: string
+                description: The unique ID of the meeting to submit review for
+              scores:
+                $ref: '#/components/schemas/RatingScores'
+                description: Scores for the user rating
+              comment:
+                type: string
+                description: Optional user comment about the meeting
       responses:
         "201":
           description: Rating posted

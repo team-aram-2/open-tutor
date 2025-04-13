@@ -253,6 +253,9 @@ type UserSignup struct {
 	Password  string              `json:"password"`
 }
 
+// PostRatingJSONBody defines parameters for PostRating.
+type PostRatingJSONBody interface{}
+
 // CreateConversationJSONBody defines parameters for CreateConversation.
 type CreateConversationJSONBody = []openapi_types.UUID
 
@@ -331,7 +334,7 @@ type UpdateMessageByIdJSONRequestBody = Message
 type CreateMessageAttachmentJSONRequestBody = MessageAttachment
 
 // PostRatingJSONRequestBody defines body for PostRating for application/json ContentType.
-type PostRatingJSONRequestBody = Rating
+type PostRatingJSONRequestBody PostRatingJSONBody
 
 // CreateSkillJSONRequestBody defines body for CreateSkill for application/json ContentType.
 type CreateSkillJSONRequestBody = TutorSkill

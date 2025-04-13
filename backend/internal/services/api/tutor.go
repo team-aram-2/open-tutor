@@ -44,13 +44,13 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 	var currentRoleMask util.RoleMask
 	err = db.GetDB().QueryRow("SELECT email, first_name, last_name, role_mask FROM users WHERE user_id = $1", authInfo.UserID).Scan(&email, &userFirstName, &userLastName, &currentRoleMask)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "Database error: %s\n", err)
+		sendError(w, http.StatusInternalServerError, "Database error.")
+		log.Printf("Tutor Registration Error: Database error: %v", err)
 		return
 	}
 	if email == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "User with ID:{} does not exist\n")
+		sendError(w, http.StatusBadRequest, "Unable to process request.")
+		log.Printf("Tutor Registration Error: user not found: %v", err)
 		return
 	}
 
@@ -58,37 +58,36 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 	var tutorExists bool
 	err = db.GetDB().QueryRow("SELECT EXISTS(SELECT 1 FROM tutors WHERE user_id = $1)", authInfo.UserID).Scan(&tutorExists)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "Database error: %s\n", err)
+		sendError(w, http.StatusInternalServerError, "Database error.")
+		log.Printf("Tutor Registration Error: Database error: %v", err)
 		return
 	}
 	if tutorExists {
-		w.WriteHeader(http.StatusConflict)
-		fmt.Fprintf(w, "User with ID:{} is already registered as a tutor.\n")
+		sendError(w, http.StatusConflict, "User Already Registered.")
 		return
 	}
 
 	// Update user role to include Tutor role
 	err = db.GetDB().QueryRow("SELECT role_mask FROM users WHERE user_id = $1", authInfo.UserID).Scan(&currentRoleMask)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "Database error: %s\n", err)
+		sendError(w, http.StatusInternalServerError, "Databse error.")
+		log.Printf("Tutor Registration Error: Database error: %v", err)
 		return
 	}
 
 	// Update the user's role in the database
 	_, err = db.GetDB().Exec("UPDATE users SET role_mask = $1 WHERE user_id = $2", currentRoleMask, authInfo.UserID)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "Failed to update user's role: %v\n", err)
+		sendError(w, http.StatusInternalServerError, "Databse error.")
+		log.Printf("Failed to update user's role: %v", err)
 		return
 	}
 
 	// Update the session token to reflect the new role
 	err = applySessionTokenForUserId(authInfo.UserID, false, currentRoleMask, w)
 	if err != nil {
-		fmt.Printf("failed to apply session token: %v\n", err)
-		sendError(w, http.StatusInternalServerError, "failed to apply session token")
+		sendError(w, http.StatusInternalServerError, "Internal error, please try again.")
+		log.Printf("Failed to apply session token: %v", err)
 		return
 	}
 
@@ -97,8 +96,8 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 
 	_, insertErr := db.GetDB().Exec("INSERT INTO tutors (user_id) VALUES ($1)", authInfo.UserID)
 	if insertErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%s\n", insertErr)
+		sendError(w, http.StatusInternalServerError, "Database error.")
+		log.Printf("Failed to update user entry in database: %v", insertErr)
 		return
 	}
 
@@ -160,13 +159,14 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 	}
 	result, err := stripe_client.GetClient().Accounts.New(params)
 	if err != nil {
-		sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to create Stripe account for tutor: %v", err))
+		sendError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to create Stripe account: %v", err))
 		return
 	}
 
 	_, err = db.GetDB().Exec("UPDATE tutors SET stripe_account_id = $1 WHERE user_id = $2", result.ID, authInfo.UserID)
 	if err != nil {
-		sendError(w, http.StatusInternalServerError, fmt.Sprintf("failed to save Stripe account id to tutor: %v", err))
+		sendError(w, http.StatusInternalServerError, "Database error.")
+		log.Printf("Failed to save Stripe account to database: %v", err)
 		return
 	}
 	w.Header().Set("Location", r.Header.Get("Origin")+"/")
