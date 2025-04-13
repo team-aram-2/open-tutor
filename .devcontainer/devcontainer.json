@@ -1,66 +1,58 @@
 {
-    "name": "open-tutor",
-    "remoteUser": "node",
-    "containerUser": "node",
-    "dockerComposeFile": "docker-compose.yml",
-    "service": "open-tutor",
-    "workspaceFolder": "/workspace",
-    "features": {
-        "ghcr.io/devcontainers/features/git:1": {}
-    },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-azuretools.vscode-docker",
-                "vscode-icons-team.vscode-icons",
-                "hashicorp.terraform",
-                "golang.go",
-                "davidanson.vscode-markdownlint",
-                "shardulm94.trailing-spaces",
-                "Gruntfuggly.todo-tree",
-                "github.vscode-pull-request-github",
-                "svelte.svelte-vscode",
-                "shd101wyy.markdown-preview-enhanced",
-                "esbenp.prettier-vscode",
-                "dbaeumer.vscode-eslint"
-            ],
-            "settings": {
-                "terminal.integrated.defaultProfile.linux": "bash",
-                "editor.formatOnSave": true,
-                "go.buildTags": "",
-                "go.toolsEnvVars": {
-                    "CGO_ENABLED": "1"
-                },
-                "go.testFlags": [
-                    "-v",
-                    "-race"
-                ],
-                "go.testTimeout": "10s",
-                "go.coverOnSingleTest": true,
-                "go.coverOnSingleTestFile": true,
-                "go.coverOnTestPackage": true,
-                "go.lintTool": "golangci-lint",
-                "go.lintOnSave": "package",
-                "[go]": {
-                    "editor.codeActionsOnSave": {
-                        "source.organizeImports": "always"
-                    }
-                },
-                "gopls": {
-                    "usePlaceholders": false,
-                    "staticcheck": true,
-                    "formatting.gofumpt": true
-                }
-            }
+  "name": "open-tutor",
+  "remoteUser": "node",
+  "containerUser": "node",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "open-tutor",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "vscode-icons-team.vscode-icons",
+        "hashicorp.terraform",
+        "golang.go",
+        "davidanson.vscode-markdownlint",
+        "shardulm94.trailing-spaces",
+        "Gruntfuggly.todo-tree",
+        "github.vscode-pull-request-github",
+        "svelte.svelte-vscode",
+        "shd101wyy.markdown-preview-enhanced",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "donjayamanne.githistory"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "go.buildTags": "",
+        "go.toolsEnvVars": {
+          "CGO_ENABLED": "1"
+        },
+        "go.testFlags": ["-v", "-race"],
+        "go.testTimeout": "10s",
+        "go.coverOnSingleTest": true,
+        "go.coverOnSingleTestFile": true,
+        "go.coverOnTestPackage": true,
+        "go.lintTool": "golangci-lint",
+        "go.lintOnSave": "package",
+        "[go]": {
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": "always"
+          }
+        },
+        "gopls": {
+          "usePlaceholders": false,
+          "staticcheck": true,
+          "formatting.gofumpt": true
         }
-    },
-    "postCreateCommand": "aws configure set region us-west-2 && aws configure set output json; sudo /etc/init.d/ssh start",
-    "forwardPorts": [
-        4566,
-        4571,
-        5050,
-        5432,
-        2222
-    ],
-    "shutdownAction": "stopCompose"
+      }
+    }
+  },
+  "postCreateCommand": "aws configure set region us-west-2 && aws configure set output json; sudo /etc/init.d/ssh start",
+  "forwardPorts": [4566, 4571, 5050, 5432, 2222],
+  "shutdownAction": "stopCompose"
 }
