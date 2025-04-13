@@ -181,7 +181,7 @@ CREATE TABLE ratings (
   "rating_type" user_type NOT NULL,
   "user_id" TEXT NOT NULL,
   "reviewer_user_id" TEXT NOT NULL,
-  "meeting_id" TEXT NOT NULL,
+  "meeting_id" TEXT NOT NULL UNIQUE,
   "professionalism" INT NOT NULL,
   "knowledge" INT NOT NULL,
   "communication" INT NOT NULL,
