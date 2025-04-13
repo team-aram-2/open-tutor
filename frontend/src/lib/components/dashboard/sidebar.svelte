@@ -10,7 +10,7 @@
 	import { sidebar_width } from '$lib/stores';
 	import { onMount } from 'svelte';
 
-	let selectedItem = 'view';
+	let selectedItem = 'home';
 	let collapsed = false;
 	import { logged_in } from '$lib/stores';
 

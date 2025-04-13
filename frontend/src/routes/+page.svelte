@@ -21,6 +21,7 @@
 	main {
 		font-family: inter;
 		display: flex;
+		width: 100%;
 		justify-content: center;
 		align-items: center;
 		min-height: 100vh;
@@ -32,8 +33,9 @@
 		flex-direction: column;
 		justify-content: center;
 		text-align: center;
-		max-width: 800px;
+		max-width: 100%;
 		padding: 2rem;
+		margin: 0 auto 0 auto;
 	}
 
 	h1 {
@@ -41,10 +43,20 @@
 		font-weight: 700;
 		margin-bottom: 2rem;
 	}
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
 	.titlecontainer {
 		display: flex;
 		flex-direction: row;
 		justify-content: center;
+		animation: fadeIn 2s ease-in;
 	}
 	.open {
 		color: var(--yellow-very-light);
