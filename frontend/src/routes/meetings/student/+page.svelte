@@ -8,7 +8,7 @@
 	import RatingSubmission from '$lib/components/cards/rating-submission.svelte';
 
 	// $: current_id = $user_id;
-	$: meetings = [];
+	$: meetings = [] as Record<string, unknown>[];
 	// let meetingId = '';
 	let isInitialized = false;
 	$: if ($user_id && !isInitialized) {
@@ -61,6 +61,28 @@
 		}
 	};
 
+	$: submitRatingsMeetingId = null;
+	const submitRatings = (ratings: Record<string, number>, comment?: string) => {
+		const netRatings: Record<string, number> = {};
+		for (const [category, score] of Object.entries(ratings)) {
+			netRatings[category.toLowerCase()] = score;
+		}
+
+		fetch(`${PUBLIC_API_HOST}/rating`, {
+			method: 'POST',
+			body: JSON.stringify({
+				meetingId: submitRatingsMeetingId,
+				scores: netRatings,
+				comment: comment
+			}),
+			credentials: 'include'
+		});
+	};
+
+	const onRatingSubmit = () => {
+		submitRatingsMeetingId = null;
+	};
+
 	// const handleKeydown = (event: KeyboardEvent) => {
 	// 	if (event.key === 'Enter' && messageContent.trim()) {
 	// 		event.preventDefault();
@@ -75,12 +97,12 @@
 <div class="meetings-container relative flex flex-col">
 	<!-- !!! DO NOT PUT ANYTHING ABOVE THIS INSIDE THIS DIV IF YOU DO YOU WILL DIE !!! -->
 	<!-- rating submission popover has to be the top element for layout to work -->
-	<div class="absolute flex justify-center items-center w-full h-full bg-black/80 z-50">
-		<RatingSubmission />
-	</div>
+	{#if submitRatingsMeetingId}
+		<RatingSubmission {submitRatings} {onRatingSubmit} />
+	{/if}
 
 	{#each meetings as meeting}
-		<MeetingCard {meeting} />
+		<MeetingCard {meeting} onSubmitRating={() => (submitRatingsMeetingId = meeting.id)} />
 	{/each}
 
 	<div class="fit-content fixed right-10 bottom-10">
