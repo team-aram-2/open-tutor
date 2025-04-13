@@ -19,8 +19,8 @@ const (
 )
 
 type Claims struct {
-	UserID   *string `json:"user_id"`
-	RoleMask util.RoleMask
+	UserID   *string       `json:"user_id"`
+	RoleMask util.RoleMask `json:"role_mask"`
 	jwt.StandardClaims
 }
 
@@ -110,6 +110,7 @@ func Authenticate(next http.Handler) http.HandlerFunc {
 
 		// Compare the stored role with the current role
 		if claims.RoleMask != currentRoleMask {
+			log.Printf("[Authenticate] JWT.Claims role bitmask (%v)!= databse role bitmask (%v).", claims.RoleMask, currentRoleMask)
 			InvalidateAuthRedirect(r, w)
 			return
 		}

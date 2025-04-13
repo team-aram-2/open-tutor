@@ -303,6 +303,20 @@ paths:
           description: The ID of the tutor to get
           schema:
             type: integer
+        - name: sort
+          in: query
+          required: false
+          description: The type of sort. Default if unspecified is pseudo-random.
+          schema:
+            type: string
+            enum: [rating, name]
+        - name: order
+          in: query
+          required: false
+          description: The order of the search results, either 'asc' or 'desc'.
+          schema:
+            type: string
+            enum: [asc, desc]
         - name: minRating
           in: query
           required: false
