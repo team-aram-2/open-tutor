@@ -50,10 +50,6 @@ func (t *OpenTutor) GetMessageAttachmentById(w http.ResponseWriter, r *http.Requ
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }
 
-func (t *OpenTutor) PostRating(w http.ResponseWriter, r *http.Request) {
-	sendError(w, http.StatusMethodNotAllowed, "TODO")
-}
-
 func (t *OpenTutor) SignUpAsStudent(w http.ResponseWriter, r *http.Request) {
 	sendError(w, http.StatusMethodNotAllowed, "TODO")
 }

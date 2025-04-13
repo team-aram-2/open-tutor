@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
-	"net"
 	"net/http"
 
 	api "open-tutor/internal/services/api"
@@ -46,8 +46,9 @@ func main() {
 
 	s := &http.Server{
 		Handler: h,
-		Addr:    net.JoinHostPort("127.0.0.1", *port),
+		Addr:    fmt.Sprintf(":%s", *port),
 	}
+	fmt.Printf("listening on %s\n", s.Addr)
 
 	log.Fatal(s.ListenAndServe())
 }
