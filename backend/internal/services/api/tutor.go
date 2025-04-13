@@ -221,14 +221,48 @@ func (t *OpenTutor) GetTutors(w http.ResponseWriter, r *http.Request, params Get
 		query += " HAVING " + strings.Join(havingConditions, " AND ")
 	}
 
-	// ORDER, LIMIT, and OFFSET
-	query += fmt.Sprintf(" ORDER BY AVG(r.overall) DESC LIMIT $%d OFFSET $%d", argIndex, argIndex+1)
+	sortQueryString := ""
+	orderQueryString := ""
+
+	if params.Sort != nil {
+		switch *params.Sort {
+		case "rating":
+			{
+				sortQueryString = "AVG(r.overall)"
+				orderQueryString = "DESC"
+			}
+		case "name":
+			{
+				sortQueryString = "lower(u.last_name)"
+				orderQueryString = "ASC"
+			}
+		}
+	} else {
+		sortQueryString = "RANDOM()"
+	}
+
+	if params.Order != nil {
+		switch *params.Order {
+		case "asc":
+			{
+				orderQueryString = "ASC"
+			}
+		case "desc":
+			{
+				orderQueryString = "DESC"
+			}
+		}
+	}
+
+	// LIMIT, and OFFSET
+	query += fmt.Sprintf("ORDER BY %s %s LIMIT $%d OFFSET $%d", sortQueryString, orderQueryString, argIndex, argIndex+1)
 	args = append(args, params.PageSize, params.PageSize*params.PageIndex)
 
 	// Execute query
 	rows, err := db.GetDB().Query(query, args...)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Database error: %v", err), http.StatusInternalServerError)
+		sendError(w, http.StatusInternalServerError, "Database Error")
+		log.Printf("[GET tutor] Database error: %v", err)
 		return
 	}
 	defer rows.Close()
@@ -248,7 +282,8 @@ func (t *OpenTutor) GetTutors(w http.ResponseWriter, r *http.Request, params Get
 			&ratingScores.Professionalism, &ratingScores.Punctuality, &ratingCount,
 		)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to parse tutors: %v", err), http.StatusInternalServerError)
+			sendError(w, http.StatusInternalServerError, "Database error.")
+			log.Printf("[GET tutor] Failed to parse tutors: %v", err)
 			return
 		}
 
@@ -267,7 +302,7 @@ func (t *OpenTutor) GetTutors(w http.ResponseWriter, r *http.Request, params Get
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(tutorResponses)
 	if err != nil {
-		log.Println("Error: ", err)
+		log.Println("[GET tutor] Error: ", err)
 	}
 }
 
