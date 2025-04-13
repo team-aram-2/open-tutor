@@ -31,6 +31,18 @@ const (
 	GetRatingByIdParamsUserTypeTutor   GetRatingByIdParamsUserType = "tutor"
 )
 
+// Defines values for GetTutorsParamsSort.
+const (
+	GetTutorsParamsSortName   GetTutorsParamsSort = "name"
+	GetTutorsParamsSortRating GetTutorsParamsSort = "rating"
+)
+
+// Defines values for GetTutorsParamsOrder.
+const (
+	Asc  GetTutorsParamsOrder = "asc"
+	Desc GetTutorsParamsOrder = "desc"
+)
+
 // AcademicCategory defines model for AcademicCategory.
 type AcademicCategory struct {
 	// Id Unique identifier for the academic category.
@@ -266,12 +278,24 @@ type GetTutorsParams struct {
 	// PageIndex The ID of the tutor to get
 	PageIndex int `form:"pageIndex" json:"pageIndex"`
 
+	// Sort The type of sort. Default if unspecified is pseudo-random.
+	Sort *GetTutorsParamsSort `form:"sort,omitempty" json:"sort,omitempty"`
+
+	// Order The order of the search results, either 'asc' or 'desc'.
+	Order *GetTutorsParamsOrder `form:"order,omitempty" json:"order,omitempty"`
+
 	// MinRating The minimum rating of tutor to get.
 	MinRating *float32 `form:"minRating,omitempty" json:"minRating,omitempty"`
 
 	// SkillsInclude The skills a tutor should have.
 	SkillsInclude *[]openapi_types.UUID `form:"skillsInclude,omitempty" json:"skillsInclude,omitempty"`
 }
+
+// GetTutorsParamsSort defines parameters for GetTutors.
+type GetTutorsParamsSort string
+
+// GetTutorsParamsOrder defines parameters for GetTutors.
+type GetTutorsParamsOrder string
 
 // SignUpAsTutorJSONBody defines parameters for SignUpAsTutor.
 type SignUpAsTutorJSONBody interface{}
@@ -1198,6 +1222,22 @@ func (siw *ServerInterfaceWrapper) GetTutors(w http.ResponseWriter, r *http.Requ
 	err = runtime.BindQueryParameter("form", true, true, "pageIndex", r.URL.Query(), &params.PageIndex)
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageIndex", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sort" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sort", r.URL.Query(), &params.Sort)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sort", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "order" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "order", r.URL.Query(), &params.Order)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "order", Err: err})
 		return
 	}
 
