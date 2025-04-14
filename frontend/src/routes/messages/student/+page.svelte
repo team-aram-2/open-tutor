@@ -21,7 +21,7 @@
 	let conversationId = '';
 	let conversations: Conversation[] = [];
 	let isInitialized = false;
-	let toLoad = false;
+	$: toLoad = false;
 
 	$: if ($user_id && !isInitialized) {
 		isInitialized = true;
@@ -159,11 +159,9 @@
 			(document.getElementsByClassName('textboxcontainer')[0] as HTMLElement).style.height =
 				Number(Number(get(font_size).slice(0, -2)) * 1.5 + 40) + 'px';
 		}
-		if (toLoad) {
-			interval = setInterval(() => {
-				fetchMessages();
-			}, 1000);
-		}
+		interval = setInterval(() => {
+			fetchMessages();
+		}, 1000);
 		return () => {
 			clearInterval(interval);
 		};
