@@ -74,12 +74,6 @@
 	font-size: calc(2 * var(--font-size));
 }
 
-@container (min-width: 50px) {
-	.tutor-name {
-		border: 2px solid chartreuse;
-	}
-}
-
 .zoom-link {
 	height: calc(var(--font-size) * 1.5);
 	width: 100%;

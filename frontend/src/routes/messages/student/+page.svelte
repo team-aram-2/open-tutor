@@ -2,13 +2,13 @@
 	import Message from '$lib/components/messaging/message.svelte';
 	import { onMount } from 'svelte';
 
-	import Sendbutton from '$lib/components/messaging/sendbutton.svelte';
+	// import Sendbutton from '$lib/components/messaging/sendbutton.svelte';
 	import Attachimagebutton from '$lib/components/messaging/attachimagebutton.svelte';
 
 	import type { MessageItem } from '$lib/types/types';
-	// import autosize from 'autosize';
-	// import { font_size } from '$lib/stores';
-	// import { get } from 'svelte/store';
+	import autosize from 'autosize';
+	import { font_size } from '$lib/stores';
+	import { get } from 'svelte/store';
 	import { PUBLIC_API_HOST } from '$env/static/public';
 	import { user_id } from '$lib/stores';
 
@@ -130,14 +130,46 @@
 	};
 
 	onMount(() => {
+		let interval: number;
+		// Set up event listener to update the size of the textboxcontainer
+		let textbox_container = document.getElementsByClassName('textboxcontainer')[0] as HTMLElement;
+
+		// Set up autosize for the textbox
+		let text_area: HTMLTextAreaElement | null =
+			document.querySelector<HTMLTextAreaElement>('textarea');
+		if (text_area) {
+			autosize(text_area);
+
+			text_area.addEventListener('autosize:resized', function () {
+				if (textbox_container) {
+					const style = window.getComputedStyle(text_area);
+					const lineHeight = parseFloat(style.lineHeight);
+					// Here we assume that if the scrollHeight is roughly equal to the line-height,
+					// then there's only one line of text. Adjust the tolerance if needed.
+					if (text_area.scrollHeight <= lineHeight + 2) {
+						text_area.style.height = lineHeight + 'px';
+					}
+					textbox_container.style.height = text_area.offsetHeight + 40 + 'px';
+				}
+			});
+			if (textbox_container) {
+				textbox_container.style.height =
+					String(window.getComputedStyle(document.body).getPropertyValue('--font-size') + 40) +
+					'px';
+			}
+		}
+		if (!(typeof document === 'undefined')) {
+			(document.getElementsByClassName('textboxcontainer')[0] as HTMLElement).style.height =
+				Number(Number(get(font_size).slice(0, -2)) * 1.5 + 40) + 'px';
+		}
 		if (toLoad) {
-			const interval = setInterval(() => {
+			interval = setInterval(() => {
 				fetchMessages();
 			}, 1000);
-			return () => {
-				clearInterval(interval);
-			};
 		}
+		return () => {
+			clearInterval(interval);
+		};
 	});
 </script>
 
@@ -167,7 +199,7 @@
 <div class="textboxcontainer">
 	<Attachimagebutton />
 	<textarea class="textbox" bind:value={messageContent} on:keydown={handleKeydown}></textarea>
-	<Sendbutton />
+	<!-- <Sendbutton /> -->
 	<button class="send-button" on:click={sendMessage} disabled={!messageContent.trim()}>
 		Send
 	</button>
@@ -232,8 +264,6 @@
 		min-height: calc(1.5 * var(--font-size));
 		width: auto;
 		min-width: 0;
-		height: calc(100% - 40px);
-		box-sizing: border-box;
 		resize: none;
 		margin: 20px 20px 20px 20px;
 		z-index: 10;
