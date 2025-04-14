@@ -2,7 +2,7 @@
 	import Message from '$lib/components/messaging/message.svelte';
 	import { onMount } from 'svelte';
 
-	import Sendbutton from '$lib/components/messaging/sendbutton.svelte';
+	// import Sendbutton from '$lib/components/messaging/sendbutton.svelte';
 	import Attachimagebutton from '$lib/components/messaging/attachimagebutton.svelte';
 
 	import type { MessageItem } from '$lib/types/types';
@@ -199,7 +199,7 @@
 <div class="textboxcontainer">
 	<Attachimagebutton />
 	<textarea class="textbox" bind:value={messageContent} on:keydown={handleKeydown}></textarea>
-	<Sendbutton />
+	<!-- <Sendbutton /> -->
 	<button class="send-button" on:click={sendMessage} disabled={!messageContent.trim()}>
 		Send
 	</button>
