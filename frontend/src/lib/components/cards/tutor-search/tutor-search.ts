@@ -4,17 +4,25 @@ import type { SkillsItem } from '$lib/types/types';
 // Get available skills from backend
 export async function fetchSkillsJSON<T>(): Promise<T> {
 	console.log('starting fetchSkills');
-	const response = await fetch(`${PUBLIC_API_HOST}/skill`, {
-		method: 'GET',
-		credentials: 'include'
-	});
-	if (!response.ok) {
-		console.error(`HTTP error, status: ${response.status}`);
+	let response: Response;
+	try {
+		response = await fetch(PUBLIC_API_HOST + '/skills', {
+			method: 'GET',
+			credentials: 'include'
+		});
+		if (!response.ok) {
+			console.error(`HTTP error, status: ${response.status}`);
+			throw new Error(`HTTP error, status: ${response.status}`);
+		}
+		console.log(response);
+		return (await response.json()) as T;
+	} catch (err) {
+		console.error('Error fetching skills, ' + err);
 	}
-	return (await response.json()) as T;
+	return null as T;
 }
 
-export async function loadSkills(): Promise<SkillsItem[]> {
+export async function loadSkills(): Promise<SkillsItem[] | null> {
 	console.log('starting loadSkills');
 	const returnedSkills = await fetchSkillsJSON<SkillsItem[]>();
 	console.log('returnedSkills: ' + String(returnedSkills));

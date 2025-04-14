@@ -26,3 +26,17 @@ export interface SkillsItem {
 	questions: string[];
 	tutorHasSkill: boolean;
 }
+
+export interface TutorItem {
+	info: {
+		email?: string;
+		firstName: string;
+		lastName: string;
+	};
+	userId: string;
+	signedUpAt?: string;
+	accountLocked?: boolean;
+	passwordHash?: string;
+	totalHours?: number;
+	skills?: string[];
+}

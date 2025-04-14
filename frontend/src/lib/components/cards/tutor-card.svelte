@@ -43,31 +43,36 @@
 				{/each}
 			</div>
 		</a>
-		<button class="message-btn" on:click={createConversation}>
-			<svg
-				class="message-icon"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-			</svg>
-		</button>
 	</h1>
 	<div class="specialties">
 		{#each skills as skill}
 			<div class="skill-tag">{skill}</div>
 		{/each}
 	</div>
+	<button
+		class="message-btn"
+		on:click={createConversation}
+		style="margin-left: calc({width}-calc(var(--font-size) * 1))"
+	>
+		<svg
+			class="message-icon"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+		</svg>
+	</button>
 </div>
 
 <style>
 	.tutor-card {
 		display: flex;
 		flex-direction: column;
+		position: relative;
 
 		margin: 0px 0px 0px 0px;
 
@@ -81,6 +86,7 @@
 	}
 
 	.tutor-header {
+		position: relative;
 		display: flex;
 		flex-direction: row;
 		height: calc(55% + max(0px, (10px - (var(--font-size) * 0.125))));
@@ -180,18 +186,24 @@
 		white-space: nowrap;
 	}
 	.message-btn {
+		position: absolute;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+
 		height: calc(var(--font-size) * 1.8);
 		padding: 0 calc(var(--font-size) * 0.5);
-		margin-right: 0px;
+		right: calc(var(--font-size) * 0.1);
+		bottom: calc(var(--font-size) * 0.1);
+
+		/* margin: calc(var(--font-size) * 0.1) calc(var(--font-size) * 0.1) auto auto; */
+
 		border-radius: calc(var(--font-size) * 0.5);
-		background: var(--yellow-neutral);
-		color: var(--yellow-very-dark);
+		background: var(--yellow-light);
+		color: var(--yellow-dark);
 		font-weight: bold;
 		font-size: calc(var(--font-size) * 0.8);
-		border: none;
+		border: 3px solid var(--yellow-neutral);
 		cursor: pointer;
 		transition: background-color 0.2s;
 	}

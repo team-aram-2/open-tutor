@@ -3,7 +3,7 @@
 	// import { PUBLIC_API_HOST } from '$env/static/public';
 	import { onMount } from 'svelte';
 
-	// import type { SkillsItem } from '$lib/types/types';
+	import type { SkillsItem } from '$lib/types/types';
 	// import SearchIcon from './tutor-search/search-icon.svelte';
 	import AscIcon from './tutor-search/order-icons/asc-icon.svelte';
 	import SearchIcon from './tutor-search/search-icon.svelte';
@@ -12,6 +12,7 @@
 	import RatingIcon from './tutor-search/sort-icons/rating-icon.svelte';
 	import TutorNameIcon from './tutor-search/sort-icons/tutor-name-icon.svelte';
 	import InteractiveRatingBar from '../generic/interactive-rating-bar.svelte';
+	import { loadSkills } from './tutor-search/tutor-search';
 	// pageSize       (integer, req)
 	// pageIndex      (integer, req)
 	// minRating      (number, optional)
@@ -21,36 +22,34 @@
 	let sort = 'rating'; // (string, optional) (can be "rating XOR name")
 
 	let availableSkills: string[] = [
-		'Aboard',
-		'About',
-		'Above',
-		'Across',
-		'After',
-		'Against',
-		'Along',
-		'Among',
-		'Around',
-		'At',
-		'Before',
-		'Behind',
-		'Below',
-		'Beneath',
-		'Beside',
-		'Between',
-		'Beyond',
-		'But',
-		'By',
-		'Down',
-		'During',
-		'Despite',
-		'Except',
-		'For',
-		'From',
-		'In',
-		'Inside'
+		'Addition',
+		'Subtraction',
+		'Multiplication',
+		'Division',
+		'Calculus I',
+		'Calculus II',
+		'Calculus III',
+		'Linear Algebra',
+		'College Algebra',
+		'Precalculus',
+		'Chemistry I',
+		'Chemistry II',
+		'Organic Chemistry',
+		'Anthropology',
+		'Art Appreciation',
+		'Baroque Music',
+		'Harpsichord',
+		'Vocal Performance',
+		'Percussion',
+		'Biology I',
+		'Biology II',
+		'Cellular Biology',
+		'Technical Writing',
+		'British Literature',
+		'Spanish',
+		'French',
+		'Japanese'
 	];
-
-	// availableSkills; TODO: LOAD AVAILABLESKILLS FROM BACKEND
 
 	// On update of one of the selected skills, update the list
 	function toggleSkill(skillName: string) {
@@ -90,11 +89,15 @@
 	onMount(async () => {
 		console.log('onmount started');
 		try {
-			// const skills: SkillsItem[] = await loadSkills();
-			// availableSkills = skills.map((skill) => skill.title);
-			console.log('Skills finished loading!');
+			const skills: SkillsItem[] | null = await loadSkills();
+			if (skills) {
+				availableSkills = skills.map((skill) => skill.title);
+				console.log('Skills finished loading!');
+			} else {
+				throw new Error('skills not loaded');
+			}
 		} catch (error) {
-			console.error('error loading skills:', error);
+			console.error('error loading skills: ', error);
 		}
 	});
 </script>
