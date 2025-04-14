@@ -61,7 +61,7 @@
 		}
 	};
 
-	$: submitRatingsMeetingId = null;
+	let submitRatingsMeetingId: string | unknown | null = null;
 	const submitRatings = (ratings: Record<string, number>, comment?: string) => {
 		const netRatings: Record<string, number> = {};
 		for (const [category, score] of Object.entries(ratings)) {
@@ -83,12 +83,6 @@
 		submitRatingsMeetingId = null;
 	};
 
-	// const handleKeydown = (event: KeyboardEvent) => {
-	// 	if (event.key === 'Enter' && messageContent.trim()) {
-	// 		event.preventDefault();
-	// 		sendMessage();
-	// 	}
-	// };
 	onMount(async () => {
 		fetchMeetings();
 	});
