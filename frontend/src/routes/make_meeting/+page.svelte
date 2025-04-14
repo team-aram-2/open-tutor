@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { PUBLIC_API_HOST } from '$env/static/public';
 	import { redirect } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
@@ -37,10 +38,11 @@
 		const response = await reqPromise;
 		if (!response || !response?.ok) {
 			console.error(`failed to sign up/login`);
+			submissionError = 'Failed to create meeting';
 			return;
 		}
 		if (response.ok) {
-			redirect(302, '/meetings');
+			goto('http://localhost:5173/meetings/student');
 		}
 
 		window.localStorage.setItem('SessionToken', response.headers.get('X-Session-Token')!);
