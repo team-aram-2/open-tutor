@@ -271,7 +271,7 @@ func (t *OpenTutor) GetConversationsByUserId(w http.ResponseWriter, r *http.Requ
 					sendError(w, http.StatusInternalServerError, "Server Error")
 					return
 				} else {
-					fullname = fmt.Sprintf("%s %s", first, last)
+					fullname = fmt.Sprintf("%s %s (%s)", first, last, uid)
 				}
 				userMap[uid] = fullname
 			}

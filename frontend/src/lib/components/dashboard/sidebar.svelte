@@ -5,12 +5,12 @@
 	import CreditCardIcon from './sidebar-icons/creditCard_icon.svelte';
 	import GearIcon from './sidebar-icons/gear_icon.svelte';
 	import PersonHeadIcon from './sidebar-icons/personHead_icon.svelte';
-	// import { resizeObserver } from '$lib/scripts/observers';
+	import HomeIcon from './sidebar-icons/home_icon.svelte';
 
 	import { sidebar_width } from '$lib/stores';
 	import { onMount } from 'svelte';
 
-	let selectedItem = 'view';
+	let selectedItem = 'home';
 	let collapsed = false;
 	import { logged_in } from '$lib/stores';
 
@@ -45,7 +45,7 @@
 <div class="sidebar flex h-screen" style="border-top-right-radius: 25px;" class:collapsed>
 	<!-- Sidebar Title -->
 	<div class="title-container">
-		<h2 class="sidebar-title">Student</h2>
+		<h2 class="sidebar-title">Sidebar</h2>
 
 		<div class="hamburger">
 			<Hamburger open={collapsed} on:toggle={handleToggle}></Hamburger>
@@ -54,6 +54,20 @@
 
 	<!-- Sidebar Items -->
 	<nav class="sidebar-items">
+		<a
+			href="/"
+			class="no-decoration"
+			class:selected-sidebar-item={selectedItem === 'home'}
+			on:click={() => setSelectedItem('home')}
+		>
+			<p class="sidebar-item-text">Home</p>
+
+			<!-- Icon that appears when sidebar is collapsed -->
+			<div class="collapsed-sidebar-item-icon">
+				<!-- HomeIcon -->
+				<HomeIcon />
+			</div>
+		</a>
 		{#if $logged_in}
 			<a
 				href="/my_people/student"

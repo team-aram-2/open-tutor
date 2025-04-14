@@ -2,9 +2,6 @@
 	import Message from '$lib/components/messaging/message.svelte';
 	import { onMount } from 'svelte';
 
-	// import Sendbutton from '$lib/components/messaging/sendbutton.svelte';
-	import Attachimagebutton from '$lib/components/messaging/attachimagebutton.svelte';
-
 	import type { MessageItem } from '$lib/types/types';
 	import autosize from 'autosize';
 	import { font_size } from '$lib/stores';
@@ -191,15 +188,14 @@
 				originId={message.originId}
 				messageContent={message.messageContent}
 				userId={current_id}
+				sentOn={message.sentOn}
 			></Message>
 		{/each}
 	{/if}
 </div>
 
 <div class="textboxcontainer">
-	<Attachimagebutton />
 	<textarea class="textbox" bind:value={messageContent} on:keydown={handleKeydown}></textarea>
-	<!-- <Sendbutton /> -->
 	<button class="send-button" on:click={sendMessage} disabled={!messageContent.trim()}>
 		Send
 	</button>
@@ -210,6 +206,7 @@
 		width: 100%;
 		padding: 10px;
 		background-color: var(--yellow-neutral);
+		border-radius: 2px;
 	}
 
 	.conversation-dropdown {
@@ -254,6 +251,7 @@
 		background-color: var(--yellow-neutral);
 		display: flex;
 		align-items: center;
+		border-radius: 2px;
 	}
 
 	.textbox {
