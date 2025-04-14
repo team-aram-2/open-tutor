@@ -2,9 +2,6 @@
 	import Message from '$lib/components/messaging/message.svelte';
 	import { onMount } from 'svelte';
 
-	import Sendbutton from '$lib/components/messaging/sendbutton.svelte';
-	import Attachimagebutton from '$lib/components/messaging/attachimagebutton.svelte';
-
 	import type { MessageItem } from '$lib/types/types';
 	// import autosize from 'autosize';
 	// import { font_size } from '$lib/stores';
