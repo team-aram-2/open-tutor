@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { PUBLIC_API_HOST } from '$env/static/public';
+	import { redirect } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 
 	$: studentIdInput = '';
@@ -37,6 +38,9 @@
 		if (!response || !response?.ok) {
 			console.error(`failed to sign up/login`);
 			return;
+		}
+		if (response.ok) {
+			redirect(302, '/meetings');
 		}
 
 		window.localStorage.setItem('SessionToken', response.headers.get('X-Session-Token')!);

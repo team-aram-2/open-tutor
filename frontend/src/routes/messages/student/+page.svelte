@@ -159,13 +159,13 @@
 				originId={message.originId}
 				messageContent={message.messageContent}
 				userId={current_id}
+				sentOn={message.sentOn}
 			></Message>
 		{/each}
 	{/if}
 </div>
 
 <div class="textboxcontainer">
-	<Attachimagebutton />
 	<textarea class="textbox" bind:value={messageContent} on:keydown={handleKeydown}></textarea>
 	<button class="send-button" on:click={sendMessage} disabled={!messageContent.trim()}>
 		Send
@@ -177,6 +177,7 @@
 		width: 100%;
 		padding: 10px;
 		background-color: var(--yellow-neutral);
+		border-radius: 2px;
 	}
 
 	.conversation-dropdown {
@@ -221,6 +222,7 @@
 		background-color: var(--yellow-neutral);
 		display: flex;
 		align-items: center;
+		border-radius: 2px;
 	}
 
 	.textbox {

@@ -31,7 +31,9 @@
 	</div>
 	<div class="flex flex-col gap-1 my-auto">
 		<div class="link-info" style="width: {sidebar_width}px;">
-			<a class="zoom-link" href={meeting.zoomHostLink ?? meeting.zoomJoinLink}>Zoom Link</a>
+			<a class="zoom-link" href={meeting.zoomHostLink ?? meeting.zoomJoinLink} target="_blank"
+				>Zoom Link</a
+			>
 		</div>
 		{#if !meeting.zoomHostLink}
 			<div class="link-info" style="width: {sidebar_width}px;">

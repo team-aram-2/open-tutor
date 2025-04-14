@@ -75,6 +75,8 @@ func (t *OpenTutor) SignUpAsTutor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	currentRoleMask.Add(util.Tutor)
+
 	// Update the user's role in the database
 	_, err = db.GetDB().Exec("UPDATE users SET role_mask = $1 WHERE user_id = $2", currentRoleMask, authInfo.UserID)
 	if err != nil {
