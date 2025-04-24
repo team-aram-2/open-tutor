@@ -32,6 +32,7 @@ export interface TutorItem {
 		email?: string;
 		firstName: string;
 		lastName: string;
+		userId: string;
 	};
 	userId: string;
 	signedUpAt?: string;

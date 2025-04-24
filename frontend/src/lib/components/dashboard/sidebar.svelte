@@ -45,7 +45,7 @@
 <div class="sidebar flex h-screen" style="border-top-right-radius: 25px;" class:collapsed>
 	<!-- Sidebar Title -->
 	<div class="title-container">
-		<h2 class="sidebar-title">Sidebar</h2>
+		<h2 class="sidebar-title">OpenTutor</h2>
 
 		<div class="hamburger">
 			<Hamburger open={collapsed} on:toggle={handleToggle}></Hamburger>

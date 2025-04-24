@@ -99,7 +99,7 @@
 				name="{tutor.info.firstName} {tutor.info.lastName}"
 				rating={5}
 				skills={tutor.skills && tutor.skills.length > 0 ? tutor.skills : ['No skills registered']}
-				userId={tutor.userId}
+				userId={tutor.info.userId}
 				width={String(cardWidth)}
 			></Tutor>
 		{/each}
