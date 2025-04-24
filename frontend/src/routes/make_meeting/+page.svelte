@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { PUBLIC_API_HOST } from '$env/static/public';
-	import { redirect } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 
 	$: studentIdInput = '';
